@@ -2,6 +2,7 @@ package com.blogen.api.v1.controllers;
 
 import com.blogen.api.v1.model.UserDTO;
 import com.blogen.api.v1.services.AuthorizationService;
+import com.blogen.api.v1.services.PostService;
 import com.blogen.api.v1.validators.UserDtoSignupValidator;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,6 +37,9 @@ public class AuthorizationControllerTest {
 
     @MockBean
     AuthorizationService authorizationService;
+
+    @MockBean
+    PostService postService;
 
     @Autowired
     WebApplicationContext webCtx;

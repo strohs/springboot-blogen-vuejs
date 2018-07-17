@@ -2,8 +2,10 @@ package com.blogen.api.v1.controllers;
 
 import com.blogen.api.v1.model.JwtAuthenticationResponse;
 import com.blogen.api.v1.model.LoginRequestDTO;
+import com.blogen.api.v1.model.PostListDTO;
 import com.blogen.api.v1.model.UserDTO;
 import com.blogen.api.v1.services.AuthorizationService;
+import com.blogen.api.v1.services.PostService;
 import com.blogen.api.v1.validators.UserDtoSignupValidator;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -31,12 +33,13 @@ public class AuthorizationController {
 
     private AuthorizationService authorizationService;
     private UserDtoSignupValidator userSignupValidator;
+    private PostService postService;
 
     @Autowired
-    public AuthorizationController( AuthorizationService authorizationService,
-                                    UserDtoSignupValidator userSignupValidator ) {
+    public AuthorizationController( AuthorizationService authorizationService, UserDtoSignupValidator userSignupValidator, PostService postService ) {
         this.authorizationService = authorizationService;
         this.userSignupValidator = userSignupValidator;
+        this.postService = postService;
     }
 
     @InitBinder("userDTO")
@@ -59,5 +62,12 @@ public class AuthorizationController {
         String jwt = authorizationService.authenticateAndLoginUser( loginDTO );
         log.debug( "JWT generated {}",jwt );
         return ResponseEntity.ok( new JwtAuthenticationResponse(jwt) );
+    }
+
+    @ApiOperation( value = "get the latest posts", produces = "application/json")
+    @GetMapping( "/latestPosts" )
+    public PostListDTO latestPosts( @RequestParam( name = "limit", defaultValue = "9") int limit ) {
+        log.debug( "get latest posts limit={}", limit );
+        return postService.getPosts( limit );
     }
 }
