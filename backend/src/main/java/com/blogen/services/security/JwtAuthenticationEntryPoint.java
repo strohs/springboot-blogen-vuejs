@@ -11,9 +11,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * Provides the implementation for AuthenticationEntryPoint commence() method. This method is called whenever
- * an exception is thrown due to an unauthenticated user trying to access a resource that requires authentication.
- * We’ll simply respond with a 401 error saying that the user is not authorized to access the resource.
+ * This method is called whenever an exception is thrown due to an unauthenticated user trying to access a
+ * resource that requires authentication. We’ll simply respond with a 401 error saying that the user is not
+ * authorized to access the resource.
  *
  * Author: Cliff
  */

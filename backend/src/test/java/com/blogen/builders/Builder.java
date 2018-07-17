@@ -1,10 +1,7 @@
 package com.blogen.builders;
 
 import com.blogen.api.v1.model.PostDTO;
-import com.blogen.domain.Category;
-import com.blogen.domain.Post;
-import com.blogen.domain.User;
-import com.blogen.domain.UserPrefs;
+import com.blogen.domain.*;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -28,6 +25,13 @@ public class Builder {
         user.setPassword( password );
         user.setEncryptedPassword( encryptedPassword );
         return user;
+    }
+
+    public static Role buildRole( Long id, String roleName ) {
+        Role role = new Role();
+        role.setId( id );
+        role.setRole( roleName );
+        return role;
     }
 
     public static UserPrefs buildUserPrefs( Long id, String avatarName ) {

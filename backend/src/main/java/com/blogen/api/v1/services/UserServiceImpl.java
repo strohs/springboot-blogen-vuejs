@@ -141,7 +141,7 @@ public class UserServiceImpl implements UserService {
      * @param user
      * @return
      */
-//// Using Mappers NullValueCheckStrategy.ALWAYS instead of this value
+//// NOTE we are now Using MapStruct NullValueCheckStrategy.ALWAYS instead of this value
 //    private User mergeUserDtoToUser( UserDTO dto, User user ) {
 //        if ( dto.getFirstName() != null ) user.setFirstName( dto.getFirstName() );
 //        if ( dto.getLastName() != null ) user.setLastName( dto.getLastName() );

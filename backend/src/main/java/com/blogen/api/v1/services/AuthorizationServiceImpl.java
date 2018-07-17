@@ -3,8 +3,10 @@ package com.blogen.api.v1.services;
 import com.blogen.api.v1.mappers.UserMapper;
 import com.blogen.api.v1.model.LoginRequestDTO;
 import com.blogen.api.v1.model.UserDTO;
+import com.blogen.domain.Role;
 import com.blogen.domain.User;
 import com.blogen.exceptions.BadRequestException;
+import com.blogen.services.RoleService;
 import com.blogen.services.security.EncryptionService;
 import com.blogen.services.security.JwtTokenProvider;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +28,7 @@ import org.springframework.stereotype.Service;
 public class AuthorizationServiceImpl implements AuthorizationService {
 
     private UserService userService;
+    private RoleService roleService;
     private UserMapper userMapper;
     private EncryptionService encryptionService;
     private AuthenticationManager authenticationManager;
@@ -34,24 +37,25 @@ public class AuthorizationServiceImpl implements AuthorizationService {
     private static final String DEFAULT_AVATAR_IMAGE = "avatar0.jpg";
 
     @Autowired
-    public AuthorizationServiceImpl( UserService userService, UserMapper userMapper,
-                                     EncryptionService encryptionService, AuthenticationManager authenticationManager,
-                                     JwtTokenProvider tokenProvider ) {
+    public AuthorizationServiceImpl( UserService userService, RoleService roleService,
+                                     UserMapper userMapper, EncryptionService encryptionService,
+                                     AuthenticationManager authenticationManager, JwtTokenProvider tokenProvider ) {
         this.userService = userService;
+        this.roleService = roleService;
         this.userMapper = userMapper;
         this.encryptionService = encryptionService;
         this.authenticationManager = authenticationManager;
         this.tokenProvider = tokenProvider;
     }
-
-    
     
     @Override
     public UserDTO signUpUser( UserDTO userDTO ) {
         //required fields validated in controller
         if (userDTO.getAvatarImage() == null ) userDTO.setAvatarImage( DEFAULT_AVATAR_IMAGE );
+        Role userRole = roleService.getByName( "USER" );
         User user = userMapper.userDtoToUser( userDTO );
         user.setEncryptedPassword( encryptionService.encrypt( user.getPassword() ) );
+        user.addRole( userRole );
         User savedUser;
         try {
             savedUser = userService.saveUser( user );
@@ -74,7 +78,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
             //if username and password are authenticated, generate and return a JSON Web Token
             jwt = tokenProvider.generateToken( auth );
         } catch (BadCredentialsException bce ) {
-            throw new BadCredentialsException( String.format( "bad request username=%s password=%s", loginDTO.getUsername(), loginDTO.getPassword() ) );
+            throw new BadCredentialsException( "bad username or password" );
         }
         return jwt;
     }
