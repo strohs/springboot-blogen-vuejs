@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 /**
@@ -59,6 +60,7 @@ public class AuthorizationController {
     @PostMapping( "/login" )
     public ResponseEntity<?> login( @RequestBody @Valid LoginRequestDTO loginDTO ) {
         log.debug( "login user loginDTO {}",loginDTO );
+        //log.debug( "request body->{}", );
         String jwt = authorizationService.authenticateAndLoginUser( loginDTO );
         log.debug( "JWT generated {}",jwt );
         return ResponseEntity.ok( new JwtAuthenticationResponse(jwt) );

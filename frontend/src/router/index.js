@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import SplashPage from '@/components/SplashPage'
+import Home from '@/components/Home'
+import Login from '@/components/Login'
 
 Vue.use(Router)
 
@@ -8,8 +9,13 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'SplashPage',
-      component: SplashPage
+      name: 'home',
+      component: Home
+    },
+    {
+      path: '/login',
+      name: 'login',
+      component: Login
     }
   ],
   mode: 'history'

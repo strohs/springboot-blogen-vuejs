@@ -17,8 +17,8 @@
     <section id="main-header" class="bg-secondary text-white">
       <div class="container">
         <div class="row">
-          <div class="col-md text-md-center">
-            <h4><i class="fa fa-leaf"></i> Latest Blogens</h4>
+          <div class="col-md text-md-left">
+            <h4><icon name="keyboard" scale="2"></icon> Latest Blogens:</h4>
           </div>
         </div>
       </div>
@@ -35,7 +35,7 @@
   import PostCards from './PostCards'
 
   export default {
-    name: 'splashPage',
+    name: 'home',
     data () {
       return {
         msg: ''
