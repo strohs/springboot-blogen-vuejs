@@ -1,5 +1,6 @@
 package com.blogen.api.v1.services;
 
+import com.blogen.api.v1.model.JwtAuthenticationResponse;
 import com.blogen.api.v1.model.LoginRequestDTO;
 import com.blogen.api.v1.model.UserDTO;
 
@@ -21,5 +22,5 @@ public interface AuthorizationService {
      * @param loginRequestDTO
      * @return a String representation of the authenticated user's JSON Web Token
      */
-    String authenticateAndLoginUser( LoginRequestDTO loginRequestDTO );
+    JwtAuthenticationResponse authenticateAndLoginUser( LoginRequestDTO loginRequestDTO );
 }

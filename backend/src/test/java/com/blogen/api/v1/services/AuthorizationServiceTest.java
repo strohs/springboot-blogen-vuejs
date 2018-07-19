@@ -18,6 +18,8 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AuthenticationManager;
 
+import java.util.Arrays;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.*;
@@ -111,6 +113,7 @@ public class AuthorizationServiceTest {
                 .lastName( "Smith" )
                 .email( "jsmith@gmail.com" )
                 .userName( "johnsmith" )
+                .roles( Arrays.asList("USER") )
                 .password( "secret" )
                 .build();
     }

@@ -5,19 +5,34 @@ Vue.use(Vuex)
 
 export const store = new Vuex.Store({
   state: {
-    AUTH_TOKEN: ''
+    AUTH_TOKEN: '',
+    user: {
+      roles: []
+    }
   },
   getters: {
     getAuthToken: state => {
       return state.AUTH_TOKEN
     },
+    getUserRoles: state => {
+      return state.user.roles
+    },
+    getUser: state => {
+      return state.user
+    },
     isAuthenticated: state => {
       return state.AUTH_TOKEN.length > 0
+    },
+    isAdmin: state => {
+      return state.user.roles.includes('ADMIN')
     }
   },
   mutations: {
     'SET_AUTH_TOKEN' (state, token) {
       state.AUTH_TOKEN = token
+    },
+    'SET_USER' (state, userObj) {
+      state.user = userObj
     }
   }
 })

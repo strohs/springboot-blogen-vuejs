@@ -61,9 +61,9 @@ public class AuthorizationController {
     public ResponseEntity<?> login( @RequestBody @Valid LoginRequestDTO loginDTO ) {
         log.debug( "login user loginDTO {}",loginDTO );
         //log.debug( "request body->{}", );
-        String jwt = authorizationService.authenticateAndLoginUser( loginDTO );
-        log.debug( "JWT generated {}",jwt );
-        return ResponseEntity.ok( new JwtAuthenticationResponse(jwt) );
+        JwtAuthenticationResponse authResponse = authorizationService.authenticateAndLoginUser( loginDTO );
+        log.debug( "JWTAuthResponse {}", authResponse );
+        return ResponseEntity.ok( authResponse );
     }
 
     @ApiOperation( value = "get the latest posts", produces = "application/json")

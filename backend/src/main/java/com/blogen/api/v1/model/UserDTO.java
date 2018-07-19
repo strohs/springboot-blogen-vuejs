@@ -1,10 +1,9 @@
 package com.blogen.api.v1.model;
 
 import io.swagger.annotations.ApiModelProperty;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
+import java.util.List;
 
 /**
  * Data Transfer Object for {@link com.blogen.domain.User}
@@ -37,6 +36,9 @@ public class UserDTO {
 
     @ApiModelProperty(value = "users avatar image file name", example="avatar43.jpg")
     private String avatarImage;
+
+    @ApiModelProperty(value = "the roles this user has within the website", readOnly = true, example = "USER,ADMIN")
+    private List<String> roles;
 
     @ApiModelProperty(value = "url that identifies this user", readOnly = true, example = "/api/v1/users/23")
     private String userUrl;

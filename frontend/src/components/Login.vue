@@ -65,7 +65,9 @@
             // if we get an access token, save in in the store and set the authorization header in axios
             if (res.data.accessToken) {
               console.log('access token:', res.data.accessToken)
+              console.log('user:', res.data.user)
               this.$store.commit('SET_AUTH_TOKEN', res.data.accessToken)
+              this.$store.commit('SET_USER', res.data.user)
               axios.defaults.headers.common['Authorization'] = 'Bearer ' + res.data.accessToken
             } else {
               console.log('expected an access token but none was sent')

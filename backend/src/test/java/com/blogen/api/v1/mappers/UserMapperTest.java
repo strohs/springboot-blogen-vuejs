@@ -5,6 +5,9 @@ import com.blogen.domain.User;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Arrays;
+import java.util.List;
+
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
@@ -57,7 +60,8 @@ public class UserMapperTest {
     @Test
     public void userDtoToUser() {
         //given
-        UserDTO userDTO = new UserDTO( ID, FIRSTNAME,LASTNAME,USERNAME,EMAIL,PASSWORD,AVATAR_IMAGE, null );
+        List<String> roles = Arrays.asList("USER","ADMIN");
+        UserDTO userDTO = new UserDTO( ID, FIRSTNAME,LASTNAME,USERNAME,EMAIL,PASSWORD,AVATAR_IMAGE, roles,  null );
 
         //when
         User user = userMapper.userDtoToUser( userDTO );
@@ -74,8 +78,8 @@ public class UserMapperTest {
     @Test
     public void userDtoToUser_withNullId_shouldSetUserIdToNull() {
         //given
-        UserDTO userDTO = new UserDTO( null,FIRSTNAME,LASTNAME,USERNAME,EMAIL,PASSWORD,AVATAR_IMAGE,null );
-        
+        List<String> roles = Arrays.asList("USER","ADMIN");
+        UserDTO userDTO = new UserDTO( null,FIRSTNAME,LASTNAME,USERNAME,EMAIL,PASSWORD,AVATAR_IMAGE, roles,null );
 
         //when
         User user = userMapper.userDtoToUser( userDTO );

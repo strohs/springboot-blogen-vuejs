@@ -54,10 +54,10 @@ public class UserControllerTest {
 
     @Before
     public void setUp() throws Exception {
-        userDTO1 = new UserDTO( 1L, "jane", "smith","janey","js@zombo.com","secret","avatar1.jpg", UserController.BASE_URL + "/1" );
-        userDTO2 = new UserDTO( 2L,"fozzy", "zoeller","shelly","foz@gmail.com","secret","avatar2.jpg", UserController.BASE_URL + "/2" );
-        newUserDTO = new UserDTO( 3L,"new","user","noob","nooblet@hotmail.com","secret","avatar1.jpg",null );
-        updateUserDTO1 = new UserDTO( 3L,"Joan","Crawford",null,"craw@hotmail.com","newsecret","avatar1.jpg",null );
+        userDTO1 = new UserDTO( 1L, "jane", "smith","janey","js@zombo.com","secret","avatar1.jpg",null, UserController.BASE_URL + "/1" );
+        userDTO2 = new UserDTO( 2L,"fozzy", "zoeller","shelly","foz@gmail.com","secret","avatar2.jpg", null, UserController.BASE_URL + "/2" );
+        newUserDTO = new UserDTO( 3L,"new","user","noob","nooblet@hotmail.com","secret","avatar1.jpg", null, null );
+        updateUserDTO1 = new UserDTO( 3L,"Joan","Crawford",null,"craw@hotmail.com","newsecret","avatar1.jpg", null,null );
 
     }
 

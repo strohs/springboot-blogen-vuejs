@@ -50,6 +50,7 @@ public class UserServiceImplTest {
     String newUserUrl;
     User updatedUser1;
     UserDTO newUserDTO;
+    List<String> roles = Arrays.asList( "USER" );
 
     @Before
     public void setUp() throws Exception {
@@ -60,7 +61,7 @@ public class UserServiceImplTest {
         user1Url = UserController.BASE_URL + "/1";
         user2 = Builder.buildUser( 2L, "mgill", "Maggy","McGill", "mags@hotmail.com","","123abc");
         user2Url = UserController.BASE_URL + "/2";
-        newUserDTO = new UserDTO( 3L,"new","user","newuser","newby@zing.org","password","avatar1.jpg",null );
+        newUserDTO = new UserDTO( 3L,"new","user","newuser","newby@zing.org","password","avatar1.jpg",roles,null );
         newUser = Builder.buildUser( 3L, "newuser","new","user","newby@zing.com",null ,"123abc");
         newUserUrl = UserController.BASE_URL + "/3";
     }
@@ -130,6 +131,7 @@ public class UserServiceImplTest {
     @Test
     public void should_updateFirstName_when_updateUser() {
         newUserDTO = new UserDTO();
+        newUserDTO.setRoles( roles );
         newUserDTO.setFirstName( "NewFirstName" );
         updatedUser1.setFirstName( "NewFirstName" );
         
