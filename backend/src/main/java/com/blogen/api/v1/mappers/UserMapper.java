@@ -25,6 +25,7 @@ public interface UserMapper {
     UserMapper INSTANCE = Mappers.getMapper( UserMapper.class );
 
     @Mapping( target = "avatarImage", source = "userPrefs.avatarImage")
+    @Mapping( target = "userUrl", expression = "java(com.blogen.api.v1.services.UserService.buildUserUrl(user))")
     UserDTO userToUserDto( User user );
 
     @Mapping( target = "userPrefs.avatarImage", source = "avatarImage")

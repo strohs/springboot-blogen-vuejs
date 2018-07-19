@@ -71,7 +71,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
             throw new BadRequestException( "user with userName=" + userDTO.getUserName() + " already exists" );
         }
         UserDTO returnDto = userMapper.userToUserDto( savedUser );
-        returnDto.setUserUrl( userService.buildUserUrl( savedUser ) );
+        returnDto.setUserUrl( UserService.buildUserUrl( savedUser ) );
         return returnDto;
     }
 

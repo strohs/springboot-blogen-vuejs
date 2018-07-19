@@ -1,5 +1,6 @@
 package com.blogen.api.v1.services;
 
+import com.blogen.api.v1.controllers.UserController;
 import com.blogen.api.v1.mappers.UserMapper;
 import com.blogen.api.v1.model.UserDTO;
 import com.blogen.api.v1.model.UserListDTO;
@@ -46,7 +47,7 @@ public class UserServiceImpl implements UserService {
                 .stream()
                 .map( user -> {
                     UserDTO dto = userMapper.userToUserDto( user );
-                    dto.setUserUrl( buildUserUrl( user ) );
+                    dto.setUserUrl( UserService.buildUserUrl( user ) );
                     return dto;
                 } ).collect( Collectors.toList());
         return new UserListDTO( userDTOS );
@@ -56,7 +57,7 @@ public class UserServiceImpl implements UserService {
     public UserDTO getUser( Long id ) {
         User user = validateUserId( id );
         UserDTO userDTO = userMapper.userToUserDto( user );
-        userDTO.setUserUrl( buildUserUrl( user ) );
+        userDTO.setUserUrl( UserService.buildUserUrl( user ) );
         return userDTO;
     }
 
@@ -72,7 +73,7 @@ public class UserServiceImpl implements UserService {
         user = checkAndEncryptPassword( user );
         User savedUser = userRepository.save( user );
         UserDTO returnDto = userMapper.userToUserDto( savedUser );
-        returnDto.setUserUrl( buildUserUrl( savedUser ) );
+        returnDto.setUserUrl( UserService.buildUserUrl( savedUser ) );
         return returnDto;
     }
 
@@ -97,6 +98,7 @@ public class UserServiceImpl implements UserService {
         user = checkAndEncryptPassword( user );
         return userRepository.save( user );
     }
+
 
     /**
      * encrypts the user password if it was set on the User object

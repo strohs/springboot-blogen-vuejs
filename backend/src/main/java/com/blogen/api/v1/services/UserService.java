@@ -24,15 +24,16 @@ public interface UserService {
 
     User saveUser( User user );
 
-    //delete user not supported in this version
-
     /**
      * build the userUrl that gets returned with every response DTO
      * @param user
      * @return
      */
-    default String buildUserUrl( User user ) {
+    static String buildUserUrl( User user ) {
         return UserController.BASE_URL + "/" + user.getId();
     }
+
+    //delete user not supported in this version
+
 
 }

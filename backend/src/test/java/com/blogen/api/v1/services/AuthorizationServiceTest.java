@@ -72,14 +72,12 @@ public class AuthorizationServiceTest {
         given( userService.saveUser( any( User.class ) )).willReturn( savedUser );
         given( roleService.getByName( anyString() )).willReturn( userRole );
         given( encryptionService.encrypt( anyString() ) ).willReturn( "{bcrypt}dfdf34343" );
-        given( userService.buildUserUrl( any(User.class) )).willReturn( UserController.BASE_URL + "/" + newId );
 
         UserDTO newUser = authorizationService.signUpUser( validDTO );
 
         then( userService ).should().saveUser( any( User.class) );
         then( roleService ).should().getByName( anyString() );
         then( encryptionService ).should().encrypt( anyString() );
-        then( userService ).should().buildUserUrl( any(User.class) );
         assertThat( newUser, is( notNullValue()) );
         assertThat( newUser.getUserUrl(), is( savedDTO.getUserUrl()) );
     }
