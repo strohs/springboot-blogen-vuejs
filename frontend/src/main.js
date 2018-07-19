@@ -9,6 +9,7 @@ import Icon from 'vue-awesome/components/Icon'
 import 'vue-awesome/icons/user-circle'
 import 'vue-awesome/icons/user-cog'
 import 'vue-awesome/icons/user-times'
+import 'vue-awesome/icons/user-plus'
 import 'vue-awesome/icons/question-circle'
 import 'vue-awesome/icons/keyboard'
 

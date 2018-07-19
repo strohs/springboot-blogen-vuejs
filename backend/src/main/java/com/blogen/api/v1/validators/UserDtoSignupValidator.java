@@ -30,6 +30,7 @@ public class UserDtoSignupValidator implements Validator {
         ValidationUtils.rejectIfEmptyOrWhitespace( errors, "email","required.email","email is a required field but was null or empty" );
         ValidationUtils.rejectIfEmptyOrWhitespace( errors, "password","required.password","password is a required field but was null or empty" );
 
+        //TODO Validate Avatar Image names
 
     }
 }

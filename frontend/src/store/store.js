@@ -7,6 +7,11 @@ export const store = new Vuex.Store({
   state: {
     AUTH_TOKEN: '',
     user: {
+      id: 0,
+      firstName: '',
+      lastName: '',
+      userName: '',
+      email: '',
       roles: []
     }
   },
@@ -33,6 +38,13 @@ export const store = new Vuex.Store({
     },
     'SET_USER' (state, userObj) {
       state.user = userObj
+    }
+  },
+  actions: {
+    saveUserProfile: ({commit}) => {
+      // save user profile changes to db
+      // axios.put...
+      // commit('SET_USER', savedUser );
     }
   }
 })

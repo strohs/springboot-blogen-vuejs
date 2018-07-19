@@ -13,7 +13,7 @@ public interface RoleService {
 
     Role getById( Long id );
 
-    Role getByName( String roleName );
+    Role getByName( String role );
 
     Role saveOrUpdate( Role role );
 

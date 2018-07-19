@@ -36,7 +36,6 @@ public class JwtTokenProvider {
     }
 
     public String generateToken( Authentication authentication ) {
-        //TODO check this and make sure UserDetails is actually returned
         UserDetails userPrincipal = ( UserDetails ) authentication.getPrincipal();
         //get user details
         User user = userRepository.findByUserName( userPrincipal.getUsername() );

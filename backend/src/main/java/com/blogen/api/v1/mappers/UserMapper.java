@@ -26,6 +26,7 @@ public interface UserMapper {
 
     @Mapping( target = "avatarImage", source = "userPrefs.avatarImage")
     @Mapping( target = "userUrl", expression = "java(com.blogen.api.v1.services.UserService.buildUserUrl(user))")
+    @Mapping( target = "password", ignore = true)
     UserDTO userToUserDto( User user );
 
     @Mapping( target = "userPrefs.avatarImage", source = "avatarImage")
@@ -36,16 +37,20 @@ public interface UserMapper {
 
     default List<String> asStrings( List<Role> roles) {
         List<String> strings = new ArrayList<>();
-        roles.forEach( role -> strings.add( role.getRole()) );
+        if ( roles != null ) {
+            roles.forEach( role -> strings.add( role.getRole()) );
+        }
         return strings;
     }
 
     default List<Role> asRoles(List<String> strings) {
         List<Role> roles = new ArrayList<>();
-        strings.forEach( s -> {
-            Role r = new Role();
-            r.setRole( s );
-        });
+        if ( strings != null ) {
+            strings.forEach( s -> {
+                Role r = new Role();
+                r.setRole( s );
+            });
+        }
         return roles;
     }
 }

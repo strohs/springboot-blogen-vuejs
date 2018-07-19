@@ -8,18 +8,18 @@ import java.util.List;
  * Author: Cliff
  */
 @Data
-public class JwtAuthenticationResponse {
+public class AuthenticationResponse {
 
     private String accessToken;
     private String tokenType = "Bearer";
     // the users role at Blogen, either: 'USER' or 'ADMIN'
     private UserDTO user;
 
-    public JwtAuthenticationResponse(String accessToken) {
+    public AuthenticationResponse( String accessToken) {
         this.accessToken = accessToken;
     }
 
-    public JwtAuthenticationResponse(String accessToken, UserDTO user) {
+    public AuthenticationResponse( String accessToken, UserDTO user) {
         this.accessToken = accessToken;
         this.user = user;
     }

@@ -1,6 +1,6 @@
 <template>
   <!-- Main Splash Page recent posts -->
-  <b-card-group columns class="my-4">
+  <b-card-group columns class="mt-4">
     <app-post-card v-for="post in posts" :key="post.id" v-bind="post"></app-post-card>
   </b-card-group>
 

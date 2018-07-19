@@ -1,7 +1,7 @@
 package com.blogen.api.v1.services;
 
 import com.blogen.api.v1.mappers.UserMapper;
-import com.blogen.api.v1.model.JwtAuthenticationResponse;
+import com.blogen.api.v1.model.AuthenticationResponse;
 import com.blogen.api.v1.model.LoginRequestDTO;
 import com.blogen.api.v1.model.UserDTO;
 import com.blogen.domain.Role;
@@ -17,14 +17,10 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -58,8 +54,9 @@ public class AuthorizationServiceImpl implements AuthorizationService {
     
     @Override
     public UserDTO signUpUser( UserDTO userDTO ) {
+        //TODO check for existing username
         //required fields validated in controller
-        if (userDTO.getAvatarImage() == null ) userDTO.setAvatarImage( DEFAULT_AVATAR_IMAGE );
+        userDTO.setAvatarImage( DEFAULT_AVATAR_IMAGE );
         Role userRole = roleService.getByName( "USER" );
         User user = userMapper.userDtoToUser( userDTO );
         user.setEncryptedPassword( encryptionService.encrypt( user.getPassword() ) );
@@ -71,13 +68,14 @@ public class AuthorizationServiceImpl implements AuthorizationService {
             throw new BadRequestException( "user with userName=" + userDTO.getUserName() + " already exists" );
         }
         UserDTO returnDto = userMapper.userToUserDto( savedUser );
+        //returnDto.setPassword( "" );
         returnDto.setUserUrl( UserService.buildUserUrl( savedUser ) );
         return returnDto;
     }
 
     @Override
-    public JwtAuthenticationResponse authenticateAndLoginUser( LoginRequestDTO loginDTO ) {
-        JwtAuthenticationResponse authResponse;
+    public AuthenticationResponse authenticateAndLoginUser( LoginRequestDTO loginDTO ) {
+        AuthenticationResponse authResponse;
         List<String> roles = new ArrayList<>(); // holds user roles
         try {
             UsernamePasswordAuthenticationToken userPassAuthToken = new UsernamePasswordAuthenticationToken( loginDTO.getUsername(), loginDTO.getPassword() );
@@ -87,7 +85,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
             //if username and password are authenticated, generate and return a JSON Web Token, and the user's details
             User user = userService.findByUserName( loginDTO.getUsername() )
                     .orElseThrow( () -> new BadCredentialsException( "username not found during authentication" ) );
-            authResponse = new JwtAuthenticationResponse( tokenProvider.generateToken( auth ),
+            authResponse = new AuthenticationResponse( tokenProvider.generateToken( auth ),
                     userMapper.userToUserDto( user ) );
         } catch (BadCredentialsException bce ) {
             throw new BadCredentialsException( "bad username or password" );

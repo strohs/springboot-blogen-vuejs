@@ -60,4 +60,12 @@ public class Role {
         user.getRoles().remove(this);
     }
 
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder( "Role{" );
+        sb.append( "id=" ).append( id );
+        sb.append( ", role='" ).append( role ).append( '\'' );
+        sb.append( '}' );
+        return sb.toString();
+    }
 }

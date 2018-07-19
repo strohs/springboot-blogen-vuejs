@@ -1,6 +1,7 @@
 package com.blogen.api.v1.controllers;
 
-import com.blogen.api.v1.model.JwtAuthenticationResponse;
+import com.blogen.annotations.CurrentUser;
+import com.blogen.api.v1.model.AuthenticationResponse;
 import com.blogen.api.v1.model.LoginRequestDTO;
 import com.blogen.api.v1.model.PostListDTO;
 import com.blogen.api.v1.model.UserDTO;
@@ -13,11 +14,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.security.Principal;
 
 /**
  * Controller for handling new-user sign-ups and user log-ins
@@ -61,8 +66,8 @@ public class AuthorizationController {
     public ResponseEntity<?> login( @RequestBody @Valid LoginRequestDTO loginDTO ) {
         log.debug( "login user loginDTO {}",loginDTO );
         //log.debug( "request body->{}", );
-        JwtAuthenticationResponse authResponse = authorizationService.authenticateAndLoginUser( loginDTO );
-        log.debug( "JWTAuthResponse {}", authResponse );
+        AuthenticationResponse authResponse = authorizationService.authenticateAndLoginUser( loginDTO );
+        log.debug( "AuthResponse {}", authResponse );
         return ResponseEntity.ok( authResponse );
     }
 

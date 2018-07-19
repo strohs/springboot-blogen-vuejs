@@ -8,30 +8,30 @@
 
     <b-collapse is-nav id="nav_collapse">
       <b-navbar-nav>
-        <!--TODO only show if authenticated -->
-        <b-nav-item to="/posts" active-class>Posts</b-nav-item>
-        <!--TODO only if authenticated, show posts authenitcated user made -->
-        <b-nav-item to="/users/USERNAME" active-class>My Posts</b-nav-item>
-        <!--TODO show categories if authenticated as Admin -->
-        <b-nav-item to="/categories">Categories</b-nav-item>
+        <b-nav-item to="/posts" active-class v-if="isAuthenticated">Posts</b-nav-item>
+        <b-nav-item to="/users" active-class v-if="isAuthenticated">My Posts</b-nav-item>
+        <b-nav-item to="/categories" active-class v-if="isAuthenticated && isAdmin">Categories</b-nav-item>
       </b-navbar-nav>
 
       <b-navbar-nav class="ml-auto">
-        <b-nav-item-dropdown :text="userName" right>
-          <!--TODO navigate to user profile page -->
+        <b-nav-item-dropdown :text="'Welcome ' + getUser.userName" left v-if="isAuthenticated">
           <b-dropdown-item to="/profile">
             <icon name="user-cog"></icon>
             Profile
           </b-dropdown-item>
         </b-nav-item-dropdown>
 
-        <!--TODO don't show if authenticated -->
-        <b-nav-item to="/login">
+        <b-nav-item to="/signup" v-if="!isAuthenticated">
+          <icon name="user-plus"></icon>
+          Sign-Up
+        </b-nav-item>
+
+        <b-nav-item to="/login" v-if="!isAuthenticated">
           <icon name="user-circle"></icon>
           Login
         </b-nav-item>
-        <!--TODO show if authenticated -->
-        <b-nav-item to="/logout">Logout</b-nav-item>
+
+
       </b-navbar-nav>
     </b-collapse>
 
@@ -41,12 +41,16 @@
 </template>
 
 <script>
+  import { mapGetters } from 'vuex'
+
   export default {
     name: 'Navbar',
-    data () {
-      return {
-        userName: 'REPLACEME'
-      }
+    computed: {
+      ...mapGetters([
+        'isAuthenticated',
+        'isAdmin',
+        'getUser'
+      ])
     }
   }
 </script>
