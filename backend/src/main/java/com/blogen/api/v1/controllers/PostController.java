@@ -5,19 +5,15 @@ import com.blogen.api.v1.model.PostListDTO;
 import com.blogen.api.v1.model.PostRequestDTO;
 import com.blogen.api.v1.services.PostService;
 import com.blogen.api.v1.validators.PostRequestDtoValidator;
-import com.blogen.services.security.UserDetailsImpl;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.security.Principal;
 
 /**
  * REST Controller for working with {@link com.blogen.domain.Post}
@@ -41,7 +37,7 @@ public class PostController {
         this.postRequestDtoValidator = postRequestDtoValidator;
     }
 
-    @InitBinder("postDTO")
+    @InitBinder("postRequestDTO")
     public void setupBinder( WebDataBinder binder ) {
         binder.addValidators( postRequestDtoValidator );
     }
@@ -78,37 +74,33 @@ public class PostController {
     @ApiOperation( value = "create a new parent post", consumes = "application/json", produces = "application/json")
     @PostMapping
     @ResponseStatus( HttpStatus.CREATED )
-    public PostDTO createPost( @Valid @RequestBody PostRequestDTO dto, @AuthenticationPrincipal UserDetailsImpl principal ) {
+    public PostDTO createPost( @Valid @RequestBody PostRequestDTO dto ) {
         log.debug( "createPost: " + dto );
-        String userName = principal.getUsername();
-        log.debug( "principal name:" + principal );
-        return postService.createNewPost( dto, userName );
+        return postService.createNewPost( dto );
     }
 
     @ApiOperation( value = "create a new child post", consumes = "application/json", produces = "application/json")
     @PostMapping( "/{id}")
     @ResponseStatus( HttpStatus.CREATED )
-    public PostDTO createChildPost( @PathVariable("id") Long parentId, @Valid @RequestBody PostRequestDTO dto, Principal principal ) {
-        log.debug( "createChildPost id=" + parentId + "\n" + dto );
-        String userName = principal.getName();
-        log.debug( "principal name:" + userName );
-        return postService.createNewChildPost( parentId, dto, userName );
+    public PostDTO createChildPost( @PathVariable("id") Long parentId, @Valid @RequestBody PostRequestDTO postRequestDTO ) {
+        log.debug( "createChildPost id=" + parentId + "\n" + postRequestDTO );
+        return postService.createNewChildPost( parentId, postRequestDTO );
     }
 
     @ApiOperation( value = "replace an existing post with a new post data", consumes = "application/json", produces = "application/json")
     @PutMapping( "/{id}" )
     @ResponseStatus( HttpStatus.OK )
-    public PostDTO updatePost( @PathVariable("id") Long id, @Valid @RequestBody PostRequestDTO dto, Principal principal ) {
-        log.debug( "updatePost id=" + id + " postDTO:\n" + dto );
-        return postService.saveUpdatePost( id, dto );
+    public PostDTO updatePost( @PathVariable("id") Long id, @Valid @RequestBody PostRequestDTO postRequestDTO ) {
+        log.debug( "updatePost id=" + id + " postDTO:\n" + postRequestDTO );
+        return postService.saveUpdatePost( id, postRequestDTO );
     }
 
     @ApiOperation( value = "update field(s) of an existing post", consumes = "application/json", produces = "application/json")
     @PatchMapping( "/{id}" )
     @ResponseStatus( HttpStatus.OK )
-    public PostDTO patchPost( @PathVariable( "id" ) Long id, @RequestBody PostRequestDTO dto ) {
-        log.debug( "patchPost id=" + id + "\n" + dto );
-        return postService.saveUpdatePost( id, dto );
+    public PostDTO patchPost( @PathVariable( "id" ) Long id, @RequestBody PostRequestDTO postRequestDTO ) {
+        log.debug( "patchPost id=" + id + "\n" + postRequestDTO );
+        return postService.saveUpdatePost( id, postRequestDTO );
     }
 
     @ApiOperation( value = "delete a post" )

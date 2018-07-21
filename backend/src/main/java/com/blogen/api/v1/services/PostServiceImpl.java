@@ -15,6 +15,8 @@ import com.blogen.exceptions.NotFoundException;
 import com.blogen.repositories.CategoryRepository;
 import com.blogen.repositories.PostRepository;
 import com.blogen.repositories.UserRepository;
+import com.blogen.services.PrincipalService;
+import com.blogen.services.security.UserDetailsImpl;
 import com.blogen.services.utils.PageRequestBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.weaver.ast.Not;
@@ -22,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,17 +48,20 @@ public class PostServiceImpl implements PostService {
     private UserRepository userRepository;
     private PostMapper postMapper;
     private PostRequestMapper postRequestMapper;
+    private PrincipalService principalService;
+
 
     @Autowired
     public PostServiceImpl( PageRequestBuilder pageRequestBuilder, PostRepository postRepository,
                             CategoryRepository categoryRepository, UserRepository userRepository, PostMapper postMapper,
-                            PostRequestMapper postRequestMapper) {
+                            PostRequestMapper postRequestMapper, PrincipalService principalService ) {
         this.pageRequestBuilder = pageRequestBuilder;
         this.postRepository = postRepository;
         this.categoryRepository = categoryRepository;
         this.userRepository = userRepository;
         this.postMapper = postMapper;
         this.postRequestMapper = postRequestMapper;
+        this.principalService = principalService;
     }
 
     @Override
@@ -129,20 +135,20 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional
     //creates a new Parent Post
-    public PostDTO createNewPost( PostRequestDTO postDTO, String userName ) {
-        Post post = buildNewPost( postDTO, userName );
+    public PostDTO createNewPost( PostRequestDTO postDTO ) {
+        Post post = buildNewPost( postDTO  );
         Post savedPost = postRepository.save( post );
         return buildReturnDto( savedPost );
     }
 
     @Override
     @Transactional
-    public PostDTO createNewChildPost( Long parentId, PostRequestDTO requestDTO, String userName ) {
+    public PostDTO createNewChildPost( Long parentId, PostRequestDTO requestDTO ) {
         Post parentPost = postRepository.findById( parentId ).orElseThrow( () ->
                 new BadRequestException( "Post with id " + parentId + " was not found" ) );
         if ( !parentPost.isParentPost() )
             throw new BadRequestException( "Post with id: " + parentId + " is a child post. Cannot create a new child post onto an existing child post" );
-        Post childPost = buildNewPost( requestDTO, userName );
+        Post childPost = buildNewPost( requestDTO  );
         parentPost.addChild( childPost );
         Post savedPost = postRepository.saveAndFlush( parentPost );
         return buildReturnDto( savedPost );
@@ -199,7 +205,9 @@ public class PostServiceImpl implements PostService {
      * @param requestDTO
      * @return
      */
-    private Post buildNewPost( PostRequestDTO requestDTO, String userName ) {
+    private Post buildNewPost( PostRequestDTO requestDTO ) {
+        // get the currently authenticated userName
+        String userName = principalService.getPrincipalUserName();
         Post post = postRequestMapper.postRequestDtoToPost( requestDTO );
         post.setCreated( LocalDateTime.now() );
         Category category = categoryRepository.findById( requestDTO.getCategoryId() )

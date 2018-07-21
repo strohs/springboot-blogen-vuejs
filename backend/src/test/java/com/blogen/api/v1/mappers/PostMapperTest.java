@@ -9,6 +9,8 @@ import com.blogen.domain.Post;
 import com.blogen.domain.User;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -19,6 +21,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 
 /**
  * Unit Test for MapStruct mapping between Post and PostDTO
@@ -54,13 +58,13 @@ public class PostMapperTest {
     private static final LocalDateTime CHILD1_POST_CREATED = LocalDateTime.of( 2017,1,1,10,15,15 );
     private static final String  CHILD1_POST_CREATED_FORMAT = "Sun Jan 01, 2017 10:15 AM";
 
-
     private PostMapper postMapper = PostMapper.INSTANCE;
 
     private Post parent;
 
     @Before
     public void setUp() throws Exception {
+
         Category cat1 = new Category();
         cat1.setId( CAT1_ID );
         cat1.setName( CAT1_NAME );

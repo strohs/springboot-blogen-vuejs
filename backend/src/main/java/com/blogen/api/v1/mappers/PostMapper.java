@@ -1,7 +1,11 @@
 package com.blogen.api.v1.mappers;
 
+import com.blogen.api.v1.model.CategoryDTO;
 import com.blogen.api.v1.model.PostDTO;
+import com.blogen.api.v1.model.PostUserDTO;
+import com.blogen.domain.Category;
 import com.blogen.domain.Post;
+import com.blogen.domain.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -12,7 +16,8 @@ import org.mapstruct.factory.Mappers;
  *
  * @author Cliff
  */
-@Mapper(uses = {CategoryMapper.class, PostUserMapper.class} )
+//@Mapper(uses = {CategoryMapper.class, PostUserMapper.class} )
+@Mapper
 public interface PostMapper {
 
     PostMapper INSTANCE = Mappers.getMapper( PostMapper.class );
@@ -23,6 +28,14 @@ public interface PostMapper {
 
     //@Mapping( target = "user.userName", source = "userName")
     Post postDtoToPost( PostDTO postDTO );
+
+    @Mapping( target = "categoryUrl", expression = "java(com.blogen.api.v1.services.CategoryService.buildCategoryUrl(category))")
+    CategoryDTO categoryToCategoryDto( Category category );
+    Category categoryDtoToCategory( CategoryDTO categoryDTO );
+
+    @Mapping( target = "userUrl", expression = "java(com.blogen.api.v1.services.UserService.buildUserUrl(user))")
+    PostUserDTO userToPostUserDto( User user );
+    User postUserDtoToUser( PostUserDTO postUserDTO );
 
     //@Mapping( target = "user.userName", source = "userName")
     //null fields in postDTO will set corresponding Post fields to null

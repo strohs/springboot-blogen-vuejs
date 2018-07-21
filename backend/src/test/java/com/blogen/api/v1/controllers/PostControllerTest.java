@@ -1,6 +1,5 @@
 package com.blogen.api.v1.controllers;
 
-import com.blogen.api.v1.mappers.PostRequestMapper;
 import com.blogen.api.v1.model.*;
 import com.blogen.api.v1.services.PostService;
 import com.blogen.api.v1.validators.PostRequestDtoValidator;
@@ -14,10 +13,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.context.WebApplicationContext;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -28,7 +25,6 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.*;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -39,7 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @RunWith( SpringRunner.class )
 @WebMvcTest(controllers = {PostController.class}, secure = false)
-@Import( {PostRequestDtoValidator.class} )
+@Import( PostRequestDtoValidator.class )
 public class PostControllerTest {
 
     @MockBean
@@ -127,7 +123,7 @@ public class PostControllerTest {
         postDTO_2.setCreated( null );
         postDTO_2.setChildren( null );
         postDTO_2.setPostUrl( null );
-        given( postService.createNewPost( any(PostRequestDTO.class), anyString() )).willReturn( postDTO_2 );
+        given( postService.createNewPost( any(PostRequestDTO.class) )).willReturn( postDTO_2 );
 
         mockMvc.perform( post( PostController.BASE_URL)
                 .contentType( MediaType.APPLICATION_JSON )
@@ -141,7 +137,7 @@ public class PostControllerTest {
         //"2018-01-30T12:39:53.798"
         //category ID is required
         requestDTO.setCategoryId( null );
-        given( postService.createNewPost( any(PostRequestDTO.class), anyString() )).willReturn( postDTO_2 );
+        given( postService.createNewPost( any(PostRequestDTO.class) )).willReturn( postDTO_2 );
 
         mockMvc.perform( post( PostController.BASE_URL)
                 .contentType( MediaType.APPLICATION_JSON )
@@ -150,12 +146,12 @@ public class PostControllerTest {
     }
 
     @Test
-    public void should_returnCREATED_when_createNewChildPost_requestBodyContainsValidPostDTO() throws Exception {
+    public void should_return_CREATED_when_createNewChildPost_requestBodyContainsValidPostDTO() throws Exception {
         childDTO_1.setCreated( null );
         childDTO_1.setPostUrl( null );
         childDTO_1.setParentPostUrl( null );
 
-        given( postService.createNewChildPost( anyLong(), any(PostRequestDTO.class), anyString() )).willReturn( childDTO_1 );
+        given( postService.createNewChildPost( anyLong(), any(PostRequestDTO.class) )).willReturn( childDTO_1 );
 
         mockMvc.perform( post( PostController.BASE_URL + "/1")
                 .contentType( MediaType.APPLICATION_JSON )
@@ -170,7 +166,7 @@ public class PostControllerTest {
         childDTO_1.getCategory().setId( null );
         requestDTO.setText( null );
 
-        given( postService.createNewChildPost( anyLong(), any(PostRequestDTO.class), anyString() )).willReturn( childDTO_1 );
+        given( postService.createNewChildPost( anyLong(), any(PostRequestDTO.class) )).willReturn( childDTO_1 );
 
         mockMvc.perform( post( PostController.BASE_URL + "/1")
                 .contentType( MediaType.APPLICATION_JSON )
@@ -183,7 +179,7 @@ public class PostControllerTest {
         //text is a required field
         requestDTO.setText( "" );
 
-        given( postService.createNewChildPost( anyLong(), any(PostRequestDTO.class), anyString() )).willReturn( childDTO_1 );
+        given( postService.createNewChildPost( anyLong(), any(PostRequestDTO.class) )).willReturn( childDTO_1 );
 
         mockMvc.perform( post( PostController.BASE_URL + "/1" )
                 .contentType( MediaType.APPLICATION_JSON )

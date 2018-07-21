@@ -59,18 +59,16 @@ public interface PostService {
      * Creates a new Parent Post. Any PostDTO.children sent will be ignored.
      *
      * @param requestDTO contains post data to create.
-     * @param userName userName of the user that this post should be created for
      * @return a {@link PostDTO} representing the newly created post
      */
-    PostDTO createNewPost( PostRequestDTO requestDTO, String userName );
+    PostDTO createNewPost( PostRequestDTO requestDTO );
 
     /**
      * Creates a new child post. The child post will be associated with the Parent Post represented by the parentId
      * @param parentId id of the parent post, under which this child will be created
-     * @param userName userName of the user that this post should be created for
      * @return a {@link PostDTO} representing the newly created child post
      */
-    PostDTO createNewChildPost( Long parentId, PostRequestDTO requestDTO, String userName );
+    PostDTO createNewChildPost( Long parentId, PostRequestDTO requestDTO );
 
     /**
      * Saves/updates an existing Post
