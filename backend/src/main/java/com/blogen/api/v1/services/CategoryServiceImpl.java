@@ -44,7 +44,7 @@ public class CategoryServiceImpl implements CategoryService {
                 .stream()
                 .map( category -> {
                     CategoryDTO dto = categoryMapper.categoryToCategoryDto( category );
-                    dto.setCategoryUrl( buildCategoryUrl( category ) );
+                    dto.setCategoryUrl( CategoryService.buildCategoryUrl( category ) );
                     return dto;
                 } ).collect( Collectors.toList());
         return new CategoryListDTO( dtos );
@@ -55,7 +55,7 @@ public class CategoryServiceImpl implements CategoryService {
         Category category = categoryRepository.findById( id ).orElseThrow( () ->
                 new BadRequestException( "category with id: " + id + " does not exist" ) );
         CategoryDTO categoryDTO = categoryMapper.categoryToCategoryDto( category );
-        categoryDTO.setCategoryUrl( buildCategoryUrl( category ) );
+        categoryDTO.setCategoryUrl( CategoryService.buildCategoryUrl( category ) );
         return categoryDTO;
     }
 
@@ -65,13 +65,9 @@ public class CategoryServiceImpl implements CategoryService {
         Category categoryToSave = categoryMapper.categoryDtoToCategory( categoryDTO );
         Category savedCategory = categoryRepository.save( categoryToSave );
         CategoryDTO savedDTO = categoryMapper.categoryToCategoryDto( savedCategory );
-        savedDTO.setCategoryUrl( buildCategoryUrl( savedCategory ) );
+        savedDTO.setCategoryUrl( CategoryService.buildCategoryUrl( savedCategory ) );
         return savedDTO;
     }
 
 
-
-    private String buildCategoryUrl( Category category ) {
-        return CategoryController.BASE_URL + "/" + category.getId();
-    }
 }

@@ -5,11 +5,14 @@ import com.blogen.api.v1.model.PostListDTO;
 import com.blogen.api.v1.model.PostRequestDTO;
 import com.blogen.api.v1.services.PostService;
 import com.blogen.api.v1.validators.PostRequestDtoValidator;
+import com.blogen.services.security.UserDetailsImpl;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
@@ -75,10 +78,10 @@ public class PostController {
     @ApiOperation( value = "create a new parent post", consumes = "application/json", produces = "application/json")
     @PostMapping
     @ResponseStatus( HttpStatus.CREATED )
-    public PostDTO createPost( @Valid @RequestBody PostRequestDTO dto, Principal principal ) {
+    public PostDTO createPost( @Valid @RequestBody PostRequestDTO dto, @AuthenticationPrincipal UserDetailsImpl principal ) {
         log.debug( "createPost: " + dto );
-        String userName = principal.getName();
-        log.debug( "principal name:" + userName );
+        String userName = principal.getUsername();
+        log.debug( "principal name:" + principal );
         return postService.createNewPost( dto, userName );
     }
 

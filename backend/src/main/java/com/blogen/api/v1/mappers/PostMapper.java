@@ -12,7 +12,7 @@ import org.mapstruct.factory.Mappers;
  *
  * @author Cliff
  */
-@Mapper
+@Mapper(uses = {CategoryMapper.class, PostUserMapper.class} )
 public interface PostMapper {
 
     PostMapper INSTANCE = Mappers.getMapper( PostMapper.class );

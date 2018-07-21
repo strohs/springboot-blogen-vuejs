@@ -1,7 +1,9 @@
 package com.blogen.api.v1.services;
 
+import com.blogen.api.v1.controllers.CategoryController;
 import com.blogen.api.v1.model.CategoryDTO;
 import com.blogen.api.v1.model.CategoryListDTO;
+import com.blogen.domain.Category;
 
 /**
  * CategoryService for REST API
@@ -30,4 +32,9 @@ public interface CategoryService {
      * @return a CategoryDTO representing the newly created Category
      */
     CategoryDTO createNewCategory( CategoryDTO categoryDTO );
+
+
+    static String buildCategoryUrl( Category category ) {
+        return CategoryController.BASE_URL + "/" + category.getId();
+    }
 }

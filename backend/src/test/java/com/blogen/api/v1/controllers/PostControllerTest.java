@@ -28,6 +28,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -44,8 +45,8 @@ public class PostControllerTest {
     @MockBean
     PostService postService;
 
-    @Autowired
-    WebApplicationContext webCtx;
+//    @Autowired
+//    WebApplicationContext webCtx;
 
     @Autowired
     MockMvc mockMvc;
@@ -178,7 +179,6 @@ public class PostControllerTest {
     }
 
     @Test
-    @WithMockUser( username = "mgill",password = "password", authorities = {"USER"})
     public void should_returnUNPROCESSABLE_ENTITY_when_requestBodyHas_RequiredFieldThatIsEmpty() throws Exception {
         //text is a required field
         requestDTO.setText( "" );

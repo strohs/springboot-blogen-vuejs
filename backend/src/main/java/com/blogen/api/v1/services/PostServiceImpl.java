@@ -3,6 +3,7 @@ package com.blogen.api.v1.services;
 import com.blogen.api.v1.controllers.PostController;
 import com.blogen.api.v1.mappers.PostMapper;
 import com.blogen.api.v1.mappers.PostRequestMapper;
+import com.blogen.api.v1.model.CategoryDTO;
 import com.blogen.api.v1.model.PostDTO;
 import com.blogen.api.v1.model.PostListDTO;
 import com.blogen.api.v1.model.PostRequestDTO;
