@@ -1,9 +1,11 @@
 package com.blogen.api.v1.services;
 
+import com.blogen.api.v1.controllers.CategoryController;
 import com.blogen.api.v1.controllers.PostController;
+import com.blogen.api.v1.controllers.UserController;
 import com.blogen.api.v1.mappers.PostMapper;
-import com.blogen.api.v1.model.PostDTO;
-import com.blogen.api.v1.model.PostListDTO;
+import com.blogen.api.v1.mappers.PostRequestMapper;
+import com.blogen.api.v1.model.*;
 import com.blogen.builders.Builder;
 import com.blogen.domain.Category;
 import com.blogen.domain.Post;
@@ -57,13 +59,16 @@ public class PostServiceImplTest {
     PageRequestBuilder pageRequestBuilder;
 
     PostMapper postMapper  = PostMapper.INSTANCE;
+    PostRequestMapper postRequestMapper = PostRequestMapper.INSTANCE;
 
     private static final Long   CAT1_ID   = 1L;
     private static final String CAT1_NAME = "Business";
+    private static final String CAT1_URL = CategoryController.BASE_URL + "/" + CAT1_ID;
     private static final Long   CAT2_ID   = 4L;
     private static final String CAT2_NAME = "Tech Gadgets";
     private static final Long   USER_ID   = 1L;
     private static final String USER_NAME = "johnny";
+    private static final String USER_URL = UserController.BASE_URL + "/" + USER_ID;
     private static final Long   USER2_ID   = 122L;
     private static final String USER2_NAME = "maggie";
     private static final Long   POST1_ID = 5L;
@@ -77,6 +82,7 @@ public class PostServiceImplTest {
     private static final Long   CHILD1_ID = 6L;
     private static final String CHILD1_TITLE = "child1 title";
     private static final String CHILD1_TEXT = "child1 text";
+    private static final String POST1_IMAGE_URL = "http://image.to/111";
     private static final String POST1_URL = PostController.BASE_URL + "/" + POST1_ID;
     private static final String CHILD1_POST_URL = PostController.BASE_URL + "/" + CHILD1_ID;
     private static final String CHILD1_PARENT_POST_URL = PostController.BASE_URL + "/" + POST1_ID;
@@ -84,7 +90,13 @@ public class PostServiceImplTest {
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks( this );
-        postService = new PostServiceImpl( pageRequestBuilder, postRepository, categoryRepository, userRepository, postMapper );
+        postService = new PostServiceImpl( pageRequestBuilder, postRepository, categoryRepository, userRepository, postMapper, postRequestMapper );
+    }
+
+    @Test
+    public void should_buildPostUrl_when_givenPostWithID() {
+        Post post = buildPost1();
+        assertThat( postService.buildPostUrl( post ), is( POST1_URL) );
     }
 
     @Test
@@ -201,63 +213,70 @@ public class PostServiceImplTest {
     @Test
     public void should_createNewParentPost() {
         Post post1 = buildPost1();
-        PostDTO dtoToSave = buildPost1DTO();
+        PostRequestDTO dtoToSave = buildPostRequest1DTO();
+        String principalName = USER_NAME;
 
-        given( categoryRepository.findByName( anyString() )).willReturn( post1.getCategory() );
+        given( categoryRepository.findById( anyLong() )).willReturn( Optional.of(post1.getCategory() ));
         given( userRepository.findByUserName( anyString() )).willReturn( post1.getUser() );
         given( postRepository.save( any( Post.class ) )).willReturn( post1 );
 
-        PostDTO postDTO = postService.createNewPost( dtoToSave );
+        PostDTO postDTO = postService.createNewPost( dtoToSave, principalName );
 
-        then( categoryRepository ).should().findByName( anyString() );
+        then( categoryRepository ).should().findById( anyLong() );
         then( userRepository ).should().findByUserName( anyString() );
         then( postRepository ).should().save( any( Post.class ) );
         assertThat( postDTO, is( notNullValue()) );
         assertThat( postDTO.getText(), is( dtoToSave.getText()) );
         assertThat( postDTO.getTitle(), is( dtoToSave.getTitle()) );
-        assertThat( postDTO.getUserName(), is( dtoToSave.getUserName()) );
-        assertThat( postDTO.getCategoryName(), is( dtoToSave.getCategoryName()) );
+        assertThat( postDTO.getUser().getUserName(), is( principalName ) );
+        assertThat( postDTO.getCategory().getId(), is( dtoToSave.getCategoryId() ) );
     }
 
     @Test(expected = BadRequestException.class )
-    public void should_throwBadRequestException_when_postDtoRequestContainsUsernameThatDoesNotExist() {
+    public void should_throwBadRequestException_when_postRequestDtoContainsCategoryIdThatDoesNotExist() {
+        PostRequestDTO requestDTO = buildPostRequest1DTO();
         Post post1 = buildPost1();
-        PostDTO dtoToSave = buildPost1DTO();
-        dtoToSave.setUserName( "BAD_USERNAME" );
+        //categoryID does not exist
+        requestDTO.setCategoryId( 999L );
+        String principalName = USER_NAME;
 
-        given( userRepository.findByUserName( anyString() ) ).willReturn( null );
+        given( categoryRepository.findById( 999L ) ).willReturn( Optional.empty() );
+        given( userRepository.findByUserName( principalName )).willReturn( post1.getUser() );
 
-        PostDTO postDTO = postService.createNewPost( dtoToSave );
+        PostDTO postDTO = postService.createNewPost( requestDTO, principalName );
     }
 
     @Test(expected = BadRequestException.class )
-    public void should_throwBadRequestException_when_postDtoRequestContainsCategoryNameThatDoesNotExist() {
+    public void should_throwBadRequestException_when_principalNameIsNull() {
+        PostRequestDTO requestDTO = buildPostRequest1DTO();
         Post post1 = buildPost1();
-        PostDTO dtoToSave = buildPost1DTO();
-        dtoToSave.setCategoryName( "BAD_CATEGORY" );
+        String principalName = null;
 
-        given( categoryRepository.findByName( anyString() ) ).willReturn( null );
+        given( categoryRepository.findById( anyLong() ) ).willReturn( Optional.of(post1.getCategory()) );
+        given( userRepository.findByUserName( principalName )).willReturn( null );
 
-        PostDTO postDTO = postService.createNewPost( dtoToSave );
+        PostDTO postDTO = postService.createNewPost( requestDTO, principalName );
     }
 
     @Test
     public void should_saveParentAndChild_AndSetURLs_when_createNewChildPost() {
+        PostRequestDTO request1DTO = buildPostRequest1DTO();
         Post post1 = buildPost1();
         Post child1 = buildChild1();
         Post savedPost = buildPost1();
         savedPost.addChild( child1 );
         PostDTO childDTO = buildChild1DTO();
+        String principalName = USER_NAME;
 
-        given( postRepository.findById(anyLong()) ).willReturn( Optional.of( post1 ) );
-        given( categoryRepository.findByName( anyString() )).willReturn( child1.getCategory() );
+        given( postRepository.findById( anyLong()) ).willReturn( Optional.of( post1 ) );
+        given( categoryRepository.findById( anyLong() )).willReturn( Optional.of(child1.getCategory()) );
         given( userRepository.findByUserName( anyString() )).willReturn( child1.getUser() );
         given( postRepository.saveAndFlush( any(Post.class) )).willReturn( savedPost );
 
-        PostDTO savedDTO = postService.createNewChildPost( POST1_ID, childDTO );
+        PostDTO savedDTO = postService.createNewChildPost( POST1_ID, request1DTO, principalName );
 
         then( postRepository ).should().findById(anyLong());
-        then( categoryRepository ).should().findByName( anyString() );
+        then( categoryRepository ).should().findById( anyLong() );
         then( userRepository ).should().findByUserName( anyString() );
         then( postRepository ).should().saveAndFlush( any( Post.class ) );
         assertThat( savedDTO, is( notNullValue() ));
@@ -269,19 +288,18 @@ public class PostServiceImplTest {
 
     @Test(expected = BadRequestException.class)
     public void should_throwException_when_parentPostId_doesNotExist() {
-        Post post1 = buildPost1();
-        Post child1 = buildChild1();
-        Post savedPost = buildPost1();
-        savedPost.addChild( child1 );
-        PostDTO childDTO = buildChild1DTO();
+        PostRequestDTO request1DTO = buildPostRequest1DTO();
+        Long parentID = 45342L;
 
-        given( postRepository.findById(anyLong()) ).willReturn( Optional.empty() );
+        given( postRepository.findById( parentID) ).willReturn( Optional.empty() );
 
-        PostDTO savedDTO = postService.createNewChildPost( 45342L, childDTO );
+        PostDTO savedDTO = postService.createNewChildPost( parentID, request1DTO, USER_NAME );
     }
 
     @Test
     public void should_savePostDTO_when_saveUpdatePost() {
+        PostRequestDTO request1DTO = buildPostRequest1DTO();
+        request1DTO.setTitle( POST2_TITLE );
         Post post = buildPost1();
         Post savedPost = buildPost1();
         savedPost.setTitle( POST2_TITLE );
@@ -290,14 +308,16 @@ public class PostServiceImplTest {
 
         given( postRepository.findById(anyLong()) ).willReturn( Optional.of( post ) );
         given( postRepository.save( any(Post.class) )).willReturn( savedPost );
-        given( categoryRepository.findByName( anyString() )).willReturn( post.getCategory() );
-        given( userRepository.findByUserName( anyString() )).willReturn( post.getUser() );
+        given( categoryRepository.findById( anyLong() )).willReturn( Optional.of( post.getCategory() ));
+        //given( userRepository.findByUserName( anyString() )).willReturn( post.getUser() );
 
-        PostDTO savedDTO = postService.saveUpdatePost( POST1_ID, postDTO );
+        PostDTO savedDTO = postService.saveUpdatePost( POST1_ID, request1DTO );
 
-        then( postRepository ).should().findById(anyLong());
+        then( postRepository ).should().findById( anyLong() );
         then( postRepository).should().save( any( Post.class ) );
-        assertThat( savedDTO.getPostUrl(), is( POST1_URL) );
+        then( categoryRepository ).should().findById( anyLong() );
+        assertThat( savedDTO.getTitle(), is( POST2_TITLE ) );
+        assertThat( savedDTO.getPostUrl(), is( POST1_URL ) );
     }
 
 //    @Test
@@ -338,6 +358,10 @@ public class PostServiceImplTest {
         return post1;
     }
 
+    private PostRequestDTO buildPostRequest1DTO() {
+        return PostRequestDTO.builder().title( POST1_TITLE ).text( POST1_TEXT ).categoryId( CAT1_ID ).imageUrl( POST1_IMAGE_URL ).build();
+    }
+
     private Post buildChild1() {
         Category cat1 = Builder.buildCategory( CAT1_ID, CAT1_NAME );
         User user1 = Builder.buildUser( USER_ID, USER_NAME, null , null,null,null,null  );
@@ -348,9 +372,13 @@ public class PostServiceImplTest {
     }
 
     private PostDTO buildPost1DTO() {
-        return Builder.buildPostDTO( POST1_ID, USER_NAME, POST1_TITLE, POST1_TEXT, null, CAT1_NAME, LocalDateTime.now(), new ArrayList<>() );
+        PostUserDTO postUserDTO = PostUserDTO.builder().id( USER_ID ).userName( USER_NAME ).userUrl( USER_URL ).build();
+        CategoryDTO categoryDTO = CategoryDTO.builder().id( CAT1_ID ).name( CAT1_NAME ).categoryUrl( CAT1_URL ).build();
+        return Builder.buildPostDTO( POST1_ID, postUserDTO, POST1_TITLE, POST1_TEXT, POST1_IMAGE_URL, categoryDTO, LocalDateTime.now(), new ArrayList<>() );
     }
     private PostDTO buildChild1DTO() {
-        return Builder.buildPostDTO( CHILD1_ID, USER_NAME, CHILD1_TITLE, CHILD1_TEXT, null, CAT1_NAME, LocalDateTime.now(), new ArrayList<>() );
+        PostUserDTO postUserDTO = PostUserDTO.builder().id( USER_ID ).userName( USER_NAME ).userUrl( USER_URL ).build();
+        CategoryDTO categoryDTO = CategoryDTO.builder().id( CAT1_ID ).name( CAT1_NAME ).categoryUrl( CAT1_URL ).build();
+        return Builder.buildPostDTO( CHILD1_ID, postUserDTO, CHILD1_TITLE, CHILD1_TEXT, POST1_IMAGE_URL, categoryDTO, LocalDateTime.now(), new ArrayList<>() );
     }
 }

@@ -54,7 +54,7 @@ public class UserMapperTest {
         assertThat( userDTO.getLastName(), equalTo( LASTNAME ) );
         assertThat( userDTO.getUserName(), equalTo( USERNAME ) );
         assertThat( userDTO.getEmail(), equalTo( EMAIL ) );
-        assertThat( userDTO.getPassword(), equalTo( PASSWORD ) );
+        assertThat( userDTO.getPassword(), equalTo( "" ) );
     }
 
     @Test

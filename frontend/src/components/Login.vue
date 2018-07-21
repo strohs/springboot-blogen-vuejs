@@ -4,7 +4,7 @@
     <div class="container">
       <div class="row my-4">
 
-        <div class="col-md-6 mx-auto">
+        <div class="col-md-8 mx-auto">
           <b-card border-variant="primary" no-body>
             <b-card-header>
               <h4><icon name="user-circle" scale="2"></icon> Account Login</h4>
@@ -13,7 +13,7 @@
               <b-alert variant="danger" :show="loginError">
                 Invalid username or password
               </b-alert>
-              <b-alert variant="success" dismissible :show="showMessage" @dismissed="message = ''">
+              <b-alert variant="success" dismissible :show="showStatusMessage" @dismissed="message = ''">
                 {{ message }}
               </b-alert>
 
@@ -46,21 +46,23 @@
 
   export default {
     name: 'Login',
-    props: ['message'],
+    props: {
+      message: String,
+      logout: Boolean
+    },
     data () {
       return {
         login: {
           username: '',
           password: ''
         },
-        loginError: false,
-        loggedOut: false,
-        statusMessage: ''
+        loginError: false
       }
     },
     methods: {
       doLogin (event) {
         event.preventDefault()
+        this.message = ''
         axios.post('/auth/login', this.login)
           .then(res => {
             // if we get an access token, save in in the store and set the authorization header in axios
@@ -81,12 +83,25 @@
             this.loginError = true
           })
       },
-      showMessage () {
+      doLogout () {
+        console.log('DO LOGOUT')
+        this.$store.commit('LOGOUT')
+        this.message = 'You have been logged out'
+      }
+    },
+    computed: {
+      showStatusMessage () {
+        return (this.message != null && this.message.length > 0)
+      },
+      showErrorMessage () {
         return (this.message != null && this.message.length > 0)
       }
     },
     mounted () {
       this.login.username = this.$store.state.user.userName
+      if (this.logout === true) {
+        this.doLogout()
+      }
     }
   }
 </script>

@@ -10,4 +10,8 @@ const logAxiosError = error => {
   }
 }
 
-export {logAxiosError}
+const getGlobalErrors = (errorObj) => {
+  return errorObj
+}
+
+export {logAxiosError, getGlobalErrors}

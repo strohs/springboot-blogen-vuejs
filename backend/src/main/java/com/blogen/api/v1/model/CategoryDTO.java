@@ -2,6 +2,7 @@ package com.blogen.api.v1.model;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -13,6 +14,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class CategoryDTO {
 
     @ApiModelProperty( value = "Category ID", readOnly = true, example = "236")

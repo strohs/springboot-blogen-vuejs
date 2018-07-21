@@ -17,19 +17,16 @@ public interface PostMapper {
 
     PostMapper INSTANCE = Mappers.getMapper( PostMapper.class );
 
-    @Mapping( source = "user.userName", target = "userName")
-    @Mapping( source = "category.name", target = "categoryName")
+    //@Mapping( source = "user.userName", target = "userName")
     //@Mapping( target = "created", dateFormat = "EEE MMM dd, yyyy hh:mm a")
     PostDTO postToPostDto( Post post );
 
-    @Mapping( target = "user.userName", source = "userName")
-    @Mapping( target = "category.name",  source = "categoryName")
+    //@Mapping( target = "user.userName", source = "userName")
     Post postDtoToPost( PostDTO postDTO );
 
-    @Mapping( target = "user.userName", source = "userName")
-    @Mapping( target = "category.name",  source = "categoryName")
+    //@Mapping( target = "user.userName", source = "userName")
     //null fields in postDTO will set corresponding Post fields to null
-    Post updatePostFromDTO( PostDTO postDTO, @MappingTarget Post post );
+    //Post updatePostFromDTO( PostDTO postDTO, @MappingTarget Post post );
 
 
 

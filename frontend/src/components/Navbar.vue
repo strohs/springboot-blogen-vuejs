@@ -31,6 +31,11 @@
           Login
         </b-nav-item>
 
+        <b-nav-item :to="{ name: 'login', params: { logout: true } }" v-if="isAuthenticated">
+          <icon name="user-times"></icon>
+          Logout
+        </b-nav-item>
+
 
       </b-navbar-nav>
     </b-collapse>
@@ -51,6 +56,11 @@
         'isAdmin',
         'getUser'
       ])
+    },
+    methods: {
+      doLogout () {
+        console.log('Logut clicked')
+      }
     }
   }
 </script>

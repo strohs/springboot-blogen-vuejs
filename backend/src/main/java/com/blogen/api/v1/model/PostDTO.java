@@ -31,10 +31,10 @@ public class PostDTO {
     private String imageUrl;
 
     @ApiModelProperty( value = "category that this post belongs to", required = true, example = "Web Development")
-    private String categoryName;
+    private CategoryDTO category;
 
-    @ApiModelProperty(value = "the userName of the user creating this post", required = true, example = "coolUserName")
-    private String userName;
+    @ApiModelProperty(value = "the userName and id of the user who created this post", required = true, example = "coolUserName")
+    private PostUserDTO user;
 
     @ApiModelProperty(value = "ISO8601 date of when this post was created" ,readOnly = true )
     private LocalDateTime created;

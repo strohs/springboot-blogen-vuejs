@@ -1,7 +1,9 @@
 package com.blogen.api.v1.services;
 
+import com.blogen.api.v1.controllers.PostController;
 import com.blogen.api.v1.model.PostDTO;
 import com.blogen.api.v1.model.PostListDTO;
+import com.blogen.api.v1.model.PostRequestDTO;
 import com.blogen.domain.Post;
 
 /**
@@ -56,25 +58,27 @@ public interface PostService {
     /**
      * Creates a new Parent Post. Any PostDTO.children sent will be ignored.
      *
-     * @param postDTO contains post data to create. Any
+     * @param requestDTO contains post data to create.
+     * @param userName userName of the user that this post should be created for
      * @return a {@link PostDTO} representing the newly created post
      */
-    PostDTO createNewPost( PostDTO postDTO );
+    PostDTO createNewPost( PostRequestDTO requestDTO, String userName );
 
     /**
      * Creates a new child post. The child post will be associated with the Parent Post represented by the parentId
      * @param parentId id of the parent post, under which this child will be created
+     * @param userName userName of the user that this post should be created for
      * @return a {@link PostDTO} representing the newly created child post
      */
-    PostDTO createNewChildPost( Long parentId, PostDTO postDTO );
+    PostDTO createNewChildPost( Long parentId, PostRequestDTO requestDTO, String userName );
 
     /**
      * Saves/updates an existing Post
      * @param id the id of the Post to update
-     * @param postDTO data to update the post with
+     * @param requestDTO data to update the post with
      * @return a {@link PostDTO} containing the newly updated fields
      */
-    PostDTO saveUpdatePost( Long id, PostDTO postDTO );
+    PostDTO saveUpdatePost( Long id, PostRequestDTO requestDTO );
 
     /**
      * search posts title and text for the specified searchStr
@@ -97,5 +101,8 @@ public interface PostService {
      */
     void deletePost( Long id );
 
-
+    //helper method that builds a URL String to a particular post
+    default String buildPostUrl( Post post ) {
+        return PostController.BASE_URL + "/" + post.getId();
+    }
 }

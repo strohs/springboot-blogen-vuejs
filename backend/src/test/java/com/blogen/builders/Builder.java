@@ -1,6 +1,8 @@
 package com.blogen.builders;
 
+import com.blogen.api.v1.model.CategoryDTO;
 import com.blogen.api.v1.model.PostDTO;
+import com.blogen.api.v1.model.PostUserDTO;
 import com.blogen.domain.*;
 
 import java.time.LocalDateTime;
@@ -67,12 +69,12 @@ public class Builder {
 
 
     //Builders for REST API
-    public static PostDTO buildPostDTO( Long id, String userName, String title, String text,
-                                        String imageUrl, String categoryName, LocalDateTime created, List<PostDTO> children) {
+    public static PostDTO buildPostDTO( Long id, PostUserDTO postUserDTO, String title, String text,
+                                        String imageUrl, CategoryDTO categoryDTO, LocalDateTime created, List<PostDTO> children) {
         PostDTO postDTO = new PostDTO();
         postDTO.setId( id );
-        postDTO.setUserName( userName );
-        postDTO.setCategoryName( categoryName );
+        postDTO.setCategory( categoryDTO );
+        postDTO.setUser( postUserDTO );
         postDTO.setText( text );
         postDTO.setTitle( title );
         postDTO.setImageUrl( imageUrl );

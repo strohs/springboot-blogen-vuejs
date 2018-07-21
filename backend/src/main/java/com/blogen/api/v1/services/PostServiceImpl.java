@@ -2,8 +2,10 @@ package com.blogen.api.v1.services;
 
 import com.blogen.api.v1.controllers.PostController;
 import com.blogen.api.v1.mappers.PostMapper;
+import com.blogen.api.v1.mappers.PostRequestMapper;
 import com.blogen.api.v1.model.PostDTO;
 import com.blogen.api.v1.model.PostListDTO;
+import com.blogen.api.v1.model.PostRequestDTO;
 import com.blogen.domain.Category;
 import com.blogen.domain.Post;
 import com.blogen.domain.User;
@@ -41,15 +43,18 @@ public class PostServiceImpl implements PostService {
     private CategoryRepository categoryRepository;
     private UserRepository userRepository;
     private PostMapper postMapper;
+    private PostRequestMapper postRequestMapper;
 
     @Autowired
     public PostServiceImpl( PageRequestBuilder pageRequestBuilder, PostRepository postRepository,
-                            CategoryRepository categoryRepository, UserRepository userRepository, PostMapper postMapper ) {
+                            CategoryRepository categoryRepository, UserRepository userRepository, PostMapper postMapper,
+                            PostRequestMapper postRequestMapper) {
         this.pageRequestBuilder = pageRequestBuilder;
         this.postRepository = postRepository;
         this.categoryRepository = categoryRepository;
         this.userRepository = userRepository;
         this.postMapper = postMapper;
+        this.postRequestMapper = postRequestMapper;
     }
 
     @Override
@@ -123,30 +128,31 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional
     //creates a new Parent Post
-    public PostDTO createNewPost( PostDTO postDTO ) {
-        Post post = buildNewPost( postDTO );
+    public PostDTO createNewPost( PostRequestDTO postDTO, String userName ) {
+        Post post = buildNewPost( postDTO, userName );
         Post savedPost = postRepository.save( post );
         return buildReturnDto( savedPost );
     }
 
     @Override
     @Transactional
-    public PostDTO createNewChildPost( Long parentId, PostDTO postDTO ) {
+    public PostDTO createNewChildPost( Long parentId, PostRequestDTO requestDTO, String userName ) {
         Post parentPost = postRepository.findById( parentId ).orElseThrow( () ->
                 new BadRequestException( "Post with id " + parentId + " was not found" ) );
         if ( !parentPost.isParentPost() )
             throw new BadRequestException( "Post with id: " + parentId + " is a child post. Cannot create a new child post onto an existing child post" );
-        Post childPost = buildNewPost( postDTO );
+        Post childPost = buildNewPost( requestDTO, userName );
         parentPost.addChild( childPost );
         Post savedPost = postRepository.saveAndFlush( parentPost );
         return buildReturnDto( savedPost );
     }
 
     @Override
-    public PostDTO saveUpdatePost( Long id, PostDTO postDTO ) {
+    public PostDTO saveUpdatePost( Long id, PostRequestDTO requestDTO ) {
         Post postToUpdate = postRepository.findById( id ).orElseThrow( () ->
                 new BadRequestException( "Post with id " + id + " was not found" ) );
-        postToUpdate = mergePostDtoToPost( postToUpdate, postDTO );
+        //TODO might be able to do this with POST mapper
+        postToUpdate = mergePostRequestDtoToPost( postToUpdate, requestDTO );
         postToUpdate.setCreated( LocalDateTime.now() );
         Post savedPost = postRepository.save( postToUpdate );
         return buildReturnDto( savedPost );
@@ -187,25 +193,21 @@ public class PostServiceImpl implements PostService {
     }
 
     /**
-     * build a new {@link Post} object, making sure to retrieve existing data from the Category and User repositories
-     * @param postDTO
+     * build a new {@link Post} object, making sure to retrieve existing data from the Category and User repositories.
+     *
+     * @param requestDTO
      * @return
      */
-    private Post buildNewPost( PostDTO postDTO ) {
-        postDTO.setCreated( LocalDateTime.now() );
-        Post post = postMapper.postDtoToPost( postDTO );
-        Category category = categoryRepository.findByName( postDTO.getCategoryName() );
-        if ( category == null ) throw new BadRequestException( "Category not found with name " + postDTO.getCategoryName() );
-        User user = userRepository.findByUserName( postDTO.getUserName() );
-        if ( user == null ) throw new BadRequestException( "User not found with name " + postDTO.getUserName() );
+    private Post buildNewPost( PostRequestDTO requestDTO, String userName ) {
+        Post post = postRequestMapper.postRequestDtoToPost( requestDTO );
+        post.setCreated( LocalDateTime.now() );
+        Category category = categoryRepository.findById( requestDTO.getCategoryId() )
+                .orElseThrow( () -> new BadRequestException( "Category does not exist with id:" + requestDTO.getCategoryId() ) );
+        User user = userRepository.findByUserName( userName );
+        if ( user == null ) throw new BadRequestException( "User not found with name " + userName );
         post.setCategory( category );
         post.setUser( user );
         return post;
-    }
-
-    //helper method that builds a URL String to a particular post
-    private String buildPostUrl( Post post ) {
-        return PostController.BASE_URL + "/" + post.getId();
     }
 
     private String buildParentPostUrl( Post post ) {
@@ -239,22 +241,16 @@ public class PostServiceImpl implements PostService {
     /**
      * Merge non-null fields of PostDTO into a {@link Post} object
      * @param target Post object to merge fields into
-     * @param source PostDTO containing the non-null fields you want to merge
+     * @param source PostRequestDTO containing the non-null fields you want to merge
      * @return a Post object containing the merged fields
      */
-    private Post mergePostDtoToPost( Post target, PostDTO source ) {
+    private Post mergePostRequestDtoToPost( Post target, PostRequestDTO source ) {
         if ( source.getImageUrl() != null )
             target.setImageUrl( source.getImageUrl() );
-        if ( source.getCategoryName() != null ) {
-            Category category = validateCategoryName( source.getCategoryName() );
+        if ( source.getCategoryId() != null ) {
+            Category category = validateCategoryId( source.getCategoryId() );
             target.setCategory( category );
         }
-        if ( source.getUserName() != null ) {
-            User user = validateUserName( source.getUserName() );
-            target.setUser( user );
-        }
-        if ( source.getCreated() != null )
-            target.setCreated( source.getCreated() );
         if ( source.getTitle() != null )
             target.setTitle( source.getTitle() );
         if ( source.getText() != null )
