@@ -51,6 +51,7 @@ public class PostControllerTest {
     PostDTO postDTO_2;
     PostDTO childDTO_1;
     PostRequestDTO requestDTO;
+    PageInfoResponse pageInfoResponse;
 
     @Before
     public void setUp() throws Exception {
@@ -68,13 +69,15 @@ public class PostControllerTest {
         postDTO_1.getChildren().add( childDTO_1 );
         postDTO_2 = Builder.buildPostDTO( 2L,postUserDTO1,"post2 title","post2 text","http://images.com/2",catDTO1, LocalDateTime.now(),new ArrayList<>() );
         postDTO_2.setPostUrl( PostController.BASE_URL + "/" + "2" );
+
+        pageInfoResponse = PageInfoResponse.builder().totalPages(1).totalElements(1L).totalPages(1).pageNumber(0).build();
     }
 
     @Test
     public void should_getOneParentPostsAndReturnOK_when_getPostsWithLimitSet() throws Exception {
-        PostListDTO postListDTO = new PostListDTO( Arrays.asList( postDTO_1 ) );
+        PostListDTO postListDTO = new PostListDTO( Arrays.asList( postDTO_1 ), pageInfoResponse );
 
-        given( postService.getPosts( anyInt() )).willReturn( postListDTO );
+        given( postService.getPosts( anyLong(), anyInt(), anyInt() )).willReturn( postListDTO );
 
         mockMvc.perform( get( PostController.BASE_URL )
                             .contentType( MediaType.APPLICATION_JSON )
@@ -85,9 +88,9 @@ public class PostControllerTest {
 
     @Test
     public void should_getTwoParentPostsAndReturnOK_when_getPostsWithNoLimitSet() throws Exception {
-        PostListDTO postListDTO = new PostListDTO( Arrays.asList( postDTO_1, postDTO_2) );
+        PostListDTO postListDTO = new PostListDTO( Arrays.asList( postDTO_1, postDTO_2), pageInfoResponse );
 
-        given( postService.getPosts( anyInt() )).willReturn( postListDTO );
+        given( postService.getPosts( anyLong(), anyInt(), anyInt() )).willReturn( postListDTO );
 
         mockMvc.perform( get( PostController.BASE_URL )
                 .contentType( MediaType.APPLICATION_JSON ))

@@ -3,10 +3,7 @@ package com.blogen.api.v1.services;
 import com.blogen.api.v1.controllers.PostController;
 import com.blogen.api.v1.mappers.PostMapper;
 import com.blogen.api.v1.mappers.PostRequestMapper;
-import com.blogen.api.v1.model.CategoryDTO;
-import com.blogen.api.v1.model.PostDTO;
-import com.blogen.api.v1.model.PostListDTO;
-import com.blogen.api.v1.model.PostRequestDTO;
+import com.blogen.api.v1.model.*;
 import com.blogen.domain.Category;
 import com.blogen.domain.Post;
 import com.blogen.domain.User;
@@ -64,34 +61,26 @@ public class PostServiceImpl implements PostService {
         this.principalService = principalService;
     }
 
-    @Override
-    public PostListDTO getPosts( int limit ) {
-        //create a PageRequest
-        PageRequest pageRequest = pageRequestBuilder.buildPageRequest( 0, limit, Sort.Direction.DESC,"created" );
-        //retrieve the posts
-        Page<Post> page = postRepository.findAllByParentNullOrderByCreatedDesc( pageRequest );
-        List<PostDTO> postDTOS = new ArrayList<>();
-        page.forEach( post -> {
-            PostDTO dto = buildReturnDto( post );
-            postDTOS.add( dto );
-        } );
-        return new PostListDTO( postDTOS );
-    }
 
     @Override
-    public PostListDTO getPosts( Long categoryId, int limit ) {
+    public PostListDTO getPosts( Long categoryId, int pageNum, int pageSize ) {
         //check if category exists
-        validateCategoryId( categoryId );
+        if( categoryId != null && categoryId > -1)
+            validateCategoryId( categoryId );
         //create a PageRequest
-        PageRequest pageRequest = pageRequestBuilder.buildPageRequest( 0, limit, Sort.Direction.DESC,"created" );
+        PageRequest pageRequest = pageRequestBuilder.buildPageRequest( pageNum, pageSize, Sort.Direction.DESC,"created" );
         //retrieve the posts
-        Page<Post> page = postRepository.findAllByCategory_IdAndParentNull( categoryId, pageRequest );
+        Page<Post> page;
+        if ( categoryId > -1 )
+            page = postRepository.findAllByCategory_IdAndParentNull( categoryId, pageRequest );
+        else
+            page = postRepository.findAllByParentNullOrderByCreatedDesc( pageRequest );
         List<PostDTO> postDTOS = new ArrayList<>();
         page.forEach( post -> {
             PostDTO dto = buildReturnDto( post );
             postDTOS.add( dto );
         } );
-        return new PostListDTO( postDTOS );
+        return new PostListDTO( postDTOS, buildPageInfoResponse(page) );
     }
 
     @Override
@@ -100,36 +89,26 @@ public class PostServiceImpl implements PostService {
         return buildReturnDto( post );
     }
 
-    //get all the parent posts for a user for all categories
-    @Override
-    public PostListDTO getPostsForUser( Long userId, int limit ) {
-        //check if user exists
-        validateUserId( userId );
-        //create a PageRequest
-        PageRequest pageRequest = pageRequestBuilder.buildPageRequest( 0, limit, Sort.Direction.DESC,"created" );
-        Page<Post> page =  postRepository.findAllByUser_IdAndParentNull( userId, pageRequest );
-        List<PostDTO> postDTOS = new ArrayList<>();
-        page.forEach( post -> {
-            PostDTO dto = buildReturnDto( post );
-            postDTOS.add( dto );
-        } );
-        return new PostListDTO( postDTOS );
-    }
 
     @Override
-    public PostListDTO getPostsForUser( Long userId, Long categoryId, int limit ) {
+    public PostListDTO getPostsForUser( Long userId, Long categoryId, int pageNum, int pageSize ) {
         //check if user exists and category exists
         validateUserId( userId );
-        validateCategoryId( categoryId );
+        if (categoryId != null && categoryId > -1)
+            validateCategoryId( categoryId );
         //create a PageRequest
-        PageRequest pageRequest = pageRequestBuilder.buildPageRequest( 0, limit, Sort.Direction.DESC,"created" );
-        Page<Post> page =  postRepository.findAllByUser_IdAndCategory_IdAndParentNull( userId, categoryId, pageRequest );
+        PageRequest pageRequest = pageRequestBuilder.buildPageRequest( pageNum, pageSize, Sort.Direction.DESC,"created" );
+        Page<Post> page;
+        if ( categoryId > -1 )
+            page =  postRepository.findAllByUser_IdAndCategory_IdAndParentNull( userId, categoryId, pageRequest );
+        else
+            page = postRepository.findAllByUser_IdAndParentNull( userId, pageRequest );
         List<PostDTO> postDTOS = new ArrayList<>();
         page.forEach( post -> {
             PostDTO dto = buildReturnDto( post );
             postDTOS.add( dto );
         } );
-        return new PostListDTO( postDTOS );
+        return new PostListDTO( postDTOS, buildPageInfoResponse(page) );
     }
 
     @Override
@@ -174,7 +153,7 @@ public class PostServiceImpl implements PostService {
             PostDTO dto = buildReturnDto( post );
             postDTOS.add( dto );
         } );
-        return new PostListDTO( postDTOS );
+        return new PostListDTO( postDTOS, buildPageInfoResponse(page) );
     }
 
 //    @Override
@@ -245,6 +224,15 @@ public class PostServiceImpl implements PostService {
             }
         }
         return postDTO;
+    }
+
+    private PageInfoResponse buildPageInfoResponse( Page page ) {
+        return PageInfoResponse.builder()
+                .totalPages( page.getTotalPages() )
+                .totalElements( page.getTotalElements() )
+                .pageSize( page.getSize() )
+                .pageNumber( page.getNumber() )
+                .build();
     }
 
     /**

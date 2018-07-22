@@ -55,13 +55,12 @@ public class UserController {
     @GetMapping( "/{id}/posts" )
     @ResponseStatus( HttpStatus.OK )
     public PostListDTO getUserPosts( @PathVariable("id") Long id,
+                                     @RequestParam(value = "page", defaultValue = "0") Integer page,
                                      @RequestParam(value = "limit", defaultValue = "5") Integer limit,
                                      @RequestParam(value = "category", defaultValue = "-1") Long category) {
-        log.debug( "getUserPosts id=" + id + " limit=" + limit + " category=" + category );
-        if ( category == -1 )  //-1L indicates ignore category and get all posts
-            return postService.getPostsForUser( id, limit  );
-        else
-            return postService.getPostsForUser( id, category, limit );
+        log.debug( "getUserPosts id={} page={} limit={} category={}", id, page, limit, category );
+        // category =-1L indicates ignore category and get posts for any category
+        return postService.getPostsForUser( id, category, page, limit );
     }
 
     @ApiOperation( value = "update field(s) of an existing user", consumes = "application/json", produces = "application/json")

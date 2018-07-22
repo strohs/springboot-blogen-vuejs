@@ -1,6 +1,5 @@
 package com.blogen.api.v1.controllers;
 
-import com.blogen.annotations.CurrentUser;
 import com.blogen.api.v1.model.AuthenticationResponse;
 import com.blogen.api.v1.model.LoginRequestDTO;
 import com.blogen.api.v1.model.PostListDTO;
@@ -14,15 +13,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.security.Principal;
 
 /**
  * Controller for handling new-user sign-ups and user log-ins
@@ -75,6 +69,6 @@ public class AuthorizationController {
     @GetMapping( "/latestPosts" )
     public PostListDTO latestPosts( @RequestParam( name = "limit", defaultValue = "9") int limit ) {
         log.debug( "get latest posts limit={}", limit );
-        return postService.getPosts( limit );
+        return postService.getPosts( -1L, 0, limit );
     }
 }

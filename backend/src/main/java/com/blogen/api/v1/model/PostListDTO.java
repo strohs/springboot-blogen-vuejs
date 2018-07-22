@@ -19,4 +19,7 @@ public class PostListDTO {
 
     @ApiModelProperty(value = "container for postDTO", readOnly = true)
     List<PostDTO> posts;
+
+    @ApiModelProperty(value = "container for a PageInfoResponse", readOnly = true)
+    PageInfoResponse pageInfo;
 }

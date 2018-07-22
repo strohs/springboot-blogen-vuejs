@@ -13,21 +13,16 @@ import com.blogen.domain.Post;
  */
 public interface PostService {
 
-    /**
-     * get all Parent Post(s) up to limit
-     * @param limit the number of Posts to retrieve. If <= 0 then by default 5 posts will be retrieved
-     * @return a List of PostDTO ordered by Post.created date. The most recent parent posts made will be at the beginning of
-     * the list. Children of parent posts will also be returned and are not included in the limit count
-     */
-    PostListDTO getPosts( int limit );
 
     /**
-     * get all posts with the specified categoryId, up to limit
-     * @param categoryId
-     * @param limit
+     * get all posts containing the specified categoryId, for the specified pageNum, with  up to pageSize posts
+     * per page
+     * @param categoryId categoryId of posts to retrieve, set to -1 to get all posts in all categories
+     * @param pageNum the page number of posts to retrieve
+     * @param pageSize the number of posts, per page, to retrieve.
      * @return
      */
-    PostListDTO getPosts( Long categoryId, int limit );
+    PostListDTO getPosts( Long categoryId, int pageNum, int pageSize );
 
     /**
      * get a specific post by its ID
@@ -39,21 +34,15 @@ public interface PostService {
     PostDTO getPost( Long id );
 
     /**
-     * get posts for the specified userId and categoryId, an return up to limit amount of posts
+     * get posts for the specified user and category
      * @param userId
-     * @param categoryId
-     * @param limit
+     * @param categoryId the categoryId of the posts to retrieve
+     * @param pageNum the page number of posts to return
+     * @param limit max posts per page to return
      * @return
      */
-    PostListDTO getPostsForUser( Long userId, Long categoryId, int limit );
+    PostListDTO getPostsForUser( Long userId, Long categoryId, int pageNum, int limit );
 
-    /**
-     * get post for the specified userId, return up to limit amount of posts
-     * @param userId
-     * @param limit
-     * @return
-     */
-    PostListDTO getPostsForUser( Long userId, int limit );
 
     /**
      * Creates a new Parent Post. Any PostDTO.children sent will be ignored.

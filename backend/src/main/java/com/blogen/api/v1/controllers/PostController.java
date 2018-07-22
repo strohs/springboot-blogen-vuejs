@@ -46,12 +46,10 @@ public class PostController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public PostListDTO getPosts( @RequestParam(value = "limit", defaultValue = "5") int limit,
+                                 @RequestParam(value = "page", defaultValue = "0") int page,
                                  @RequestParam(value = "category", defaultValue = "-1") Long category) {
-        log.debug( "getPosts limit=" + limit + " category:" + category );
-        if ( category == -1 )
-            return postService.getPosts( limit );
-        else
-            return postService.getPosts( category, limit );
+        log.debug( "getPosts page={} limit={} category={}", page, limit, category );
+        return postService.getPosts( category, page, limit );
     }
 
     @ApiOperation( value = "search posts for the passed in text", produces = "application/json")
@@ -59,7 +57,7 @@ public class PostController {
     @ResponseStatus(HttpStatus.OK)
     public PostListDTO searchPosts( @PathVariable(value = "text") String text,
                                     @RequestParam(value = "limit", defaultValue = "5") int limit) {
-        log.debug( "search posts limit=" + limit + " search text:" + text );
+        log.debug( "search posts limit={} search text:{}", limit, text );
         return postService.searchPosts( text,limit );
     }
 
@@ -87,7 +85,7 @@ public class PostController {
         return postService.createNewChildPost( parentId, postRequestDTO );
     }
 
-    @ApiOperation( value = "replace an existing post with a new post data", consumes = "application/json", produces = "application/json")
+    @ApiOperation( value = "replace an existing post with new post data", consumes = "application/json", produces = "application/json")
     @PutMapping( "/{id}" )
     @ResponseStatus( HttpStatus.OK )
     public PostDTO updatePost( @PathVariable("id") Long id, @Valid @RequestBody PostRequestDTO postRequestDTO ) {

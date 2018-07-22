@@ -108,22 +108,22 @@ public class PostServiceImplTest {
     }
 
     @Test
-    public void should_getOnePost_when_getPostSizeIsOne() {
-        int size = 1;
+    public void should_getOnePost_when_pageSizeIsOne() {
+        int pageSize = 1; int pageNum = 0;
         Post post1 = buildPost1();
         PostDTO post1DTO = buildPost1DTO();
         List<Post> posts = new ArrayList<>();
         posts.add( post1 );
-        PageRequest pageRequest = PageRequest.of( 0,size,Sort.Direction.DESC,"created" );
+        PageRequest pageRequest = PageRequest.of( pageNum,pageSize,Sort.Direction.DESC,"created" );
         Page<Post> page = new PageImpl<Post>( posts );
 
-        given( pageRequestBuilder.buildPageRequest( anyInt(), anyInt(), any( Sort.Direction.class ), anyString() )).willReturn( pageRequest );
+        given( pageRequestBuilder.buildPageRequest( anyInt(), anyInt(), any( Sort.Direction.class ), anyString())).willReturn( pageRequest );
         given( postRepository.findAllByParentNullOrderByCreatedDesc( pageRequest )).willReturn( page );
         given( postMapper.postToPostDto( post1 )).willReturn( post1DTO );
 
-        PostListDTO postDTOS = postService.getPosts( size );
+        PostListDTO postDTOS = postService.getPosts(-1L, pageNum, pageSize );
 
-        then( pageRequestBuilder ).should().buildPageRequest( 0, size, Sort.Direction.DESC, "created" );
+        then( pageRequestBuilder ).should().buildPageRequest( pageNum, pageSize, Sort.Direction.DESC, "created" );
         then( postRepository).should().findAllByParentNullOrderByCreatedDesc( pageRequest );
         assertThat( postDTOS.getPosts().size(), is(1));
     }
@@ -131,18 +131,18 @@ public class PostServiceImplTest {
 
     @Test
     public void should_setReturnedPostUrlToPost1Url_when_getPostsReturnsParentPost() {
-        int size = 5;
+        int pageSize = 25; int pageNum = 0;
         Post post1 = buildPost1();
         PostDTO postDTO1 = buildPost1DTO();
         List<Post> posts = Arrays.asList( post1 );
-        PageRequest pageRequest = new PageRequest( 0,25,Sort.Direction.DESC,"created" );
+        PageRequest pageRequest = PageRequest.of( pageNum,pageSize,Sort.Direction.DESC,"created" );
         Page<Post> page = new PageImpl<Post>( posts );
 
         given( pageRequestBuilder.buildPageRequest( anyInt(), anyInt(), any( Sort.Direction.class ), anyString() )).willReturn( pageRequest );
         given( postRepository.findAllByParentNullOrderByCreatedDesc( any(Pageable.class) )).willReturn( page );
         given( postMapper.postToPostDto( post1 )).willReturn( postDTO1 );
 
-        PostListDTO postDTOS = postService.getPosts( size );
+        PostListDTO postDTOS = postService.getPosts(-1L,pageNum, pageSize);
 
         then( postRepository ).should().findAllByParentNullOrderByCreatedDesc( pageRequest );
         assertThat( postDTOS.getPosts().get( 0 ).getPostUrl(), is( POST1_URL ));
