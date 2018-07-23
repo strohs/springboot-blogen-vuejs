@@ -7,8 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Contains information about a page a data. This object can be included in a response when API clients request a
- * page of data
+ * Contains information about a page a data. This object can be included in a response when API clients make requests
+ * that request a specific page
  *
  * Author: Cliff
  */
