@@ -5,36 +5,62 @@
       <div class="row my-4">
 
         <div class="col-md-8 mx-auto">
-          <b-card border-variant="primary" no-body>
-            <b-card-header>
-              <h4><icon name="user-circle" scale="2"></icon> Account Login</h4>
-            </b-card-header>
-            <b-card-body>
-              <b-alert variant="danger" :show="loginError">
-                Invalid username or password
-              </b-alert>
-              <b-alert variant="success" dismissible :show="showStatusMessage" @dismissed="message = ''">
-                {{ message }}
-              </b-alert>
+          <transition name="flip" mode="out-in">
+            <b-card border-variant="primary" no-body v-if="!showHelp" key="login">
+              <b-card-header>
+                <div class="row">
+                  <h4>
+                    <icon class="mx-2" name="user-circle" scale="2"></icon>
+                    Account Login
+                  </h4>
+                  <b-link class="ml-auto mx-2" @click="showHelp = !showHelp">
+                    <icon name="question-circle" scale="1.5"></icon>
+                  </b-link>
+                </div>
+              </b-card-header>
+              <b-card-body>
+                <b-alert variant="danger" :show="loginError">
+                  Invalid username or password
+                </b-alert>
+                <b-alert variant="success" dismissible :show="showStatusMessage" @dismissed="message = ''">
+                  {{ message }}
+                </b-alert>
 
-              <b-form @submit="doLogin">
-                <b-form-group id="userNameGroup" label="User Name:" label-for="userName">
-                  <b-form-input id="userName" type="text" v-model="login.username" required placeholder="username">
-                  </b-form-input>
-                </b-form-group>
+                <b-form @submit="doLogin">
+                  <b-form-group id="userNameGroup" label="User Name:" label-for="userName">
+                    <b-form-input id="userName" type="text" v-model="login.username" required placeholder="username">
+                    </b-form-input>
+                  </b-form-group>
 
-                <b-form-group id="passwordGroup" label="Password:" label-for="password">
-                  <b-form-input id="password" type="password" v-model="login.password" required>
-                  </b-form-input>
-                </b-form-group>
+                  <b-form-group id="passwordGroup" label="Password:" label-for="password">
+                    <b-form-input id="password" type="password" v-model="login.password" required>
+                    </b-form-input>
+                  </b-form-group>
 
-                <b-button block size="lg" type="submit" variant="primary">Login</b-button>
+                  <b-button block size="lg" type="submit" variant="primary">Login</b-button>
 
-              </b-form>
-            </b-card-body>
-          </b-card>
+                </b-form>
+              </b-card-body>
+            </b-card>
+            <!-- Login help -->
+            <b-card no-body v-if="showHelp" key="loginHelp">
+              <b-card-header header-text-variant="white" header-bg-variant="secondary">
+                <div class="row">
+                  <h4>
+                    <icon class="mx-2" name="user-circle" scale="2"></icon>
+                    Blogen Login Help
+                  </h4>
+
+                </div>
+              </b-card-header>
+              <b-card-body>
+                <b-table striped hover :items="blogenUsers"></b-table>
+                <b-button @click="showHelp = !showHelp" class="ml-auto" variant="primary" size="sm">Back to Login
+                </b-button>
+              </b-card-body>
+            </b-card>
+          </transition>
         </div>
-
       </div>
     </div>
   </section>
@@ -43,6 +69,7 @@
 <script>
   import axios from '../axios-auth'
   import {logAxiosError} from '../common'
+  import {defaultUsers} from '../common/defaultUsers'
 
   export default {
     name: 'Login',
@@ -56,7 +83,9 @@
           username: '',
           password: ''
         },
-        loginError: false
+        blogenUsers: defaultUsers,
+        loginError: false,
+        showHelp: false
       }
     },
     methods: {
@@ -72,7 +101,7 @@
               this.$store.commit('SET_AUTH_TOKEN', res.data.accessToken)
               this.$store.commit('SET_USER', res.data.user)
               axios.defaults.headers.common['Authorization'] = 'Bearer ' + res.data.accessToken
-              this.$router.push({ name: 'posts' })
+              this.$router.push({name: 'posts'})
             } else {
               console.log('expected an access token but none was sent')
             }
@@ -107,5 +136,11 @@
 </script>
 
 <style scoped>
+  .flip-enter-active, .flip-leave-active {
+    transition: 0.3s ease-out;
+  }
 
+  .flip-enter, .flip-leave-to {
+    transform: scaleX(0);
+  }
 </style>
