@@ -1,11 +1,14 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import axios from '../axios-auth'
+import {logAxiosError} from '../common'
 
 Vue.use(Vuex)
 
 export const store = new Vuex.Store({
   state: {
     AUTH_TOKEN: '',
+    // user holds details of the currently logged in user
     user: {
       id: 0,
       firstName: '',
@@ -13,7 +16,11 @@ export const store = new Vuex.Store({
       userName: '',
       email: '',
       roles: []
-    }
+    },
+    // categories holds a list of the current blogen categories, they are used across multiple components
+    categories: [
+      {id: 0, name: '', categoryUrl: ''}
+    ]
   },
   getters: {
     getAuthToken: state => {
@@ -24,6 +31,9 @@ export const store = new Vuex.Store({
     },
     getUser: state => {
       return state.user
+    },
+    getCategories: state => {
+      return state.categories
     },
     isAuthenticated: state => {
       return state.AUTH_TOKEN.length > 0
@@ -48,6 +58,12 @@ export const store = new Vuex.Store({
     'RESET_USER' (state) {
       const u = { id: 0, firstName: '', lastName: '', userName: '', email: '', roles: [] }
       state.user = u
+    },
+    'SET_CATEGORIES' (state, categoriesArr) {
+      state.categories = categoriesArr
+    },
+    'ADD_CATEGORY' (state, category) {
+      state.categories.push(category)
     }
   },
   actions: {
@@ -60,6 +76,16 @@ export const store = new Vuex.Store({
     doLogout: ({commit}) => {
       commit('LOGOUT')
       commit('RESET_USER')
+    },
+    fetchCategories: ({commit}) => {
+      axios.get('/api/v1/categories')
+        .then(res => {
+          console.log('fetchCategories response:', res.data)
+          commit('SET_CATEGORIES', res.data.categories)
+        })
+        .catch(error => {
+          logAxiosError(error)
+        })
     }
   }
 })

@@ -56,11 +56,6 @@
         'isAdmin',
         'getUser'
       ])
-    },
-    methods: {
-      doLogout () {
-        console.log('Logut clicked')
-      }
     }
   }
 </script>

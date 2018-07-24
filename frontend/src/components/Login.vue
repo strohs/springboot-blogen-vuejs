@@ -22,8 +22,8 @@
                 <b-alert variant="danger" :show="loginError">
                   Invalid username or password
                 </b-alert>
-                <b-alert variant="success" dismissible :show="showStatusMessage" @dismissed="message = ''">
-                  {{ message }}
+                <b-alert variant="success" dismissible :show="showStatusMessage" @dismissed="statusMessage = ''">
+                  {{ statusMessage }}
                 </b-alert>
 
                 <b-form @submit="doLogin">
@@ -74,7 +74,6 @@
   export default {
     name: 'Login',
     props: {
-      message: String,
       logout: Boolean
     },
     data () {
@@ -84,6 +83,7 @@
           password: ''
         },
         blogenUsers: defaultUsers,
+        statusMessage: '',
         loginError: false,
         showHelp: false
       }
@@ -91,8 +91,8 @@
     methods: {
       doLogin (event) {
         event.preventDefault()
-        this.message = ''
-        axios.post('/auth/login', this.login)
+        this.statusMessage = ''
+        axios.post('/api/v1/auth/login', this.login)
           .then(res => {
             // if we get an access token, save in in the store and set the authorization header in axios
             if (res.data.accessToken) {
@@ -115,21 +115,19 @@
       doLogout () {
         console.log('DO LOGOUT')
         this.$store.commit('LOGOUT')
-        this.message = 'You have been logged out'
+        // this.message = 'You have been logged out'
       }
     },
     computed: {
       showStatusMessage () {
-        return (this.message != null && this.message.length > 0)
-      },
-      showErrorMessage () {
-        return (this.message != null && this.message.length > 0)
+        return (this.statusMessage != null && this.statusMessage.length > 0)
       }
     },
     mounted () {
       this.login.username = this.$store.state.user.userName
       if (this.logout === true) {
         this.doLogout()
+        this.statusMessage = 'You have been logged out'
       }
     }
   }

@@ -1,3 +1,8 @@
+/**
+ * Blogen default usernames and PWs
+ * @type {*[]}
+ */
+
 export const defaultUsers = [
   {
     user_name: 'mgill',

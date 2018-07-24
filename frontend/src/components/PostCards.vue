@@ -20,7 +20,7 @@
     },
     methods: {
       getLatestPosts () {
-        axios.get('/auth/latestPosts')
+        axios.get('/api/v1/auth/latestPosts')
           .then(res => {
             console.log('api response:', res.data)
             this.posts = this.posts.concat(res.data.posts)
