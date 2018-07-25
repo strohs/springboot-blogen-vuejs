@@ -92,4 +92,6 @@ public interface PostService {
     default String buildPostUrl( Post post ) {
         return PostController.BASE_URL + "/" + post.getId();
     }
+
+
 }

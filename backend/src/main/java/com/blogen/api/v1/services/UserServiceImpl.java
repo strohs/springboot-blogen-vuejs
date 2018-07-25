@@ -11,6 +11,7 @@ import com.blogen.repositories.UserRepository;
 import com.blogen.services.security.EncryptionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,6 +30,9 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
     private EncryptionService encryptionService;
     private UserMapper userMapper;
+
+    @Value("${app.avatar.dir}")
+    private String AVATAR_DIR;
 
     private static final String DEFAULT_AVATAR = "avatar0.jpg";
 
@@ -88,6 +92,11 @@ public class UserServiceImpl implements UserService {
         return Optional.ofNullable( userRepository.findByUserName( name ) );
     }
 
+    @Override
+    public Optional<User> findById( Long id ) {
+        return userRepository.findById( id );
+    }
+
     /**
      * save a {@link User} to the repository
      * @param user to save
@@ -99,7 +108,10 @@ public class UserServiceImpl implements UserService {
         return userRepository.save( user );
     }
 
-
+    @Override
+    public String buildAvatarUrl( User user ) {
+        return AVATAR_DIR + "/" + user.getUserPrefs().getAvatarImage();
+    }
     /**
      * encrypts the user password if it was set on the User object
      * @param user

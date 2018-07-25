@@ -21,11 +21,11 @@ public class AvatarServiceImpl implements AvatarService {
 
     //TODO move this to properties file
     //image directory containing Avatar Images
-    private static final String AVATAR_IMG_DIR = "classpath:static/img/avatar*";
+    private static final String AVATAR_IMG_DIR = "classpath:static/avatars*";
 
 
     /**
-     * Gets a list of all the avatar filenames in the /img directory.
+     * Gets a list of all the avatar filenames in the /avatars directory.
      * Avatar filenames must start with avatar
      *
      * @return a List of filenames: e.g. avatar1.jpg,avatar2.jpg...
@@ -52,7 +52,7 @@ public class AvatarServiceImpl implements AvatarService {
         try {
             isFile = resource.getFile().isFile();
         } catch ( IOException e ) {
-            log.error( "error checking if file in /img directory isFile: " + e.getMessage() );
+            log.error( "error checking if file in /avatars directory isFile: " + e.getMessage() );
         }
         return isFile;
     }

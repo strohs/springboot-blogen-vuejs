@@ -18,6 +18,7 @@ import com.blogen.services.utils.PageRequestBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.weaver.ast.Not;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -42,20 +43,19 @@ public class PostServiceImpl implements PostService {
     private PageRequestBuilder pageRequestBuilder;
     private PostRepository postRepository;
     private CategoryRepository categoryRepository;
-    private UserRepository userRepository;
+    private UserService userService;
     private PostMapper postMapper;
     private PostRequestMapper postRequestMapper;
     private PrincipalService principalService;
 
-
     @Autowired
     public PostServiceImpl( PageRequestBuilder pageRequestBuilder, PostRepository postRepository,
-                            CategoryRepository categoryRepository, UserRepository userRepository, PostMapper postMapper,
+                            CategoryRepository categoryRepository, UserService userService, PostMapper postMapper,
                             PostRequestMapper postRequestMapper, PrincipalService principalService ) {
         this.pageRequestBuilder = pageRequestBuilder;
         this.postRepository = postRepository;
         this.categoryRepository = categoryRepository;
-        this.userRepository = userRepository;
+        this.userService = userService;
         this.postMapper = postMapper;
         this.postRequestMapper = postRequestMapper;
         this.principalService = principalService;
@@ -191,8 +191,8 @@ public class PostServiceImpl implements PostService {
         post.setCreated( LocalDateTime.now() );
         Category category = categoryRepository.findById( requestDTO.getCategoryId() )
                 .orElseThrow( () -> new BadRequestException( "Category does not exist with id:" + requestDTO.getCategoryId() ) );
-        User user = userRepository.findByUserName( userName );
-        if ( user == null ) throw new BadRequestException( "User not found with name " + userName );
+        User user = userService.findByUserName( userName )
+                .orElseThrow( () -> new BadRequestException( "User not found with name " + userName ) );
         post.setCategory( category );
         post.setUser( user );
         return post;
@@ -213,6 +213,7 @@ public class PostServiceImpl implements PostService {
     private PostDTO buildReturnDto( Post post ) {
         PostDTO postDTO = postMapper.postToPostDto( post );
         postDTO.setPostUrl( buildPostUrl( post ) );
+        postDTO.getUser().setAvatarUrl( userService.buildAvatarUrl( post.getUser() ) );
         //if post is a child post, set the parentPostUrl
         if ( post.getParent() != null  ) postDTO.setParentPostUrl( buildPostUrl( post.getParent() ));
         if ( post.getChildren() != null ) {
@@ -220,6 +221,7 @@ public class PostServiceImpl implements PostService {
                 PostDTO childDTO = postDTO.getChildren().get( i );
                 Post child = post.getChildren().get( i );
                 childDTO.setPostUrl( buildPostUrl( post.getChildren().get( i ) ) );
+                childDTO.getUser().setAvatarUrl( userService.buildAvatarUrl( child.getUser() ) );
                 childDTO.setParentPostUrl( buildParentPostUrl( child ) );
             }
         }
@@ -273,7 +275,7 @@ public class PostServiceImpl implements PostService {
     }
 
     private User validateUserId( Long id ) throws NotFoundException {
-        return userRepository.findById( id )
+        return userService.findById( id )
                 .orElseThrow( () -> new NotFoundException( "user with id: " + id + " does not exist" ) );
     }
 
@@ -284,8 +286,7 @@ public class PostServiceImpl implements PostService {
      * @throws BadRequestException if the username does not exist in the repository
      */
     private User validateUserName( String name ) throws BadRequestException {
-        User user = userRepository.findByUserName( name );
-        if ( user == null ) throw new BadRequestException( "user with name: " + name + " does not exist" );
-        return user;
+        return userService.findByUserName( name )
+                .orElseThrow( () -> new BadRequestException( "user with name: " + name + " does not exist" ) );
     }
 }

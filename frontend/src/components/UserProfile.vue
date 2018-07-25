@@ -103,7 +103,7 @@
       doSignUp (event) {
         event.preventDefault()
         console.log('USER:', this.user)
-        axios.post('/auth/signup', this.user)
+        axios.post('/api/v1/auth/signup', this.user)
           .then(res => {
             console.log('/sign-up OK user:', res.data)
             this.$store.commit('SET_USER', res.data)

@@ -7,7 +7,7 @@
         <div class="row">
           <div class="col-md-6">
                 <span>
-                    <h1><icon class="mx-2" name="pencil-alt" scale="1.5"></icon>Posts (<small>{{selectedCategory}}</small>)</h1>
+                    <h1><icon class="mx-2" name="pencil-alt" scale="1.5"></icon>Posts (<small>{{selectedCategory.name}}</small>)</h1>
                 </span>
           </div>
         </div>
@@ -20,10 +20,7 @@
         <div class="row">
           <!-- POST Category FILTER -->
           <div class="col-md-4">
-            <b-dropdown id="filterPostDdown1" text="Filter Posts" variant="success">
-              <b-dropdown-item v-for="cat in categories" :key="cat.id" @click="setCategory($event,cat)">{{cat.name}}
-              </b-dropdown-item>
-            </b-dropdown>
+            <app-category-filter-button v-model="selectedCategory"></app-category-filter-button>
           </div>
           <!-- NEW POST Button -->
           <div class="col-md-4">
@@ -34,14 +31,7 @@
           </div>
           <!-- SEARCH -->
           <div class="col-md-4">
-            <form id="searchPostsForm" th:action="@{/posts/search}" method="get">
-              <div class="form-row">
-                <div class="form-inline ml-auto">
-                  <input type="text" name="searchStr" class="form-control" placeholder="Search Post Title and Text"/>
-                  <input type="submit" class="btn btn-primary" value="Search"/>
-                </div>
-              </div>
-            </form>
+            <app-post-search v-model="postSearchStr"></app-post-search>
           </div>
         </div>
 
@@ -208,21 +198,21 @@
                       :state="categoryValidator.state" :invalid-feedback="categoryValidator.invalidFeedback"
                       :valid-feedback="categoryValidator.validFeedback">
           <b-form-select v-model="postModal.post.categoryId" :state="categoryValidator.state" @change="validateCategory"
-                         :options="postModal.categoryOptions"></b-form-select>
+                         :options="categoryOptions"></b-form-select>
         </b-form-group>
 
         <b-form-group id="imageUrlGroup" label="Image URL" label-for="imageUrl"
                       :state="imageUrlValidator.state" :invalid-feedback="imageUrlValidator.invalidFeedback"
                       :valid-feedback="imageUrlValidator.validFeedback">
-          <b-form-input id="imageUrl" type="text" v-model.trim="postModal.post.imageUrl"
+          <b-form-input id="imageUrl" type="text" v-model="postModal.post.imageUrl"
                         placeholder="image link URL (optional)"
-                        :state="imageUrlValidator.state" @change="validateImageUrl" required></b-form-input>
+                        :state="imageUrlValidator.state" @change="validateImageUrl"></b-form-input>
         </b-form-group>
 
         <b-form-group id="textGroup" label="Text" label-for="text"
                       :state="textValidator.state" :invalid-feedback="textValidator.invalidFeedback"
                       :valid-feedback="textValidator.validFeedback">
-          <b-form-textarea id="text" type="text" v-model.trim="postModal.post.text" placeholder="post text" rows="3"
+          <b-form-textarea id="text" type="text" v-model="postModal.post.text" placeholder="post text" rows="3"
                            :state="textValidator.state" @input="validateText" required></b-form-textarea>
         </b-form-group>
       </b-form>
@@ -234,16 +224,23 @@
 <script>
   import axios from '../../axios-auth'
   import {logAxiosError} from '../../common'
+  import CategoryFilterButton from './CategoryFilterButton'
+  import PostSearch from './PostSearch'
   import textLengthValidator from '../../validators/textLengthValidator'
   import selectValidator from '../../validators/selectValidator'
 
   export default {
     name: 'Posts',
+    components: {
+      appCategoryFilterButton: CategoryFilterButton,
+      appPostSearch: PostSearch
+    },
     data () {
       return {
-        selectedCategory: 'All',
-        categories: [],
+        selectedCategory: {},
+        postSearchStr: '',
         pageNum: 0,
+        pageLimit: 5,
         // array of posts to display in this component
         posts: [],
         pageInfo: {
@@ -258,13 +255,12 @@
           headerBgVariant: 'primary',
           headerTextVariant: 'white',
           post: {id: 0, title: '', text: '', imageUrl: '', categoryId: null},
-          categoryOptions: [{value: null, text: 'Please Select a Category'}],
           fieldsValid: false
         },
         titleValidator: {state: null, invalidFeedback: '', validFeedback: ''},
         textValidator: {state: null, invalidFeedback: '', validFeedback: ''},
         categoryValidator: {state: null, invalidFeedback: '', validFeedback: ''},
-        imageUrlValidator: {state: null, invalidFeedback: '', validFeedback: ''}
+        imageUrlValidator: {state: true, invalidFeedback: '', validFeedback: ''}
       }
     },
     methods: {
@@ -285,35 +281,38 @@
             logAxiosError(error)
           })
       },
+      searchPosts (searchStr, pageLimit = 5) {
+        axios.get(`/api/v1/posts/search/${searchStr}`, {
+          params: {
+            limit: pageLimit
+          }
+        })
+          .then(res => {
+            console.log('searchPosts response:', res.data)
+            this.posts = res.data.posts
+            this.pageInfo = res.data.pageInfo
+          })
+          .catch(error => {
+            logAxiosError(error)
+          })
+      },
       showNewPostModal () {
+        this.postModal.title = 'New Post'
+        this.postModal.headerBgVariant = 'primary'
+        this.postModal.headerTextVariant = 'white'
+        this.postModal.post = {id: 0, title: '', text: '', imageUrl: '', categoryId: null}
         this.$refs.postModalRef.show()
       },
       submitPostModal () {
-        // TODO
-        console.log('SUBMIT CLICKED')
-      },
-      // set the selected category
-      setCategory (event, cat) {
-        this.selectedCategory = cat.name
-        this.fetchPosts(0, 5, cat.id)
-      },
-      buildCategories () {
-        // manually add the 'All' category to the Category list, this will require us to build our own category list
-        //  using categories from the $store
-        this.categories.push({id: -1, name: 'All', categoryUrl: ''})
-        this.$store.dispatch('fetchCategories')
-          .then(() => {
-            this.$store.state.categories.forEach(c => {
-              this.categories.push(c)
-            })
-            this.buildCategoryOptions()
+        console.log('submitting post:', this.postModal.post)
+        axios.post('/api/v1/posts', this.postModal.post)
+          .then(res => {
+            this.posts.splice(0, 0, res.data)
           })
-      },
-      buildCategoryOptions () {
-        this.$store.getters.getCategories.forEach(cat => this.postModal.categoryOptions.push({
-          value: cat.id,
-          text: cat.name
-        }))
+          .catch(error => {
+            // TODO display user friendly message on page top
+            logAxiosError(error)
+          })
       },
       validateTitle (val) {
         this.titleValidator = textLengthValidator(val, 1)
@@ -322,7 +321,8 @@
         this.textValidator = textLengthValidator(val, 1)
       },
       validateImageUrl (val) {
-        this.imageUrlValidator = textLengthValidator(val, 1)
+        // TODO possibly implement image link validator
+        // this.imageUrlValidator = textLengthValidator(val, 0)
       },
       validateCategory (val) {
         this.categoryValidator = selectValidator(val)
@@ -331,11 +331,28 @@
     computed: {
       allModalFieldsValid () {
         return (this.titleValidator.state && this.categoryValidator.state && this.imageUrlValidator.state && this.textValidator.state)
+      },
+      categoryOptions () {
+        let options = [{value: null, text: 'Please Select a Category'}]
+        this.$store.getters.getCategories.forEach(cat => options.push({ value: cat.id, text: cat.name }))
+        return options
+      }
+    },
+    watch: {
+      selectedCategory (newCategory) {
+        // when selected category changes, re-fetch posts with the new category
+        this.fetchPosts(0, this.pageLimit, newCategory.id)
+      },
+      postSearchStr (newSearchStr) {
+        if (newSearchStr.length > 0) {
+          this.searchPosts(newSearchStr)
+        } else {
+          this.fetchPosts(this.pageNum, this.pageLimit, this.selectedCategory.id)
+        }
       }
     },
     created () {
       this.fetchPosts(0)
-      this.buildCategories()
     }
   }
 </script>

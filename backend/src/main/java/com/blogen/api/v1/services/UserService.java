@@ -22,6 +22,8 @@ public interface UserService {
 
     Optional<User> findByUserName( String name );
 
+    Optional<User> findById( Long id );
+
     User saveUser( User user );
 
     /**
@@ -32,6 +34,9 @@ public interface UserService {
     static String buildUserUrl( User user ) {
         return UserController.BASE_URL + "/" + user.getId();
     }
+
+
+    String buildAvatarUrl( User user );
 
     //delete user not supported in this version
 

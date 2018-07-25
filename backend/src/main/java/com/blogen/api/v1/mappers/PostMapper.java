@@ -3,6 +3,7 @@ package com.blogen.api.v1.mappers;
 import com.blogen.api.v1.model.CategoryDTO;
 import com.blogen.api.v1.model.PostDTO;
 import com.blogen.api.v1.model.PostUserDTO;
+import com.blogen.api.v1.services.UserService;
 import com.blogen.domain.Category;
 import com.blogen.domain.Post;
 import com.blogen.domain.User;
@@ -10,13 +11,13 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.factory.Mappers;
+import org.springframework.beans.factory.annotation.Value;
 
 /**
  * MapStruct mappers for mapping data between {@link com.blogen.domain.Post} and {@link com.blogen.api.v1.model.PostDTO}
  *
  * @author Cliff
  */
-//@Mapper(uses = {CategoryMapper.class, PostUserMapper.class} )
 @Mapper
 public interface PostMapper {
 
@@ -33,8 +34,15 @@ public interface PostMapper {
     CategoryDTO categoryToCategoryDto( Category category );
     Category categoryDtoToCategory( CategoryDTO categoryDTO );
 
-    @Mapping( target = "userUrl", expression = "java(com.blogen.api.v1.services.UserService.buildUserUrl(user))")
-    PostUserDTO userToPostUserDto( User user );
+    default PostUserDTO userToPostUserDto( User user ) {
+        PostUserDTO postUser = new PostUserDTO();
+        postUser.setId( user.getId() );
+        postUser.setUserName( user.getUserName() );
+        postUser.setUserUrl( UserService.buildUserUrl( user ) );
+        postUser.setAvatarUrl( user.getUserPrefs().getAvatarImage() );
+        return postUser;
+    }
+
     User postUserDtoToUser( PostUserDTO postUserDTO );
 
     //@Mapping( target = "user.userName", source = "userName")

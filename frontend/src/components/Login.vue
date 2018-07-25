@@ -101,7 +101,9 @@
               this.$store.commit('SET_AUTH_TOKEN', res.data.accessToken)
               this.$store.commit('SET_USER', res.data.user)
               axios.defaults.headers.common['Authorization'] = 'Bearer ' + res.data.accessToken
-              this.$router.push({name: 'posts'})
+              // get a list of categories and store in vuex
+              this.$store.dispatch('fetchCategories')
+                .then(() => this.$router.push({name: 'posts'}))
             } else {
               console.log('expected an access token but none was sent')
             }
