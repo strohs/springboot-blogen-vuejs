@@ -1,11 +1,11 @@
 <template>
   <!-- Main Posts Page -->
   <section>
-    <!-- DASHBOARD HEADER -->
-    <header id="main-header" class="py-2 bg-primary text-white">
-      <div class="container">
+    <!-- Post Page HEADER -->
+    <header id="post-header" class="py-2 bg-primary text-white">
+      <div class="container-fluid">
         <div class="row">
-          <div class="col-md-6">
+          <div class="col-sm-6">
                 <span>
                     <h1><icon class="mx-2" name="pencil-alt" scale="1.5"></icon>Posts (<small>{{selectedCategory.name}}</small>)</h1>
                 </span>
@@ -18,168 +18,72 @@
     <section id="search-posts" class="py-4 mb-4 bg-light">
       <div class="container">
         <div class="row">
-          <!-- POST Category FILTER -->
+          <!-- POST Category Filter Dropdown -->
           <div class="col-md-4">
             <app-category-filter-button v-model="selectedCategory"></app-category-filter-button>
           </div>
-          <!-- NEW POST Button -->
+          <!-- NEW Post Button -->
           <div class="col-md-4">
             <b-button block variant="primary" @click="showNewPostModal">
               <icon class="mx-2" name="plus"></icon>
               New Post
             </b-button>
           </div>
-          <!-- SEARCH -->
+          <!-- SEARCH Post input -->
           <div class="col-md-4">
             <app-post-search v-model="postSearchStr"></app-post-search>
           </div>
         </div>
-
       </div>
-
     </section>
 
     <!-- POSTS IN MEDIA OBJECTS STYLE -->
     <section id="posts" class="py-2">
-      <div class="container">
+      <div class="container-fluid">
+        <div v-for="post in posts" :key="post.id">
+          <div class="row my-2">
+            <div class="col">
+              <app-post-media v-bind="post" @replyPost="replyToPost"></app-post-media>
 
-        <!-- POST BEGIN HERE -->
-        <div class="media mt-3" th:each="parentPost : ${page.posts}">
-          <img class="d-flex mr-3" src="img/avatar2.jpg" th:src="@{'/img/'+${parentPost.userAvatar}}">
-          <div class="media-body">
-
-            <h5 class="font-weight-bold" th:text="${parentPost.title}">Loving the echo</h5>
-
-            <h6>By
-              <small th:text="${parentPost.userName}">rogueTwo</small>
-              in
-              <small class="font-italic" th:text="${parentPost.categoryName}">Tech Gadgets</small>
-              at
-              <small class="font-italic" th:text="${parentPost.created}">date</small>
-            </h6>
-
-            <span th:text="${parentPost.text}">Got one of these Amazon Echo things for Christmas. I don't think I'll leave the house.</span>
-            <div class="my-2">
-              <!--EDIT BUTTON - only users who created a post OR admins can edit it -->
-              <a th:if="${parentPost.userId == user.id || #authorization.expression('hasAuthority(''ADMIN'')')}"
-                 href="#" class="btn btn-outline-primary btn-sm"
-                 th:data-edit-post-id="${parentPost.id}" data-edit-post-id="2"
-                 th:data-edit-user-name="${parentPost.userName}" data-edit-user-name="johndoe"
-                 th:data-edit-title="${parentPost.title}" data-edit-title="Title"
-                 th:data-edit-text="${parentPost.text}" data-edit-text="Text"
-                 th:data-edit-image-url="${parentPost.imageUrl}" data-edit-image-url="http://blog.com"
-                 data-toggle="modal" data-target="#editPostModal">
-                Edit
-              </a>
-
-              <!--REPLY BUTTON - any user can reply to a parent post -->
-              <a href="#" class="btn btn-outline-success btn-sm"
-                 th:data-post-id="${parentPost.id}" data-post-id="2"
-                 th:data-cat-name="${parentPost.categoryName}" data-cat-name="Business" data-toggle="modal"
-                 data-target="#replyPostModal">
-                Reply
-              </a>
-
-              <!-- DELETE BUTTON only user that created a post can delete it -->
-              <a th:if="${parentPost.userId == user.id || #authorization.expression('hasAuthority(''ADMIN'')')}"
-                 href="#" th:href="@{'/posts/'+${parentPost.id}+'/delete'}"
-                 class="btn btn-outline-danger btn-sm" th:data-val="${parentPost.id}" data-val="2">
-                Delete
-              </a>
-            </div>
-
-
-            <!--CHILD POSTS start here -->
-            <div class="media mt-3" th:each="childPost : ${parentPost.children}">
-              <a class="d-flex pr-3" href="#">
-                <img src="img/avatar3.jpg" th:src="@{'/img/'+${childPost.userAvatar}}" class="img-thumbnail" width="100"
-                     height="100">
-              </a>
-              <div class="media-body">
-                <h5 class="mt-0" th:text="${childPost.title}">Loving the echo....be careful</h5>
-                <h6>By
-                  <small th:text="${childPost.userName}">rogueTwo</small>
-                  in
-                  <small class="font-italic" th:text="${childPost.categoryName}">Tech Gadgets</small>
-                  at
-                  <small class="font-italic" th:text="${childPost.created}">date</small>
-                </h6>
-                <span
-                  th:text="${childPost.text}">Be careful...I don't trust those things. They're always on... :(</span>
-                <div class="my-2">
-                  <!--EDIT BUTTON - only users who created a post OR admins can edit it -->
-                  <a th:if="${childPost.userId == user.id || #authorization.expression('hasAuthority(''ADMIN'')')}"
-                     href="#" class="btn btn-outline-primary btn-sm"
-                     th:data-edit-post-id="${childPost.id}" data-edit-post-id="2"
-                     th:data-edit-user-id="${childPost.userId}" data-edit-user-id="3"
-                     th:data-edit-user-name="${childPost.userName}" data-edit-user-name="3"
-                     th:data-edit-title="${childPost.title}" data-edit-title="Title"
-                     th:data-edit-text="${childPost.text}" data-edit-text="Text"
-                     th:data-edit-image-url="${childPost.imageUrl}" data-edit-image-url="http://blog.com"
-                     data-toggle="modal" data-target="#editPostModal">
-                    Edit
-                  </a>
-
-                  <!-- DELETE BUTTON only user that created a post can delete it -->
-                  <a th:if="${childPost.userId == user.id || #authorization.expression('hasAuthority(''ADMIN'')')}"
-                     href="#" th:href="@{'/posts/'+${childPost.id}+'/delete'}" class="btn btn-outline-danger btn-sm"
-                     th:data-val="${parentPost.id}" data-val="2">
-                    Delete
-                  </a>
+              <div class="row my-2" v-for="child in post.children" :key="child.id">
+                <div class="col-md-6 offset-md-2">
+                  <app-post-media v-bind="child" @replyPost="replyToPost"></app-post-media>
                 </div>
               </div>
-            </div>
 
-            <div class="media mt-3" th:remove="all">
-              <a class="d-flex pr-3" href="#">
-                <img src="img/avatar4.jpg" class="img-thumbnail" width="100" height="100">
-              </a>
-              <div class="media-body">
-                <h5 class="mt-0">Loving the echo...You're not alone</h5>
-                <h6>Tech Gadgets</h6>
-                I'm loving it too. I just played a game of chess on it. :)
-              </div>
             </div>
-
           </div>
+
         </div>
 
-        <div class="media mt-3" th:remove="all">
-          <img class="d-flex mr-3 align-self-start img-thumbnail" width="100" height="100" src="img/avatar.png">
-          <div class="media-body">
-            <h5 class="mt-0">Bootstrap 4</h5>
-            <h6>Web Development</h6>
-            Finally took the time to dig into this. It's amazing how you can do a lot with so little.
-          </div>
-        </div>
-
-
-        <!-- PAGINATION -->
-        <nav class="ml-4 mt-5">
-          <ul class="pagination">
-            <li class="page-item disabled" th:class="${page.requestedPage == 0 ? 'page-item disabled' : 'page-item'}">
-              <a href="#" th:href="@{/posts/show(cat=${page.selectedCategoryId},page=${page.requestedPage - 1})}"
-                 class="page-link">Previous</a>
-            </li>
-            <li class="page-item" th:each="i: ${#numbers.sequence(0,page.totalPages - 1)}">
-              <a href="#" th:href="@{/posts/show(cat=${page.selectedCategoryId},page=${i})}" class="page-link"
-                 th:text="${i + 1}">1</a>
-            </li>
-            <li class="page-item" th:remove="all">
-              <a href="#" class="page-link">2</a>
-            </li>
-            <li class="page-item" th:remove="all">
-              <a href="#" class="page-link">3</a>
-            </li>
-            <li class="page-item"
-                th:class="${page.requestedPage + 1 == page.totalPages ? 'page-item disabled' : 'page-item'}">
-              <a href="#" th:href="@{/posts/show(cat=${page.selectedCategoryId},page=${page.requestedPage + 1})}"
-                 class="page-link">Next</a>
-            </li>
-          </ul>
-        </nav>
       </div>
     </section>
+
+    <!-- PAGINATION -->
+    <nav class="ml-4 mt-5">
+      <ul class="pagination">
+        <li class="page-item disabled" th:class="${page.requestedPage == 0 ? 'page-item disabled' : 'page-item'}">
+          <a href="#" th:href="@{/posts/show(cat=${page.selectedCategoryId},page=${page.requestedPage - 1})}"
+             class="page-link">Previous</a>
+        </li>
+        <li class="page-item" th:each="i: ${#numbers.sequence(0,page.totalPages - 1)}">
+          <a href="#" th:href="@{/posts/show(cat=${page.selectedCategoryId},page=${i})}" class="page-link"
+             th:text="${i + 1}">1</a>
+        </li>
+        <li class="page-item" th:remove="all">
+          <a href="#" class="page-link">2</a>
+        </li>
+        <li class="page-item" th:remove="all">
+          <a href="#" class="page-link">3</a>
+        </li>
+        <li class="page-item"
+            th:class="${page.requestedPage + 1 == page.totalPages ? 'page-item disabled' : 'page-item'}">
+          <a href="#" th:href="@{/posts/show(cat=${page.selectedCategoryId},page=${page.requestedPage + 1})}"
+             class="page-link">Next</a>
+        </li>
+      </ul>
+    </nav>
+
     <!-- Modal for CRUD ops on a post -->
     <b-modal id="postModal" ref="postModalRef"
              :title="postModal.title"
@@ -218,6 +122,7 @@
       </b-form>
 
     </b-modal>
+
   </section>
 </template>
 
@@ -226,6 +131,7 @@
   import {logAxiosError} from '../../common'
   import CategoryFilterButton from './CategoryFilterButton'
   import PostSearch from './PostSearch'
+  import PostMedia from './PostMedia'
   import textLengthValidator from '../../validators/textLengthValidator'
   import selectValidator from '../../validators/selectValidator'
 
@@ -233,16 +139,28 @@
     name: 'Posts',
     components: {
       appCategoryFilterButton: CategoryFilterButton,
-      appPostSearch: PostSearch
+      appPostSearch: PostSearch,
+      appPostMedia: PostMedia
     },
     data () {
       return {
-        selectedCategory: {},
+        selectedCategory: { id: -1, name: 'All' },
         postSearchStr: '',
         pageNum: 0,
         pageLimit: 5,
         // array of posts to display in this component
-        posts: [],
+        posts: [{
+          id: 0,
+          text: '',
+          title: '',
+          created: '',
+          imageUrl: '',
+          user: {},
+          category: {},
+          postUrl: '',
+          parentPostUrl: null,
+          children: []
+        }],
         pageInfo: {
           totalElements: 0,
           totalPages: 0,
@@ -314,6 +232,9 @@
             logAxiosError(error)
           })
       },
+      replyToPost (id) {
+        console.log('reply to post:', id)
+      },
       validateTitle (val) {
         this.titleValidator = textLengthValidator(val, 1)
       },
@@ -358,5 +279,20 @@
 </script>
 
 <style scoped>
+  .fade-enter {
+    opacity: 0;
+  }
 
+  .fade-enter-active {
+    transition: opacity 1s;
+  }
+
+  .fade-leave {
+
+  }
+
+  .fade-leave-active {
+    transition: opacity 1s;
+    opacity: 0;
+  }
 </style>

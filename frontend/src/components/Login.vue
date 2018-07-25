@@ -22,7 +22,7 @@
                 <b-alert variant="danger" :show="loginError">
                   Invalid username or password
                 </b-alert>
-                <b-alert variant="success" dismissible :show="showStatusMessage" @dismissed="statusMessage = ''">
+                <b-alert variant="success" dismissible :show="isStatusMessage" @dismissed="statusMessage = ''">
                   {{ statusMessage }}
                 </b-alert>
 
@@ -121,7 +121,7 @@
       }
     },
     computed: {
-      showStatusMessage () {
+      isStatusMessage () {
         return (this.statusMessage != null && this.statusMessage.length > 0)
       }
     },

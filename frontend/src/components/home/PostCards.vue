@@ -8,8 +8,8 @@
 
 <script>
   import PostCard from './PostCard'
-  import axios from '../axios-auth'
-  import {logAxiosError} from '../common'
+  import axios from '../../axios-auth'
+  import {logAxiosError} from '../../common'
 
   export default {
     name: 'PostCards',

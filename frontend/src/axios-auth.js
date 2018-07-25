@@ -1,4 +1,5 @@
 import axios from 'axios'
+import constants from './common/constants'
 
 /**
  * example of creating a custom axios instance that we can configure and then import into our modules where needed
@@ -9,7 +10,7 @@ import axios from 'axios'
 
 const instance = axios.create({
   // TODO see if authentication header can be configured with Bearer token
-  baseURL: 'http://localhost:8088',
+  baseURL: constants.API_SERVER_URL,
   responseType: 'json' // default
   // `headers` are custom headers to be sent
   // headers: {'X-Requested-With': 'XMLHttpRequest'},
