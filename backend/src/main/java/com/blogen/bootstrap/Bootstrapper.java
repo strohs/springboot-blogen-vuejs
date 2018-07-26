@@ -85,23 +85,23 @@ public class Bootstrapper implements ApplicationListener<ContextRefreshedEvent> 
         //BUILD USER PREFS
         UserPrefsBuilder upb = new UserPrefsBuilder( "avatar3.jpg" );
         UserPrefs upJohn = upb.build();
-        userPrefsRepository.save( upJohn );
+        //userPrefsRepository.save( upJohn );
 
         upb = new UserPrefsBuilder( "avatar2.jpg" );
         UserPrefs upAdmin = upb.build();
-        userPrefsRepository.save( upAdmin );
+        //userPrefsRepository.save( upAdmin );
 
         upb = new UserPrefsBuilder( "avatar1.jpg" );
         UserPrefs upMaggie = upb.build();
-        userPrefsRepository.save( upMaggie );
+        //userPrefsRepository.save( upMaggie );
 
         upb = new UserPrefsBuilder( "avatar4.jpg");
         UserPrefs upWilliam = upb.build();
-        userPrefsRepository.save( upWilliam );
+        //userPrefsRepository.save( upWilliam );
 
         upb = new UserPrefsBuilder( "avatar5.jpg");
         UserPrefs upElizabeth = upb.build();
-        userPrefsRepository.save( upElizabeth );
+        //userPrefsRepository.save( upElizabeth );
 
 
         
@@ -116,30 +116,35 @@ public class Bootstrapper implements ApplicationListener<ContextRefreshedEvent> 
         User admin = ub.build();
         admin.addRole( adminRole );
         admin.addRole( userRole );
+        admin.setUserPrefs( upAdmin );
         userService.saveUser( admin );
 
         //JohnDoe
         ub = new UserBuilder( "johndoe","John","Doe","jdoe@gmail.com","password", upJohn );
         User john = ub.build();
         john.addRole( userRole );
+        john.setUserPrefs( upJohn );
         userService.saveUser( john );
 
         //Maggie McGill
         ub = new UserBuilder( "mgill","Maggie","McGill","gilly@yahoo.com","password", upMaggie );
         User maggie = ub.build();
         maggie.addRole( userRole );
+        maggie.setUserPrefs( upMaggie );
         userService.saveUser( maggie );
 
         //William Wallace
         ub = new UserBuilder( "scotsman","William","Wallace","scotty@hotmail.com","password", upWilliam );
         User william = ub.build();
         william.addRole( userRole );
+        william.setUserPrefs( upWilliam );
         userService.saveUser( william );
 
         //Elizabeth Reed
         ub = new UserBuilder( "lizreed","Elizabeth","Reed","liz@gmail.com","password", upElizabeth);
         User elizabeth = ub.build();
         elizabeth.addRole( userRole );
+        elizabeth.setUserPrefs( upElizabeth );
         userService.saveUser( elizabeth );
 
 

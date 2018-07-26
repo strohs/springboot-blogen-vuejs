@@ -7,6 +7,7 @@ import com.blogen.api.v1.model.UserDTO;
 import com.blogen.api.v1.services.AuthorizationService;
 import com.blogen.api.v1.services.PostService;
 import com.blogen.api.v1.validators.UserDtoSignupValidator;
+import com.blogen.services.AvatarService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * Controller for handling new-user sign-ups and user log-ins
@@ -36,7 +38,9 @@ public class AuthorizationController {
     private PostService postService;
 
     @Autowired
-    public AuthorizationController( AuthorizationService authorizationService, UserDtoSignupValidator userSignupValidator, PostService postService ) {
+    public AuthorizationController( AuthorizationService authorizationService,
+                                    UserDtoSignupValidator userSignupValidator,
+                                    PostService postService ) {
         this.authorizationService = authorizationService;
         this.userSignupValidator = userSignupValidator;
         this.postService = postService;
@@ -71,4 +75,5 @@ public class AuthorizationController {
         log.debug( "get latest posts limit={}", limit );
         return postService.getPosts( -1L, 0, limit );
     }
+
 }
