@@ -12,7 +12,9 @@ export default new Router({
     { path: '/', name: 'home', component: Home },
     { path: '/login', name: 'login', component: Login, props: true },
     { path: '/signup', name: 'userProfile', component: UserProfile },
-    { path: '/posts', name: 'posts', component: Posts }
+    { path: '/posts', name: 'posts', component: Posts },
+    // catch all route that handles any URL not explicitly handled above it
+    { path: '*', redirect: '/' }
   ],
   mode: 'history'
 })

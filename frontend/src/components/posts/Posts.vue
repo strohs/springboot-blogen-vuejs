@@ -37,17 +37,22 @@
       </div>
     </section>
 
-    <!-- POSTS IN MEDIA OBJECTS STYLE -->
+    <!-- List of Posts and child posts -->
     <section id="posts" class="py-2">
       <div class="container-fluid">
         <div v-for="post in posts" :key="post.id">
           <div class="row my-2">
             <div class="col">
-              <app-post-media v-bind="post" @replyPost="replyToPost"></app-post-media>
+              <transition appear name="fade" mode="out-in">
+                <app-post-media v-bind="post" @replyPost="replyToPost"></app-post-media>
+              </transition>
+
 
               <div class="row my-2" v-for="child in post.children" :key="child.id">
                 <div class="col-md-6 offset-md-2">
-                  <app-post-media v-bind="child" @replyPost="replyToPost"></app-post-media>
+                  <transition appear name="fade" mode="out-in">
+                    <app-post-media v-bind="child" @replyPost="replyToPost"></app-post-media>
+                  </transition>
                 </div>
               </div>
 
@@ -60,29 +65,13 @@
     </section>
 
     <!-- PAGINATION -->
-    <nav class="ml-4 mt-5">
-      <ul class="pagination">
-        <li class="page-item disabled" th:class="${page.requestedPage == 0 ? 'page-item disabled' : 'page-item'}">
-          <a href="#" th:href="@{/posts/show(cat=${page.selectedCategoryId},page=${page.requestedPage - 1})}"
-             class="page-link">Previous</a>
-        </li>
-        <li class="page-item" th:each="i: ${#numbers.sequence(0,page.totalPages - 1)}">
-          <a href="#" th:href="@{/posts/show(cat=${page.selectedCategoryId},page=${i})}" class="page-link"
-             th:text="${i + 1}">1</a>
-        </li>
-        <li class="page-item" th:remove="all">
-          <a href="#" class="page-link">2</a>
-        </li>
-        <li class="page-item" th:remove="all">
-          <a href="#" class="page-link">3</a>
-        </li>
-        <li class="page-item"
-            th:class="${page.requestedPage + 1 == page.totalPages ? 'page-item disabled' : 'page-item'}">
-          <a href="#" th:href="@{/posts/show(cat=${page.selectedCategoryId},page=${page.requestedPage + 1})}"
-             class="page-link">Next</a>
-        </li>
-      </ul>
-    </nav>
+    <b-pagination class="ml-4 mt-5"
+                  v-model="currentPageNum"
+                  :total-rows="pageInfo.totalElements"
+                  :per-page="pageInfo.pageSize"
+                  @input="fetchPage"
+    >
+    </b-pagination>
 
     <!-- Modal for CRUD ops on a post -->
     <b-modal id="postModal" ref="postModalRef"
@@ -146,7 +135,7 @@
       return {
         selectedCategory: { id: -1, name: 'All' },
         postSearchStr: '',
-        pageNum: 0,
+        currentPageNum: 0,
         pageLimit: 5,
         // array of posts to display in this component
         posts: [{
@@ -161,11 +150,11 @@
           parentPostUrl: null,
           children: []
         }],
-        pageInfo: {
-          totalElements: 0,
-          totalPages: 0,
-          pageNumber: 0,
-          pageSize: 0
+        pageInfo: {          // pageInfo is returned by the API on each page request
+          totalElements: 0,   // total posts available using the current filter criteria
+          totalPages: 0,      // total pages available using the current filter criteria
+          pageNumber: 0,      // the page number of data that was requested (0 based indices)
+          pageSize: 0         // the maximum number of parent posts that will be displayed on a page
         },
         // data that is used by our modal
         postModal: {
@@ -182,12 +171,12 @@
       }
     },
     methods: {
-      fetchPosts (pageNum, pageLimit = 5, category = -1) {
+      fetchPosts (pageNum, pageLimit = 5, categoryId = -1) {
         axios.get('/api/v1/posts', {
           params: {
             page: pageNum,
             limit: pageLimit,
-            category: category
+            category: categoryId
           }
         })
           .then(res => {
@@ -196,8 +185,13 @@
             this.pageInfo = res.data.pageInfo
           })
           .catch(error => {
+            // TODO check for 401 errors
             logAxiosError(error)
           })
+      },
+      fetchPage (pageNum) {
+        // API page numbers are 0-based, so subtract one from pageNum
+        this.fetchPosts(pageNum - 1, this.pageLimit, this.selectedCategory.id)
       },
       searchPosts (searchStr, pageLimit = 5) {
         axios.get(`/api/v1/posts/search/${searchStr}`, {
@@ -222,7 +216,7 @@
         this.$refs.postModalRef.show()
       },
       submitPostModal () {
-        console.log('submitting post:', this.postModal.post)
+        // console.log('submitting post:', this.postModal.post)
         axios.post('/api/v1/posts', this.postModal.post)
           .then(res => {
             this.posts.splice(0, 0, res.data)
@@ -233,7 +227,7 @@
           })
       },
       replyToPost (id) {
-        console.log('reply to post:', id)
+
       },
       validateTitle (val) {
         this.titleValidator = textLengthValidator(val, 1)
@@ -257,6 +251,9 @@
         let options = [{value: null, text: 'Please Select a Category'}]
         this.$store.getters.getCategories.forEach(cat => options.push({ value: cat.id, text: cat.name }))
         return options
+      },
+      navPageNumber () {
+        return this.pageInfo.pageNumber + 1
       }
     },
     watch: {
@@ -268,7 +265,7 @@
         if (newSearchStr.length > 0) {
           this.searchPosts(newSearchStr)
         } else {
-          this.fetchPosts(this.pageNum, this.pageLimit, this.selectedCategory.id)
+          this.fetchPosts(this.currentPageNum, this.pageLimit, this.selectedCategory.id)
         }
       }
     },
@@ -294,5 +291,33 @@
   .fade-leave-active {
     transition: opacity 1s;
     opacity: 0;
+  }
+
+  .slide-enter-active {
+    animation: slide-in 500ms ease-out forwards;
+  }
+  .slide-leave-active {
+    animation: slide-out 500ms ease-out forwards;
+  }
+
+  @keyframes slide-in {
+    from {
+      transform: translateX(50px);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+  @keyframes slide-out {
+    from {
+      transform: translateX(0px);
+      opacity: 1;
+    }
+    to {
+      transform: translateX(50px);
+      opacity: 0;
+    }
   }
 </style>

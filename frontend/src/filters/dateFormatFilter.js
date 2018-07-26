@@ -6,6 +6,6 @@ export {dateLongFormat}
  * @returns {string}
  */
 function dateLongFormat (dateStr) {
-  const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }
+  const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric' }
   return new Date(dateStr).toLocaleDateString('en-US', options)
 }
