@@ -14,11 +14,18 @@
     </h6>
     <p>{{ text }}</p>
     <!-- CRUD buttons for a post -->
-    <div class="my-2">
-      <b-button id="replyButton" size="sm" variant="outline-success" v-if="isParentPost" @click="$emit('replyPost',id)">Reply</b-button>
-      <b-btn id="editButton" size="sm" variant="outline-primary" v-if="canEditOrDeletePost">Edit</b-btn>
-      <b-btn id="deleteButton" size="sm" variant="outline-danger" v-if="canEditOrDeletePost">Delete</b-btn>
-    </div>
+
+      <app-reply-post v-if="isParentPost" :postId="id" @submitPost="replyToPost">
+      </app-reply-post>
+
+      <!--<b-btn id="editButton" size="sm" variant="outline-primary"-->
+             <!--v-if="canEditOrDeletePost" @click="$emit('editPost',id)">-->
+        <!--Edit-->
+      <!--</b-btn>-->
+      <!--<b-btn id="deleteButton" size="sm" variant="outline-danger"-->
+             <!--v-if="canEditOrDeletePost" @click="$emit('deletePost',id)">-->
+        <!--Delete-->
+      <!--</b-btn>-->
 
     <!-- [Optional: add media children here for nesting] -->
   </b-media>
@@ -27,9 +34,13 @@
 <script>
   import constants from '../../common/constants'
   import {dateLongFormat} from '../../filters/dateFormatFilter'
+  import ReplyPost from './ReplyPost'
 
   export default {
     name: 'PostMedia',
+    components: {
+      appReplyPost: ReplyPost
+    },
     props: {
       id: Number,
       title: String,
@@ -39,6 +50,12 @@
       category: Object,
       user: Object,
       parentPostUrl: String
+    },
+    methods: {
+      replyToPost (postData) {
+        console.log(`reply to post id:${this.id} with data:${postData}`)
+        this.$store.dispatch('createPost', {id: this.id, post: postData})
+      }
     },
     computed: {
       avatarUrl () {

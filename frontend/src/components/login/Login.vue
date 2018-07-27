@@ -67,14 +67,15 @@
 </template>
 
 <script>
-  import axios from '../axios-auth'
-  import {logAxiosError} from '../common'
-  import {defaultUsers} from '../common/defaultUsers'
+  import axios from '../../axios-auth'
+  import {logAxiosError} from '../../common'
+  import {defaultUsers} from '../../common/defaultUsers'
 
   export default {
     name: 'Login',
     props: {
-      logout: Boolean
+      logout: Boolean,
+      message: ''
     },
     data () {
       return {
@@ -83,7 +84,7 @@
           password: ''
         },
         blogenUsers: defaultUsers,
-        statusMessage: '',
+        statusMessage: this.message,
         loginError: false,
         showHelp: false
       }
@@ -127,6 +128,7 @@
     },
     mounted () {
       this.login.username = this.$store.state.user.userName
+      console.log('LOGIN PAGE PROPS.message:', this.message)
       if (this.logout === true) {
         this.doLogout()
         this.statusMessage = 'You have been logged out'

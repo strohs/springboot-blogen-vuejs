@@ -4,7 +4,10 @@
 
     <b-navbar-toggle target="nav_collapse"></b-navbar-toggle>
 
-    <b-navbar-brand to="/">Blogen</b-navbar-brand>
+    <b-navbar-brand to="/">
+      <app-blogen-logo :height="30" :width="30"></app-blogen-logo>
+      Blogen
+    </b-navbar-brand>
 
     <b-collapse is-nav id="nav_collapse">
       <b-navbar-nav>
@@ -47,9 +50,13 @@
 
 <script>
   import { mapGetters } from 'vuex'
+  import BlogenLogo from './common/BlogenLogo'
 
   export default {
     name: 'Navbar',
+    components: {
+      appBlogenLogo: BlogenLogo
+    },
     computed: {
       ...mapGetters([
         'isAuthenticated',
