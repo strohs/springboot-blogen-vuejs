@@ -77,7 +77,7 @@
   import axios from '../axios-auth'
   import textLengthValidator from '../validators/textLengthValidator'
   import emailValidator from '../validators/emailValidator'
-  import { logAxiosError } from '../common'
+  import { handleAxiosError } from '../common'
 
   export default {
     name: 'UserProfile',
@@ -115,7 +115,7 @@
             })
           })
           .catch(error => {
-            logAxiosError(error)
+            handleAxiosError(error)
           })
       },
       validateUserName (val) {

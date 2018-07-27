@@ -6,26 +6,23 @@
 
     <h5 class="font-weight-bold">{{ title }}</h5>
     <h6>Posted By:
-      <small>{{ user.userName }}</small>
+      <small><strong>{{ user.userName }}</strong></small>
       in
       <small class="font-italic">{{ category.name }}</small>
       on
       <small class="font-italic">{{ created | formatDate }}</small>
     </h6>
     <p>{{ text }}</p>
+
     <!-- CRUD buttons for a post -->
+    <div class="row">
+      <app-reply-post v-if="isParentPost" :postId="id"></app-reply-post>
 
-      <app-reply-post v-if="isParentPost" :postId="id" @submitPost="replyToPost">
-      </app-reply-post>
+      <app-edit-post v-if="canEditOrDeletePost" :postId="id"></app-edit-post>
 
-      <!--<b-btn id="editButton" size="sm" variant="outline-primary"-->
-             <!--v-if="canEditOrDeletePost" @click="$emit('editPost',id)">-->
-        <!--Edit-->
-      <!--</b-btn>-->
-      <!--<b-btn id="deleteButton" size="sm" variant="outline-danger"-->
-             <!--v-if="canEditOrDeletePost" @click="$emit('deletePost',id)">-->
-        <!--Delete-->
-      <!--</b-btn>-->
+      <app-delete-post v-if="canEditOrDeletePost" :postId="id"></app-delete-post>
+
+    </div>
 
     <!-- [Optional: add media children here for nesting] -->
   </b-media>
@@ -34,12 +31,17 @@
 <script>
   import constants from '../../common/constants'
   import {dateLongFormat} from '../../filters/dateFormatFilter'
+  import { mapGetters } from 'vuex'
   import ReplyPost from './ReplyPost'
+  import EditPost from './EditPost'
+  import DeletePost from './DeletePost'
 
   export default {
     name: 'PostMedia',
     components: {
-      appReplyPost: ReplyPost
+      appReplyPost: ReplyPost,
+      appEditPost: EditPost,
+      appDeletePost: DeletePost
     },
     props: {
       id: Number,
@@ -52,19 +54,19 @@
       parentPostUrl: String
     },
     methods: {
-      replyToPost (postData) {
-        console.log(`reply to post id:${this.id} with data:${postData}`)
-        this.$store.dispatch('createPost', {id: this.id, post: postData})
-      }
     },
     computed: {
+      ...mapGetters([
+        'isAdmin',
+        'getAuthUserId'
+      ]),
       avatarUrl () {
         return constants.API_SERVER_URL + this.user.avatarUrl
       },
       canEditOrDeletePost () {
         // the logged in user can delete a post of they created the post
-        const loggedInUserId = this.$store.state.user.id
-        return (loggedInUserId === this.user.id)
+        // ADMINS can edit or delete all posts
+        return ((this.getAuthUserId === this.user.id) || this.isAdmin)
       },
       isParentPost () {
         // a post is a parent post if its parentPostUrl is null

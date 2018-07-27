@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from '../axios-auth'
-import {logAxiosError} from '../common'
+import {handleAxiosError} from '../common'
 
 Vue.use(Vuex)
 
@@ -45,11 +45,14 @@ export const store = new Vuex.Store({
     getAuthToken: state => {
       return state.AUTH_TOKEN
     },
-    getUserRoles: state => {
+    getAuthUserRoles: state => {
       return state.user.roles
     },
-    getUser: state => {
+    getAuthUser: state => {
       return state.user
+    },
+    getAuthUserId: state => {
+      return state.user.id
     },
     getCategories: state => {
       return state.categories
@@ -68,16 +71,22 @@ export const store = new Vuex.Store({
       }
     },
     getPostIndicesById: (state) => (id) => {
-      // returns an object of two integers representing the parent index and child index of the post that
-      // has the passed in id. If child index is -1, then the post is a parent post
+      // find a post by id in this.posts as well as in this.posts.children
       let indices = {pi: -1, ci: -1}
-      state.posts.forEach((post, idx) => {
-        if (post.id === id) {
-          indices.pi = idx
+      for (let pi = 0; pi < state.posts.length; pi++) {
+        if (state.posts[pi].id === id) {
+          indices.pi = pi
+          break
         } else {
-          indices.ci = post.children.findIndex(child => child.id === id)
+          for (let ci = 0; ci < state.posts[pi].children.length; ci++) {
+            if (state.posts[pi].children[ci].id === id) {
+              indices.pi = pi
+              indices.ci = ci
+              break
+            }
+          }
         }
-      })
+      }
       return indices
     },
     isAuthenticated: state => {
@@ -101,7 +110,7 @@ export const store = new Vuex.Store({
       }
     },
     'RESET_USER' (state) {
-      state.user = { id: 0, firstName: '', lastName: '', userName: '', email: '', roles: [] }
+      state.user = {id: 0, firstName: '', lastName: '', userName: '', email: '', roles: []}
     },
     'SET_CATEGORIES' (state, categoriesArr) {
       state.categories = categoriesArr
@@ -121,21 +130,28 @@ export const store = new Vuex.Store({
     },
     'UPDATE_POST' (state, {pi, ci, newPost}) {
       // pi is index of parent post to update and ci is index of child post to update
+      // console.log(`pi:${pi} ci:${ci} postData`, newPost)
       if (ci >= 0) {
-        state.posts[pi].children[ci] = newPost
+        state.posts[pi].children.splice(ci, 1, newPost)
       } else {
-        state.posts[pi] = newPost
+        state.posts.splice(pi, 1, newPost)
       }
     },
     'DELETE_POST' (state, {pi, ci}) {
-      if (ci) {
+      console.log(`DELETE_POST pi:${pi} ci:${ci}`)
+      if (ci >= 0) {
+        // a child index was provided so delete the child post
         state.posts[pi].children.splice(ci, 1)
       } else {
-        state.posts[pi].splice(pi, 1)
+        // a parent index should always be provided, so delete it
+        state.posts.splice(pi, 1)
       }
     },
     'SET_PAGE_INFO' (state, pageInfo) {
       state.pageInfo = pageInfo
+    },
+    'SET_CURRENT_PAGE_NUM' (state, pageNum) {
+      state.pageInfo.pageNumber = pageNum
     }
   },
   actions: {
@@ -161,11 +177,10 @@ export const store = new Vuex.Store({
           commit('SET_CATEGORIES', res.data.categories)
         })
         .catch(error => {
-          // TODO check for 401 and redirect
-          logAxiosError(error)
+          handleAxiosError(error)
         })
     },
-    fetchPosts: ({commit}, {pageNum, pageLimit, categoryId}) => {
+    fetchPosts: ({commit, dispatch}, {pageNum, pageLimit, categoryId}) => {
       axios.get('/api/v1/posts', {
         params: {
           page: pageNum,
@@ -179,8 +194,7 @@ export const store = new Vuex.Store({
           commit('SET_PAGE_INFO', res.data.pageInfo)
         })
         .catch(error => {
-          // TODO check for 401 and redirect
-          logAxiosError(error)
+          handleAxiosError(error)
         })
     },
     createPost: (context, {id, post}) => {
@@ -198,8 +212,7 @@ export const store = new Vuex.Store({
           }
         })
         .catch(error => {
-          // TODO check for 401 and redirect
-          logAxiosError(error)
+          handleAxiosError(error)
         })
     },
     updatePost: (context, {id, post}) => {
@@ -211,8 +224,7 @@ export const store = new Vuex.Store({
           context.dispatch('updatePostData', {id: id, newPost: res.data})
         })
         .catch(error => {
-          // TODO check for 401 and redirect
-          logAxiosError(error)
+          handleAxiosError(error)
         })
     },
     deletePost: (context, id) => {
@@ -224,8 +236,7 @@ export const store = new Vuex.Store({
           context.commit('DELETE_POST', indices)
         })
         .catch(error => {
-          // TODO check for 401 and redirect
-          logAxiosError(error)
+          handleAxiosError(error)
         })
     }
   }

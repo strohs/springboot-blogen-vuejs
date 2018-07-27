@@ -6,7 +6,7 @@
     <b-form-group id="titleGroup" label="Title" label-for="title"
                   :state="titleValidator.state" :invalid-feedback="titleValidator.invalidFeedback"
                   :valid-feedback="titleValidator.validFeedback">
-      <b-form-input v-model.trim="post.title" id="title" type="text" placeholder="post title"
+      <b-form-input v-model="post.title" id="title" type="text" placeholder="post title"
                     :state="titleValidator.state" @change="validateTitle" required></b-form-input>
     </b-form-group>
 
@@ -90,6 +90,13 @@
         this.$store.getters.getCategories.forEach(cat => options.push({ value: cat.id, text: cat.name }))
         return options
       }
+    },
+    created () {
+      // pre-validate any filled in form fields
+      this.validateTitle(this.title)
+      this.validateText(this.text)
+      this.validateImageUrl(this.imageUrl)
+      this.validateCategory(this.categoryId)
     }
   }
 </script>

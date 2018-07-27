@@ -9,7 +9,7 @@
 <script>
   import PostCard from './PostCard'
   import axios from '../../axios-auth'
-  import {logAxiosError} from '../../common'
+  import {handleAxiosError} from '../../common'
 
   export default {
     name: 'PostCards',
@@ -26,7 +26,7 @@
             this.posts = this.posts.concat(res.data.posts)
           })
           .catch(error => {
-            logAxiosError(error)
+            handleAxiosError(error)
           })
       }
     },

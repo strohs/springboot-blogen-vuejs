@@ -19,10 +19,8 @@
                 </div>
               </b-card-header>
               <b-card-body>
-                <b-alert variant="danger" :show="loginError">
-                  Invalid username or password
-                </b-alert>
-                <b-alert variant="success" dismissible :show="isStatusMessage" @dismissed="statusMessage = ''">
+
+                <b-alert variant="info" dismissible :show="isStatusMessage" @dismissed="statusMessage = ''">
                   {{ statusMessage }}
                 </b-alert>
 
@@ -68,7 +66,7 @@
 
 <script>
   import axios from '../../axios-auth'
-  import {logAxiosError} from '../../common'
+// import {handleAxiosError} from '../../common'
   import {defaultUsers} from '../../common/defaultUsers'
 
   export default {
@@ -108,17 +106,18 @@
             } else {
               console.log('expected an access token but none was sent')
             }
-            this.loginError = false
           })
           .catch(error => {
-            logAxiosError(error)
-            this.loginError = true
+            if (error.response.status === 401) {
+              this.statusMessage = 'Invalid Username or Password'
+            } else {
+              this.statusMessage = 'Some other error occurred, please contact the server admin'
+              console.log('login error:', error.response.message)
+            }
           })
       },
       doLogout () {
-        console.log('DO LOGOUT')
-        this.$store.commit('LOGOUT')
-        // this.message = 'You have been logged out'
+        this.$store.dispatch('doLogout')
       }
     },
     computed: {
@@ -128,10 +127,8 @@
     },
     mounted () {
       this.login.username = this.$store.state.user.userName
-      console.log('LOGIN PAGE PROPS.message:', this.message)
       if (this.logout === true) {
         this.doLogout()
-        this.statusMessage = 'You have been logged out'
       }
     }
   }

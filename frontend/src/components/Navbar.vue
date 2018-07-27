@@ -17,7 +17,7 @@
       </b-navbar-nav>
 
       <b-navbar-nav class="ml-auto">
-        <b-nav-item-dropdown :text="'Welcome ' + getUser.userName" left v-if="isAuthenticated">
+        <b-nav-item-dropdown :text="'Welcome ' + getAuthUser.userName" left v-if="isAuthenticated">
           <b-dropdown-item to="/profile">
             <icon name="user-cog"></icon>
             Profile
@@ -61,7 +61,8 @@
       ...mapGetters([
         'isAuthenticated',
         'isAdmin',
-        'getUser'
+        'getAuthUser',
+        'getAuthUserId'
       ])
     }
   }

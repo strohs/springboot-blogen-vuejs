@@ -38,7 +38,7 @@
     <section id="posts" class="py-2">
       <div class="container-fluid">
         <div v-for="post in posts" :key="post.id">
-          <div class="row my-2">
+          <div class="row my-4">
             <div class="col">
               <transition appear name="fade" mode="out-in">
                 <app-post-media v-bind="post">
@@ -65,10 +65,10 @@
 
     <!-- PAGINATION -->
     <b-pagination class="ml-4 mt-5"
-                  v-model="currentPageNum"
+                  v-model="currentNavPage"
                   :total-rows="pageInfo.totalElements"
                   :per-page="pageInfo.pageSize"
-                  @input="fetchPage"
+                  @change="fetchPage"
     >
     </b-pagination>
 
@@ -78,7 +78,7 @@
 
 <script>
   import axios from '../../axios-auth'
-  import { logAxiosError } from '../../common'
+  import { handleAxiosError } from '../../common'
   import CategoryFilterButton from './CategoryFilterButton'
   import NewPost from './NewPost'
   import PostSearch from './PostSearch'
@@ -97,19 +97,26 @@
       return {
         selectedCategory: { id: -1, name: 'All' },
         postSearchStr: '',
-        currentPageNum: 0,
-        pageLimit: 5
+        pageLimit: 3,
+        currentNavPage: 1
       }
     },
+    computed: {
+      ...mapState([
+        'posts',
+        'pageInfo'
+      ])
+    },
     methods: {
-      fetchPosts (pageNum, pageLimit = 5, categoryId = -1) {
+      fetchPosts (pageNum, pageLimit = 3, categoryId = -1) {
         this.$store.dispatch('fetchPosts', {pageNum, pageLimit, categoryId})
       },
       fetchPage (pageNum) {
+        console.log('fetchPAGE:', pageNum)
         // API page numbers are 0-based, so subtract one from pageNum
         this.fetchPosts(pageNum - 1, this.pageLimit, this.selectedCategory.id)
       },
-      searchPosts (searchStr, pageLimit = 5) {
+      searchPosts (searchStr, pageLimit = 3) {
         // TODO add to store
         axios.get(`/api/v1/posts/search/${searchStr}`, {
           params: {
@@ -122,48 +129,21 @@
             this.$store.commit('SET_PAGE_INFO', res.data.pageInfo)
           })
           .catch(error => {
-            logAxiosError(error)
+            handleAxiosError(error)
           })
-      }
-      // findPostIndex (id) {
-      //   // find a post by id in this.posts as well as in this.posts.children
-      //   let indices = { parentIndex: -1, childIndex: undefined }
-      //   for (let pi = 0; pi < this.posts.length; pi++) {
-      //     if (this.posts[pi].id === id) {
-      //       indices.parentIndex = pi
-      //       break
-      //     } else {
-      //       for (let ci = 0; ci < this.posts[pi].children.length; ci++) {
-      //         if (this.posts[pi].children[ci].id === id) {
-      //           indices.parentIndex = pi
-      //           indices.childIndex = ci
-      //           break
-      //         }
-      //       }
-      //     }
-      //   }
-      //   return indices
-      // },
-    },
-    computed: {
-      ...mapState([
-        'posts',
-        'pageInfo'
-      ]),
-      navPageNumber () {
-        return this.pageInfo.pageNumber + 1
       }
     },
     watch: {
       selectedCategory (newCategory) {
-        // when selected category changes, re-fetch posts with the new category
+        // when selected category changes, re-fetch posts with the new category and start on the first page
+        this.currentNavPage = 1
         this.fetchPosts(0, this.pageLimit, newCategory.id)
       },
       postSearchStr (newSearchStr) {
         if (newSearchStr.length > 0) {
           this.searchPosts(newSearchStr)
         } else {
-          this.fetchPosts(this.currentPageNum, this.pageLimit, this.selectedCategory.id)
+          this.fetchPosts(this.pageInfo.pageNumber, this.pageLimit, this.selectedCategory.id)
         }
       }
     },

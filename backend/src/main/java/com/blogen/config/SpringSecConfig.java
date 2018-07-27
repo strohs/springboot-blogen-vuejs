@@ -29,6 +29,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
  * @author Cliff
  */
 @Configuration
+@EnableWebSecurity
 @EnableGlobalMethodSecurity(jsr250Enabled = true)
 public class SpringSecConfig extends WebSecurityConfigurerAdapter {
 
@@ -70,7 +71,7 @@ public class SpringSecConfig extends WebSecurityConfigurerAdapter {
         //this will allow swagger UI and h2-console through spring-security
         web.ignoring().antMatchers("/v2/api-docs", "/configuration/ui", "/swagger-resources",
                 "/configuration/security", "/swagger-ui.html", "/webjars/**", "/console/*",
-                "/h2-console/**");
+                "/h2-console/**", "/actuator/**");
     }
 
     @Autowired
