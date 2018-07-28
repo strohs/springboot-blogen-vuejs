@@ -1,6 +1,8 @@
 package com.blogen.services.utils;
 
+import com.blogen.api.v1.model.PageInfoResponse;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
@@ -32,5 +34,14 @@ public class PageRequestBuilder {
 
     public PageRequest buildPageRequest( int pageNum, int elementsPerPage, Sort.Direction sortDir, String property ) {
         return PageRequest.of( pageNum, elementsPerPage, sortDir, property );
+    }
+
+    public static PageInfoResponse buildPageInfoResponse( Page page ) {
+        return PageInfoResponse.builder()
+                .totalPages( page.getTotalPages() )
+                .totalElements( page.getTotalElements() )
+                .pageSize( page.getSize() )
+                .pageNumber( page.getNumber() )
+                .build();
     }
 }

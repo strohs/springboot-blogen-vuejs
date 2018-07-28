@@ -4,6 +4,8 @@ import com.blogen.api.v1.model.CategoryDTO;
 import com.blogen.domain.Category;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.NullValueCheckStrategy;
 import org.mapstruct.factory.Mappers;
 
 /**
@@ -12,7 +14,7 @@ import org.mapstruct.factory.Mappers;
  *
  * @author Cliff
  */
-@Mapper
+@Mapper(nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS)
 public interface CategoryMapper {
 
     CategoryMapper INSTANCE = Mappers.getMapper( CategoryMapper.class );
@@ -22,4 +24,5 @@ public interface CategoryMapper {
 
     Category categoryDtoToCategory( CategoryDTO categoryDTO );
 
+    void updateCategoryFromCategoryDTO( CategoryDTO requestDTO, @MappingTarget Category category );
 }

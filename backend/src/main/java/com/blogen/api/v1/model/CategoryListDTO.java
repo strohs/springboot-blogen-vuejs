@@ -18,4 +18,6 @@ public class CategoryListDTO {
     @ApiModelProperty(value = "container for categoryDTO", readOnly = true)
     List<CategoryDTO> categories;
 
+    @ApiModelProperty(value = "page information", readOnly = true)
+    PageInfoResponse pageInfo;
 }

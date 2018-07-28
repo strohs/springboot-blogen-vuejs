@@ -43,12 +43,21 @@ public class CategoryController {
         binder.addValidators( categoryDtoValidator );
     }
 
-    @ApiOperation( value = "get a list of all categories", produces = "application/json")
+//    @ApiOperation( value = "get a list of all categories", produces = "application/json")
+//    @GetMapping
+//    @ResponseStatus( HttpStatus.OK )
+//    public CategoryListDTO getAllCategories() {
+//        log.debug( "getAllCategories" );
+//        return categoryService.getAllCategories();
+//    }
+
+    @ApiOperation( value = "get a page of categories", produces = "application/json")
     @GetMapping
     @ResponseStatus( HttpStatus.OK )
-    public CategoryListDTO getAllCategories() {
-        log.debug( "getAllCategories" );
-        return categoryService.getAllCategories();
+    public CategoryListDTO getCategories( @RequestParam(value = "page", defaultValue = "0") int pageNum,
+                                            @RequestParam(value = "limit", defaultValue = "3") int pageLimit) {
+        log.debug( "getCategoryPage pageNum={} limit={}",pageNum, pageLimit );
+        return categoryService.getCategories( pageNum, pageLimit );
     }
 
     @ApiOperation( value = "get a specific category by id", produces = "application/json")
@@ -65,5 +74,13 @@ public class CategoryController {
     public CategoryDTO createNewCategory( @Valid @RequestBody CategoryDTO categoryDTO ) {
         log.debug( "createNewCategory categoryDTO=" + categoryDTO );
         return categoryService.createNewCategory( categoryDTO );
+    }
+
+    @ApiOperation( value = "replace an existing category with new category data", consumes = "application/json", produces = "application/json")
+    @PutMapping( "/{id}" )
+    @ResponseStatus( HttpStatus.OK )
+    public CategoryDTO updateCategory( @PathVariable("id") Long id, @Valid @RequestBody CategoryDTO categoryDTO ) {
+        log.debug( "updateCategory id=" + id + " categoryDTO:\n" + categoryDTO );
+        return categoryService.updateCategory( id, categoryDTO );
     }
 }

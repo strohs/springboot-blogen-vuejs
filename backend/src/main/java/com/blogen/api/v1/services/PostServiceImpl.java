@@ -80,7 +80,7 @@ public class PostServiceImpl implements PostService {
             PostDTO dto = buildReturnDto( post );
             postDTOS.add( dto );
         } );
-        return new PostListDTO( postDTOS, buildPageInfoResponse(page) );
+        return new PostListDTO( postDTOS, PageRequestBuilder.buildPageInfoResponse(page) );
     }
 
     @Override
@@ -108,7 +108,7 @@ public class PostServiceImpl implements PostService {
             PostDTO dto = buildReturnDto( post );
             postDTOS.add( dto );
         } );
-        return new PostListDTO( postDTOS, buildPageInfoResponse(page) );
+        return new PostListDTO( postDTOS, PageRequestBuilder.buildPageInfoResponse(page) );
     }
 
     @Override
@@ -153,7 +153,7 @@ public class PostServiceImpl implements PostService {
             PostDTO dto = buildReturnDto( post );
             postDTOS.add( dto );
         } );
-        return new PostListDTO( postDTOS, buildPageInfoResponse(page) );
+        return new PostListDTO( postDTOS, PageRequestBuilder.buildPageInfoResponse(page) );
     }
 
 //    @Override
@@ -228,14 +228,6 @@ public class PostServiceImpl implements PostService {
         return postDTO;
     }
 
-    private PageInfoResponse buildPageInfoResponse( Page page ) {
-        return PageInfoResponse.builder()
-                .totalPages( page.getTotalPages() )
-                .totalElements( page.getTotalElements() )
-                .pageSize( page.getSize() )
-                .pageNumber( page.getNumber() )
-                .build();
-    }
 
     /**
      * Merge non-null fields of PostDTO into a {@link Post} object
