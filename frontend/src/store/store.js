@@ -170,11 +170,31 @@ export const store = new Vuex.Store({
       updateData.newPost = newPost  // { ci, pi, newPost }
       commit('UPDATE_POST', updateData)
     },
-    fetchCategories: ({commit}) => {
-      axios.get('/api/v1/categories')
+    fetchAndStoreCategories: ({commit}, {pageNum = 0, pageLimit = 20}) => {
+      axios.get('/api/v1/categories', {
+        params: {
+          page: pageNum,
+          limit: pageLimit
+        }
+      })
         .then(res => {
-          console.log('fetchCategories response:', res.data)
+          console.log(`fetchAndStoreCategories response:`, res.data)
           commit('SET_CATEGORIES', res.data.categories)
+        })
+        .catch(error => {
+          handleAxiosError(error)
+        })
+    },
+    fetchCategories: ({commit}, {pageNum = 0, pageLimit = 20}) => {
+      return axios.get('/api/v1/categories', {
+        params: {
+          page: pageNum,
+          limit: pageLimit
+        }
+      })
+        .then(res => {
+          console.log(`fetchCategories response:`, res.data)
+          return res.data
         })
         .catch(error => {
           handleAxiosError(error)

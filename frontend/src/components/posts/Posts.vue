@@ -117,7 +117,7 @@
         this.fetchPosts(pageNum - 1, this.pageLimit, this.selectedCategory.id)
       },
       searchPosts (searchStr, pageLimit = 3) {
-        // TODO add to store
+        // TODO possibly add to store
         axios.get(`/api/v1/posts/search/${searchStr}`, {
           params: {
             limit: pageLimit
@@ -148,6 +148,8 @@
       }
     },
     created () {
+      // get a list of all categories and store in vuex
+      this.$store.dispatch('fetchAndStoreCategories', {pageNum: 0, pageLimit: 10})
       this.fetchPosts(0)
     }
   }

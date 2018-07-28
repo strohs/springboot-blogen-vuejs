@@ -5,7 +5,10 @@
       <div class="container">
         <div class="row">
           <div class="col-md-6">
-            <h1><icon class="mx-2" name="folder" scale="2"></icon>Categories</h1>
+            <h1>
+              <icon class="mx-2" name="folder" scale="2"></icon>
+              Categories
+            </h1>
           </div>
         </div>
       </div>
@@ -27,24 +30,24 @@
 
       <div class="row my-4">
         <div class="col">
-          <b-card no-body>
-            <b-card-header><h2>Category List</h2></b-card-header>
-            <b-card-body>
-              <b-table striped hover :items="fetchCategories"></b-table>
-
-            </b-card-body>
-            <b-card-footer>
-              <!-- PAGINATION -->
-              <b-pagination class="ml-4 mt-5"
-                            v-model="currentNavPage"
-                            :total-rows="pageInfo.totalElements"
-                            :per-page="pageInfo.pageSize"
-                            @change="fetchPage"
-              >
-              </b-pagination>
-            </b-card-footer>
-          </b-card>
+          <b-table striped hover caption-top :fields="fields"
+                   :items="tableDataProvider"
+                   :per-page="itemsPerPage" :current-page="tableCurrentPage" :total-rows="pageInfo.totalElements"
+          >
+            <template slot="table-caption">
+              <h2>Category List</h2>
+            </template>
+          </b-table>
         </div>
+      </div>
+      <div class="row">
+        <!-- PAGINATION -->
+        <b-pagination class="ml-4 mt-5"
+                      v-model="tableCurrentPage"
+                      :total-rows="pageInfo.totalElements"
+                      :per-page="itemsPerPage"
+        >
+        </b-pagination>
       </div>
     </div>
 
@@ -63,9 +66,18 @@
       return {
         category: '',
         statusMessage: '',
+        tableCurrentPage: 1,
+        itemsPerPage: 3,
+        // category fields to display in the table
+        fields: ['id', 'name'],
+        categories: [
+          {id: 0, name: '', categoryUrl: ''}
+        ],
+        // pageInfo holds the category 'page details' returned from the API
         pageInfo: {
-          currentNavPage: 1,
+          pageNumber: 0,
           totalElements: 0,
+          totalPages: 0,
           pageSize: 0
         }
       }
@@ -73,13 +85,40 @@
     computed: {
       isStatusMessage () {
         return (this.statusMessage.length > 0)
-      },
-      fetchCategories () {
-        return this.$store.getters.getCategories
       }
     },
     methods: {
+      async fetchCategories (pageNum, pageLimit) {
+        console.log(`fetch categories with pageNum:${pageNum} and limit:${pageLimit}`)
+        await this.$store.dispatch('fetchCategories', {pageNum: pageNum, pageLimit: pageLimit})
+          .then(data => {
+            this.categories = data.categories
+            // this.categories.splice(0, this.categories.length)
+            // data.categories.forEach(c => this.categories.push(c))
+            this.pageInfo = data.pageInfo
+          })
+      },
+      tableDataProvider (ctx, callback) {
+        this.$store.dispatch('fetchCategories', {pageNum: ctx.currentPage - 1, pageLimit: ctx.perPage})
+          .then(data => {
+            this.pageInfo = data.pageInfo
+            this.categories = data.categories
+            // let categories = data.categories
+            callback(this.categories)
+          })
+          .catch(error => {
+            console.log(error)
+            callback([])
+          })
+        return null
+      },
+      storeCategories () {
+        this.$store.commit('SET_CATEGORIES', this.categories)
+      }
     }
+    // created () {
+    //   this.fetchCategories(0)
+    // }
   }
 </script>
 
@@ -104,6 +143,7 @@
   .slide-enter-active {
     animation: slide-in 500ms ease-out forwards;
   }
+
   .slide-leave-active {
     animation: slide-out 500ms ease-out forwards;
   }
@@ -118,6 +158,7 @@
       opacity: 1;
     }
   }
+
   @keyframes slide-out {
     from {
       transform: translateX(0px);
