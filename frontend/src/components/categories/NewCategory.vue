@@ -33,14 +33,19 @@
         category: {
           id: -1,
           name: ''
+        },
+        // result of creating the category which is emitted to calling component
+        result: {
+          code: 0,
+          message: '',
+          category: {}
         }
       }
     },
     methods: {
       submitCategory (newCategory) {
-        // TODO possibly check if category exists
-        this.$store.dispatch('createCategory', newCategory)
         this.hideModal()
+        this.$emit('submit', newCategory)
       },
       showModal () {
         this.$refs.newCategoryModalRef.show()

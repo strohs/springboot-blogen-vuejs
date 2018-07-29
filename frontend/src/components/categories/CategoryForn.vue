@@ -30,6 +30,7 @@
       return {
         // make a copy of the props so we don't mutate them
         category: {
+          id: this.id,
           name: this.name
         },
         fieldsValid: false,

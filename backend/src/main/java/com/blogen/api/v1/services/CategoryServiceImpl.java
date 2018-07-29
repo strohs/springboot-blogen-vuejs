@@ -1,6 +1,5 @@
 package com.blogen.api.v1.services;
 
-import com.blogen.api.v1.controllers.CategoryController;
 import com.blogen.api.v1.mappers.CategoryMapper;
 import com.blogen.api.v1.model.CategoryDTO;
 import com.blogen.api.v1.model.CategoryListDTO;
@@ -10,6 +9,7 @@ import com.blogen.repositories.CategoryRepository;
 import com.blogen.services.utils.PageRequestBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Category Service for REST API
@@ -60,7 +59,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryListDTO getCategories( int pageNum, int pageSize ) {
-        PageRequest pageRequest = pageRequestBuilder.buildPageRequest( pageNum, pageSize, Sort.Direction.ASC,"name" );
+        PageRequest pageRequest = pageRequestBuilder.buildPageRequest( pageNum, pageSize, Sort.Direction.DESC,"id" );
         //retrieve the posts
         Page<Category> page = categoryRepository.findAllBy( pageRequest );
 
@@ -84,10 +83,16 @@ public class CategoryServiceImpl implements CategoryService {
     //TODO only administrators can create categories
     @Override
     public CategoryDTO createNewCategory( CategoryDTO categoryDTO ) {
-        Category categoryToSave = categoryMapper.categoryDtoToCategory( categoryDTO );
-        Category savedCategory = categoryRepository.save( categoryToSave );
-        CategoryDTO savedDTO = categoryMapper.categoryToCategoryDto( savedCategory );
-        savedDTO.setCategoryUrl( CategoryService.buildCategoryUrl( savedCategory ) );
+        CategoryDTO savedDTO = null;
+        try {
+            Category categoryToSave = categoryMapper.categoryDtoToCategory( categoryDTO );
+            Category savedCategory = categoryRepository.save( categoryToSave );
+            savedDTO = categoryMapper.categoryToCategoryDto( savedCategory );
+            savedDTO.setCategoryUrl( CategoryService.buildCategoryUrl( savedCategory ) );
+        } catch ( DataIntegrityViolationException e ) {
+            String message = String.format( "Category already exists with name %s", categoryDTO.getName() );
+            throw new DataIntegrityViolationException( message );
+        }
         return savedDTO;
     }
 

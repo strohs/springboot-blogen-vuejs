@@ -18,36 +18,55 @@
     <div class="container">
       <div class="row mt-4">
         <div class="col-md-4 offset-md-4">
-          <app-new-category></app-new-category>
+          <app-new-category @submit="createCategory"></app-new-category>
         </div>
       </div>
       <!-- category status message -->
-      <div class="row justify-content-center mt-2">
-        <b-alert variant="info" dismissible :show="isStatusMessage" @dismissed="statusMessage = ''">
-          {{ statusMessage }}
-        </b-alert>
+      <div class="row justify-content-center pt-2">
+        <app-status-alert v-bind="status" @dismissed="dismissStatusAlert"></app-status-alert>
       </div>
 
       <div class="row my-4">
         <div class="col">
-          <b-table striped hover caption-top :fields="fields"
-                   :items="tableDataProvider"
-                   :per-page="itemsPerPage" :current-page="tableCurrentPage" :total-rows="pageInfo.totalElements"
-          >
-            <template slot="table-caption">
-              <h2>Category List</h2>
-            </template>
-          </b-table>
+          <b-card no-body border-variant="success">
+            <b-card-header>
+              <h2>Categories</h2>
+            </b-card-header>
+            <b-card-body>
+              <table class="table table-bordered table-striped table-hover">
+                <thead>
+                <tr>
+                  <th scope="col">ID</th>
+                  <th scope="col">Name</th>
+                  <th scope="col"></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for="cat in categories" :key="cat.id">
+                  <td>{{cat.id}}</td>
+                  <td>{{cat.name}}</td>
+                  <td>
+                    <transition appear name="fade" mode="out-in">
+                      <app-edit-category v-bind="cat" @submit="editCategory"></app-edit-category>
+                    </transition>
+                  </td>
+                </tr>
+                </tbody>
+              </table>
+            </b-card-body>
+
+            <b-card-footer>
+              <!-- PAGINATION -->
+              <b-pagination class="tpage"
+                            v-model="tableCurrentPage"
+                            :total-rows="pageInfo.totalElements"
+                            :per-page="pageInfo.pageSize"
+                            @change="fetchPage"
+              >
+              </b-pagination>
+            </b-card-footer>
+          </b-card>
         </div>
-      </div>
-      <div class="row">
-        <!-- PAGINATION -->
-        <b-pagination class="ml-4 mt-5"
-                      v-model="tableCurrentPage"
-                      :total-rows="pageInfo.totalElements"
-                      :per-page="itemsPerPage"
-        >
-        </b-pagination>
       </div>
     </div>
 
@@ -56,36 +75,37 @@
 
 <script>
   import NewCategory from './NewCategory'
+  import StatusAlert from '../common/StatusAlert'
+  import EditCategory from './EditCategory'
 
   export default {
     name: 'Categories',
     components: {
-      appNewCategory: NewCategory
+      appNewCategory: NewCategory,
+      appStatusAlert: StatusAlert,
+      appEditCategory: EditCategory
     },
     data () {
       return {
         category: '',
-        statusMessage: '',
+        status: {
+          code: 200,
+          message: '',
+          show: false
+        },
         tableCurrentPage: 1,
-        itemsPerPage: 3,
-        // category fields to display in the table
-        fields: ['id', 'name'],
-        categories: [
-          {id: 0, name: '', categoryUrl: ''}
-        ],
+        // a page of categories to display in the table
+        categories: [],
         // pageInfo holds the category 'page details' returned from the API
         pageInfo: {
           pageNumber: 0,
           totalElements: 0,
           totalPages: 0,
-          pageSize: 0
+          pageSize: 4
         }
       }
     },
     computed: {
-      isStatusMessage () {
-        return (this.statusMessage.length > 0)
-      }
     },
     methods: {
       async fetchCategories (pageNum, pageLimit) {
@@ -93,32 +113,54 @@
         await this.$store.dispatch('fetchCategories', {pageNum: pageNum, pageLimit: pageLimit})
           .then(data => {
             this.categories = data.categories
-            // this.categories.splice(0, this.categories.length)
-            // data.categories.forEach(c => this.categories.push(c))
             this.pageInfo = data.pageInfo
           })
       },
-      tableDataProvider (ctx, callback) {
-        this.$store.dispatch('fetchCategories', {pageNum: ctx.currentPage - 1, pageLimit: ctx.perPage})
-          .then(data => {
-            this.pageInfo = data.pageInfo
-            this.categories = data.categories
-            // let categories = data.categories
-            callback(this.categories)
+      fetchPage (page) {
+        // api pages are 0-based, need to subtract 1 from table page
+        this.fetchCategories(page - 1, this.pageInfo.pageSize)
+      },
+      createCategory (newCategory) {
+        this.$store.dispatch('createCategory', newCategory)
+          .then(ncat => {
+            this.status.code = 200
+            this.status.message = `Category: ${newCategory.name} created`
+            // display the first page of the table
+            this.tableCurrentPage = 1
+            this.fetchPage(1)
           })
           .catch(error => {
-            console.log(error)
-            callback([])
+            this.status.code = error.response.status
+            // TODO possibly move global error check into VUEX
+            this.status.message = error.response.data.globalError[0].message
           })
-        return null
+        this.displayStatusAlert()
       },
-      storeCategories () {
-        this.$store.commit('SET_CATEGORIES', this.categories)
+      displayStatusAlert () {
+        // display the status code from CRUD request
+        this.status.show = true
+      },
+      dismissStatusAlert () {
+        this.status.show = false
+      },
+      editCategory (cat) {
+        console.log('edit category id:', cat.id)
+        this.$store.dispatch('updateCategory', cat)
+          .then(res => {
+            const idx = this.categories.findIndex(c => c.id === cat.id)
+            this.categories.splice(idx, 1, cat)
+          })
+          .catch(error => {
+            this.status.code = error.response.status
+            // TODO possible global error handling
+            this.status.message = error.response.data.globalError[0].message
+            this.displayStatusAlert()
+          })
       }
+    },
+    created () {
+      this.fetchCategories(0, this.pageInfo.pageSize)
     }
-    // created () {
-    //   this.fetchCategories(0)
-    // }
   }
 </script>
 

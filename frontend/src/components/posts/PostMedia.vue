@@ -2,11 +2,15 @@
   <!-- This the component that renders a single post using a Bootstrap Media Object -->
 
   <b-media>
-    <b-img thumbnail fluid slot="aside" width="100" :src="avatarUrl" alt="avatar"></b-img>
+
+      <b-img thumbnail fluid slot="aside" width="100" :src="image" alt="image"></b-img>
 
     <h5 class="font-weight-bold">{{ title }}</h5>
     <h6>Posted By:
-      <small><strong>{{ user.userName }}</strong></small>
+      <small>
+        <b-link @mouseenter.native="image = avatarUrl" @mouseleave.native="image = imageUrl"
+                :to="{ name: 'users', params: { id: user.id } }">{{user.userName}}</b-link>
+      </small>
       in
       <small class="font-italic">{{ category.name }}</small>
       on
@@ -52,6 +56,11 @@
       category: Object,
       user: Object,
       parentPostUrl: String
+    },
+    data () {
+      return {
+        image: this.imageUrl   // will hold a url to either the users avatar or (default) the image the user posted
+      }
     },
     methods: {
     },

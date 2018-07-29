@@ -7,6 +7,7 @@ import com.blogen.exceptions.BadRequestException;
 import com.blogen.exceptions.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.TypeMismatchException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -61,6 +62,15 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
         List<ApiGlobalError> globalErrors = Arrays.asList( globalError );
         ApiErrorsView errorsView = new ApiErrorsView( null, globalErrors );
         return new ResponseEntity<>( errorsView, new HttpHeaders(), HttpStatus.UNAUTHORIZED );
+    }
+
+    @ExceptionHandler( {DataIntegrityViolationException.class} )
+    public ResponseEntity<Object> handleRowExists( Exception exception, WebRequest request ) {
+        log.error( exception.getMessage() );
+        ApiGlobalError globalError = new ApiGlobalError( exception.getMessage() );
+        List<ApiGlobalError> globalErrors = Arrays.asList( globalError );
+        ApiErrorsView errorsView = new ApiErrorsView( null, globalErrors );
+        return new ResponseEntity<>( errorsView, new HttpHeaders(), HttpStatus.UNPROCESSABLE_ENTITY );
     }
 
     @Override

@@ -1,5 +1,5 @@
 <template>
-  <b-dropdown id="categoryFilterButton" text="Filter Posts" variant="success">
+  <b-dropdown id="categoryFilterButton" text="Filter By Category" variant="success">
     <b-dropdown-item v-for="cat in categories" :key="cat.id" :value="value" @click="$emit('input', cat)">
       {{cat.name}}
     </b-dropdown-item>

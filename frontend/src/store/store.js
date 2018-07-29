@@ -118,6 +118,11 @@ export const store = new Vuex.Store({
     'ADD_CATEGORY' (state, category) {
       state.categories.push(category)
     },
+    'UPDATE_CATEGORY' (state, updatedCategory) {
+      // find existing category id and update it with the new category
+      const index = state.categories.findIndex(c => c.id === updatedCategory.id)
+      state.categories.splice(index, 1, updatedCategory)
+    },
     'SET_POSTS' (state, postsArr) {
       state.posts = postsArr
     },
@@ -198,6 +203,33 @@ export const store = new Vuex.Store({
         })
         .catch(error => {
           handleAxiosError(error)
+        })
+    },
+    createCategory: ({commit}, categoryObj) => {
+      console.log('create category with object:', categoryObj)
+      return axios.post('/api/v1/categories', categoryObj)
+        .then(res => {
+          console.log('createCategory response:', res.data)
+          commit('ADD_CATEGORY', res.data)
+          return res.data
+        })
+        .catch(error => {
+          handleAxiosError(error)
+          throw error
+        })
+    },
+    updateCategory: ({commit}, categoryObj) => {
+      console.log('update category with object:', categoryObj)
+      delete categoryObj.categoryUrl
+      return axios.put(`/api/v1/categories/${categoryObj.id}`, categoryObj)
+        .then(res => {
+          console.log('updateCategory response:', res.data)
+          commit('UPDATE_CATEGORY', res.data)
+          return res.data
+        })
+        .catch(error => {
+          handleAxiosError(error)
+          throw error
         })
     },
     fetchPosts: ({commit, dispatch}, {pageNum, pageLimit, categoryId}) => {
