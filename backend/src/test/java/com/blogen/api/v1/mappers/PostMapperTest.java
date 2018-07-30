@@ -7,6 +7,7 @@ import com.blogen.builders.Builder;
 import com.blogen.domain.Category;
 import com.blogen.domain.Post;
 import com.blogen.domain.User;
+import com.blogen.domain.UserPrefs;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -38,9 +39,11 @@ public class PostMapperTest {
     private static final Long    USER1_ID = 20L;
     private static final String  USER1_USERNAME = "jdoe";
     private static final String  USER1_EMAIL = "jdoe@gmail.com";
+    private static final String  USER1_AVATAR = "avatar1.jpg";
     private static final Long    USER2_ID = 22L;
     private static final String  USER2_USERNAME = "wallace";
     private static final String  USER2_EMAIL = "wally@gmail.com";
+    private static final String  USER2_AVATAR = "avatar2.jpg";
 
     private static final Long     POST_ID = 33L;
     private static final Long     PARENT_POST_ID = 1L;
@@ -77,11 +80,17 @@ public class PostMapperTest {
         user1.setId( USER1_ID );
         user1.setUserName( USER1_USERNAME );
         user1.setEmail( USER1_EMAIL );
+        UserPrefs user1Prefs = new UserPrefs();
+        user1Prefs.setAvatarImage( USER1_AVATAR );
+        user1.setUserPrefs( user1Prefs );
 
         User user2 = new User();
         user2.setId( USER2_ID );
         user2.setUserName( USER2_USERNAME );
         user2.setEmail( USER1_EMAIL );
+        UserPrefs user2Prefs = new UserPrefs();
+        user2Prefs.setAvatarImage( USER2_AVATAR );
+        user2.setUserPrefs( user2Prefs );
 
         parent = new Post();
         parent.setId( PARENT_POST_ID );
