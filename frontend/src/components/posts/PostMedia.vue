@@ -3,13 +3,13 @@
 
   <b-media>
 
-      <b-img thumbnail fluid slot="aside" width="100" :src="image" alt="image"></b-img>
+      <b-img thumbnail fluid slot="aside" width="100" alt="image"
+             @mouseover="image = imageUrl" @mouseout="image = avatarUrl" :src="image"></b-img>
 
     <h5 class="font-weight-bold">{{ title }}</h5>
     <h6>Posted By:
       <small>
-        <b-link @mouseenter.native="image = avatarUrl" @mouseleave.native="image = imageUrl"
-                :to="{ name: 'users', params: { id: user.id } }">{{user.userName}}</b-link>
+        <b-link :to="{ name: 'users', params: { id: user.id } }">{{user.userName}}</b-link>
       </small>
       in
       <small class="font-italic">{{ category.name }}</small>
@@ -59,7 +59,8 @@
     },
     data () {
       return {
-        image: this.imageUrl   // will hold a url to either the users avatar or (default) the image the user posted
+        // will hold a url to either the users avatar or the image the user posted
+        image: constants.API_SERVER_URL + this.user.avatarUrl
       }
     },
     methods: {

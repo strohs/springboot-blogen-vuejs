@@ -13,7 +13,7 @@ import java.util.List;
  */
 @Data
 @NoArgsConstructor
-@EqualsAndHashCode(of = {"userName"})
+@EqualsAndHashCode(of = {"id","userName"})
 @Entity
 public class User {
 
@@ -27,7 +27,7 @@ public class User {
 
     private String email;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String userName;
 
     @Transient

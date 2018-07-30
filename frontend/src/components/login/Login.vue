@@ -116,6 +116,7 @@
       },
       doLogout () {
         this.$store.dispatch('doLogout')
+        this.statusMessage = 'You have been logged out'
       }
     },
     computed: {

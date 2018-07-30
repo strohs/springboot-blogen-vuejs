@@ -1,6 +1,7 @@
 package com.blogen.config;
 
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -10,6 +11,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * Author: Cliff
  */
 @Configuration
+@Profile( {"dev"} )
 public class WebMvcConfig implements WebMvcConfigurer {
 
     //TODO may be able to enable CORS this via WebPack settings, so this configuration may not be needed
@@ -18,10 +20,10 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     // Note that CORS has also been enabled in the SpringSecConfig
     @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
-                .allowedOrigins("*")
-                .allowedMethods("HEAD", "OPTIONS", "GET", "POST", "PUT", "PATCH", "DELETE")
-                .maxAge(MAX_AGE_SECS);
+    public void addCorsMappings( CorsRegistry registry ) {
+        registry.addMapping( "/**" )
+                .allowedOrigins( "*" )
+                .allowedMethods( "HEAD", "OPTIONS", "GET", "POST", "PUT", "PATCH", "DELETE" )
+                .maxAge( MAX_AGE_SECS );
     }
 }

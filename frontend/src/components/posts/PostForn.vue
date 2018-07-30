@@ -7,13 +7,13 @@
                   :state="titleValidator.state" :invalid-feedback="titleValidator.invalidFeedback"
                   :valid-feedback="titleValidator.validFeedback">
       <b-form-input v-model="post.title" id="title" type="text" placeholder="post title"
-                    :state="titleValidator.state" @change="validateTitle" required></b-form-input>
+                    :state="titleValidator.state" @input="validateTitle" required></b-form-input>
     </b-form-group>
 
     <b-form-group id="categoryGroup" label="Category" label-for="category"
                   :state="categoryValidator.state" :invalid-feedback="categoryValidator.invalidFeedback"
                   :valid-feedback="categoryValidator.validFeedback">
-      <b-form-select v-model="post.categoryId" :state="categoryValidator.state" @change="validateCategory"
+      <b-form-select v-model="post.categoryId" :state="categoryValidator.state" @input="validateCategory"
                      :options="categoryOptions"></b-form-select>
     </b-form-group>
 
@@ -22,7 +22,7 @@
                   :valid-feedback="imageUrlValidator.validFeedback">
       <b-form-input v-model="post.imageUrl" id="imageUrl" type="text"
                     placeholder="image link URL (optional)"
-                    :state="imageUrlValidator.state" @change="validateImageUrl"></b-form-input>
+                    :state="imageUrlValidator.state" @input="validateImageUrl"></b-form-input>
     </b-form-group>
 
     <b-form-group id="textGroup" label="Text" label-for="text"
@@ -32,7 +32,7 @@
                        :state="textValidator.state" @input="validateText" required></b-form-textarea>
     </b-form-group>
     <b-button type="button" variant="secondary" @click="$emit('cancelPost')">Cancel</b-button>
-    <b-button type="button" variant="primary" @click="$emit('submitPost',post)" :disabled="!allModalFieldsValid">Submit</b-button>
+    <b-button type="button" variant="primary" @mouseover="validateAllFields" @click="$emit('submitPost',post)" :disabled="!allModalFieldsValid">Submit</b-button>
   </b-form>
 
 
@@ -67,6 +67,12 @@
       }
     },
     methods: {
+      validateAllFields () {
+        this.validateTitle(this.post.title)
+        this.validateText(this.post.text)
+        this.validateCategory(this.post.categoryId)
+        this.validateImageUrl(this.post.imageUrl)
+      },
       validateTitle (val) {
         this.titleValidator = textLengthValidator(val, 1)
       },
@@ -93,10 +99,10 @@
     },
     created () {
       // pre-validate any filled in form fields
-      this.validateTitle(this.title)
-      this.validateText(this.text)
-      this.validateImageUrl(this.imageUrl)
-      this.validateCategory(this.categoryId)
+      // this.validateTitle(this.title)
+      // this.validateText(this.text)
+      // this.validateImageUrl(this.imageUrl)
+      // this.validateCategory(this.categoryId)
     }
   }
 </script>
