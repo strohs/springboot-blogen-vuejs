@@ -1,63 +1,56 @@
+// Component for editing a users profile (i.e. their sign-up information
+//
+//
+
 <template>
   <div id="userProfile">
     <header id="user-profile-header" class="py-2 bg-info text-white">
       <div class="container">
         <div class="row">
           <div class="col-md-6">
-            <h1><icon name="user-cog" class="mr-2" scale="2"></icon>User Profile</h1>
+            <h1>
+              <icon name="user-cog" class="mr-2" scale="2"></icon>
+              User Profile
+            </h1>
           </div>
         </div>
       </div>
     </header>
+
     <div class="container">
+      <!-- alert message box -->
       <div class="row my-4 justify-content-center">
         <app-status-alert v-bind="status" @dismissed="dismissStatusAlert"></app-status-alert>
       </div>
-      <div class="row my-4">
+      <b-card class="my-4" no-body border-variant="info">
+        <b-card-header class="text-left">
+          <div class="row">
+            <h4>Profile</h4>
+            <app-edit-password class="ml-auto" password="" @submit="doChangePassword"></app-edit-password>
+          </div>
+        </b-card-header>
+        <b-card-body>
+          <div class="row">
 
-        <div class="col">
-          <b-card no-body border-variant="info">
-            <b-card-header class="text-center">
-              <h4>User Info</h4>
-            </b-card-header>
-            <b-card-body>
-              <div class="row">
-                <div class="col-md-6">
-                  <app-user-profile-form v-bind="user" @submit="doChangeProfile"></app-user-profile-form>
-                </div>
-
-                <div class="col-md-6">
-                  <div class="row">
-                    <div class="col-md">
-                      <b-form-group id="avatarGroup" label="Select Your Avatar" label-for="avatarSelect">
-                        <b-form-select id="avatarSelect" v-model="user.avatarImage" :options="avatars"></b-form-select>
-                      </b-form-group>
-                    </div>
-                    <div class="col-md">
-                      <b-img thumbnail fluid width="100" :src="avatarUrl" alt="avatar image"></b-img>
-                    </div>
-                  </div>
-                  <div class="row mt-4 justify-content-center">
-                    <app-edit-password password="" @submit="doChangePassword"></app-edit-password>
-                  </div>
-                </div>
-              </div>
-            </b-card-body>
-          </b-card>
-        </div>
-
-      </div>
+            <div class="col">
+              <app-user-profile-form v-bind="user" @submit="doChangeProfile"></app-user-profile-form>
+            </div>
+            <div class="col">
+            </div>
+          </div>
+          
+        </b-card-body>
+      </b-card>
     </div>
   </div>
 </template>
 
 <script>
   import axios from '../../axios-auth'
-  import constants from '../../common/constants'
   import UserProfileForm from './UserProfileForm'
-  import EditPassword from './EditPassword'
   import StatusAlert from '../common/StatusAlert'
-  import { handleAxiosError } from '../../common'
+  import {handleAxiosError} from '../../common'
+  import EditPassword from './EditPassword'
   // import { mapState } from 'vuex'
 
   export default {
@@ -78,7 +71,6 @@
           avatarImage: '',
           password: ''
         },
-        avatars: [],
         status: {
           code: 200,
           message: '',
@@ -86,15 +78,8 @@
         }
       }
     },
-    computed: {
-      avatarUrl () {
-        return constants.DEFAULT_AVATAR_URL + '/' + this.user.avatarImage
-      }
-    },
     methods: {
       doChangeProfile (user) {
-        // todo move avatar image select into form
-        user.avatarImage = this.user.avatarImage
         console.log('change profile user info:', user)
         axios.put(`/api/v1/users/${this.user.id}`, user)
           .then(res => {
@@ -127,12 +112,6 @@
             this.displayStatusAlert()
           })
       },
-      fetchAvatarFileNames () {
-        this.$store.dispatch('fetchAvatarFileNames')
-          .then(data => {
-            this.avatars = data.avatars
-          })
-      },
       displayStatusAlert () {
         // display the status code from CRUD request
         this.status.show = true
@@ -143,7 +122,6 @@
     },
     created () {
       this.user = this.$store.getters.getAuthUser
-      this.fetchAvatarFileNames()
     }
   }
 </script>

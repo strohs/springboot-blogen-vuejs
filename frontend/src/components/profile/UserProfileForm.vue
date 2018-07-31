@@ -32,7 +32,9 @@
     </b-form-group>
 
 
-    <b-button :to="{ name: 'home'}" type="button" variant="secondary">Cancel</b-button>
+    <app-avatar-select v-model="user.avatarImage"></app-avatar-select>
+
+    <b-button :to="{ name: 'posts'}" type="button" variant="secondary">Cancel</b-button>
     <b-button  :disabled="!allFieldsValid" type="button" variant="primary" @click="doSubmit">Submit</b-button>
 
   </b-form>
@@ -41,14 +43,19 @@
 <script>
   import textLengthValidator from '../../validators/textLengthValidator'
   import emailValidator from '../../validators/emailValidator'
+  import AvatarSelect from './AvatarSelect'
 
   export default {
     name: 'UserProfileForm',
+    components: {
+      appAvatarSelect: AvatarSelect
+    },
     props: {
       firstName: '',
       lastName: '',
       userName: '',
-      email: ''
+      email: '',
+      avatarImage: ''
     },
     data () {
       return {
@@ -56,7 +63,8 @@
           firstName: this.firstName,
           lastName: this.lastName,
           email: this.email,
-          userName: this.userName
+          userName: this.userName,
+          avatarImage: this.avatarImage
         },
         formError: false,
         userNameValidator: { state: null, invalidFeedback: '', validFeedback: '' },

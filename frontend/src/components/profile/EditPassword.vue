@@ -2,14 +2,14 @@
 <template>
   <div class="mx-1">
 
-    <b-btn block size="sm" variant="danger" @click="showModal">
+    <b-btn variant="danger" @click="showModal">
       Change Password
     </b-btn>
 
     <b-modal ref="editPasswordModalRef"
-             title="Edit Password"
+             title="Change Password"
              :hide-footer="true"
-             header-bg-variant="warning"
+             header-bg-variant="info"
              header-text-variant="white">
 
       <b-form>
