@@ -1,6 +1,7 @@
 package com.blogen.api.v1.services;
 
 import com.blogen.api.v1.controllers.UserController;
+import com.blogen.api.v1.model.PasswordRequestDTO;
 import com.blogen.api.v1.model.UserDTO;
 import com.blogen.api.v1.model.UserListDTO;
 import com.blogen.domain.User;
@@ -25,6 +26,8 @@ public interface UserService {
     Optional<User> findById( Long id );
 
     User saveUser( User user );
+
+    void changePassword( Long id, PasswordRequestDTO dto );
 
     /**
      * build the userUrl that gets returned with every response DTO

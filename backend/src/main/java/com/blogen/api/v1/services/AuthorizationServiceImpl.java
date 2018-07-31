@@ -58,6 +58,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
         //required fields validated in controller
         userDTO.setAvatarImage( DEFAULT_AVATAR_IMAGE );
         Role userRole = roleService.getByName( "USER" );
+        //TODO userDtoToUser is setting User.roles to null becuase userDTO has no roles
         User user = userMapper.userDtoToUser( userDTO );
         user.setEncryptedPassword( encryptionService.encrypt( user.getPassword() ) );
         user.addRole( userRole );
@@ -76,7 +77,6 @@ public class AuthorizationServiceImpl implements AuthorizationService {
     @Override
     public AuthenticationResponse authenticateAndLoginUser( LoginRequestDTO loginDTO ) {
         AuthenticationResponse authResponse;
-        //List<String> roles = new ArrayList<>(); // holds user roles
         try {
             UsernamePasswordAuthenticationToken userPassAuthToken = new UsernamePasswordAuthenticationToken( loginDTO.getUsername(), loginDTO.getPassword() );
             //authenticate username and password with authentication manager

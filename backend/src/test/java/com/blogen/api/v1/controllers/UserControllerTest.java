@@ -4,6 +4,7 @@ import com.blogen.api.v1.model.UserDTO;
 import com.blogen.api.v1.model.UserListDTO;
 import com.blogen.api.v1.services.PostService;
 import com.blogen.api.v1.services.UserService;
+import com.blogen.api.v1.validators.PasswordValidator;
 import com.blogen.api.v1.validators.UpdateUserValidator;
 import com.blogen.exceptions.BadRequestException;
 import org.junit.Before;
@@ -36,7 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @RunWith(SpringRunner.class)
 @WebMvcTest( controllers = {UserController.class}, secure = false)
-@Import( {UpdateUserValidator.class} )
+@Import( {UpdateUserValidator.class, PasswordValidator.class } )
 public class UserControllerTest {
 
     @MockBean

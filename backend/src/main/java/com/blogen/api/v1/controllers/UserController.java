@@ -1,10 +1,12 @@
 package com.blogen.api.v1.controllers;
 
+import com.blogen.api.v1.model.PasswordRequestDTO;
 import com.blogen.api.v1.model.PostListDTO;
 import com.blogen.api.v1.model.UserDTO;
 import com.blogen.api.v1.model.UserListDTO;
 import com.blogen.api.v1.services.PostService;
 import com.blogen.api.v1.services.UserService;
+import com.blogen.api.v1.validators.PasswordValidator;
 import com.blogen.api.v1.validators.UpdateUserValidator;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -32,19 +34,27 @@ public class UserController {
     private UserService userService;
     private PostService postService;
     private UpdateUserValidator updateUserValidator;
+    private PasswordValidator passwordValidator;
 
     @Autowired
     public UserController( UserService userService,
                            PostService postService,
-                           UpdateUserValidator updateUserValidator ) {
+                           UpdateUserValidator updateUserValidator,
+                           PasswordValidator passwordValidator ) {
         this.userService = userService;
         this.postService = postService;
         this.updateUserValidator = updateUserValidator;
+        this.passwordValidator = passwordValidator;
     }
 
     @InitBinder("userDTO")
-    public void setupBinder( WebDataBinder binder ) {
+    public void setupUpdateUserBinder( WebDataBinder binder ) {
         binder.addValidators( updateUserValidator );
+    }
+
+    @InitBinder("passwordRequestDTO")
+    public void setupPasswordBinder( WebDataBinder binder ) {
+        binder.addValidators( passwordValidator );
     }
 
     @ApiOperation( value = "get a list of all users", produces = "application/json")
@@ -81,5 +91,13 @@ public class UserController {
     public UserDTO updateUser( @PathVariable("id") Long id, @Valid @RequestBody UserDTO userDTO ) {
         log.debug( "update user id=" + id + " userDTO=" + userDTO );
         return userService.updateUser( id, userDTO );
+    }
+
+    @ApiOperation( value = "change a users password", consumes = "application/json")
+    @PutMapping( "/{id}/password" )
+    @ResponseStatus( HttpStatus.OK )
+    public void updatePassword( @PathVariable("id") Long id, @Valid @RequestBody PasswordRequestDTO passwordRequestDTO ) {
+        log.debug( "change password user id=" + id + " passwordDTO= " + passwordRequestDTO );
+        userService.changePassword( id, passwordRequestDTO );
     }
 }

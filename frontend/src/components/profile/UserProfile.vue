@@ -10,6 +10,9 @@
       </div>
     </header>
     <div class="container">
+      <div class="row my-4 justify-content-center">
+        <app-status-alert v-bind="status" @dismissed="dismissStatusAlert"></app-status-alert>
+      </div>
       <div class="row my-4">
 
         <div class="col">
@@ -34,6 +37,9 @@
                       <b-img thumbnail fluid width="100" :src="avatarUrl" alt="avatar image"></b-img>
                     </div>
                   </div>
+                  <div class="row mt-4 justify-content-center">
+                    <app-edit-password password="" @submit="doChangePassword"></app-edit-password>
+                  </div>
                 </div>
               </div>
             </b-card-body>
@@ -49,13 +55,17 @@
   import axios from '../../axios-auth'
   import constants from '../../common/constants'
   import UserProfileForm from './UserProfileForm'
+  import EditPassword from './EditPassword'
+  import StatusAlert from '../common/StatusAlert'
   import { handleAxiosError } from '../../common'
   // import { mapState } from 'vuex'
 
   export default {
     name: 'UserProfile',
     components: {
-      appUserProfileForm: UserProfileForm
+      appUserProfileForm: UserProfileForm,
+      appStatusAlert: StatusAlert,
+      appEditPassword: EditPassword
     },
     data () {
       return {
@@ -69,8 +79,11 @@
           password: ''
         },
         avatars: [],
-        password: '',
-        message: ''  // todo status message alert box
+        status: {
+          code: 200,
+          message: '',
+          show: false
+        }
       }
     },
     computed: {
@@ -80,27 +93,38 @@
     },
     methods: {
       doChangeProfile (user) {
+        // todo move avatar image select into form
+        user.avatarImage = this.user.avatarImage
         console.log('change profile user info:', user)
-        axios.put('/api/v1/users', user)
+        axios.put(`/api/v1/users/${this.user.id}`, user)
           .then(res => {
-            console.log('sign-up OK with response:', res.data)
-            if (this.userNameChanged(user)) {
-              // todo test this
-              this.$store.dispatch('doLogout')
-              this.$router.push({
-                name: 'login',
-                params: {
-                  message: `Please log back in with your new username and password`
-                }
-              })
-            } else {
-              this.$store.commit('SET_USER', res.data)
-              this.message = 'Your profile has been changed'
-            }
+            console.log('user profile change response:', res.data)
+            this.$store.commit('SET_USER', res.data)
+            this.status.code = 200
+            this.status.message = 'Your profile was successfully changed'
+            this.displayStatusAlert()
           })
           .catch(error => {
-            // TODO possibly set app wide status message if signup failed
             handleAxiosError(error)
+            this.status.code = error.response.status
+            this.status.message = error.response.data.globalError[0].message
+            this.displayStatusAlert()
+          })
+      },
+      doChangePassword (newPassword) {
+        console.log('change password:', newPassword)
+        axios.put(`api/v1/users/${this.user.id}/password`, {password: newPassword})
+          .then(res => {
+            console.log('change password success')
+            this.status.code = 200
+            this.status.message = 'Your password was successfully changed'
+            this.displayStatusAlert()
+          })
+          .catch(error => {
+            handleAxiosError(error)
+            this.status.code = error.response.status
+            this.status.message = error.response.data.globalError[0].message
+            this.displayStatusAlert()
           })
       },
       fetchAvatarFileNames () {
@@ -109,8 +133,12 @@
             this.avatars = data.avatars
           })
       },
-      userNameChanged (newUser) {
-        return (this.user.userName !== newUser.userName)
+      displayStatusAlert () {
+        // display the status code from CRUD request
+        this.status.show = true
+      },
+      dismissStatusAlert () {
+        this.status.show = false
       }
     },
     created () {

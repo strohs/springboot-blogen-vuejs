@@ -31,7 +31,7 @@ public class UserDTO {
     @ApiModelProperty(value = "users email address", example = "crazy@gmail.com")
     private String email;
 
-    @ApiModelProperty(value = "users password, between 8 and 30 characters", example="superSecretPassword")
+    @ApiModelProperty(value = "users password", example="superSecretPassword")
     private String password = "";
 
     @ApiModelProperty(value = "users avatar image file name", example="avatar43.jpg")

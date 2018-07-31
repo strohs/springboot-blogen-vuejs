@@ -2,6 +2,7 @@ package com.blogen.api.v1.services;
 
 import com.blogen.api.v1.controllers.UserController;
 import com.blogen.api.v1.mappers.UserMapper;
+import com.blogen.api.v1.model.PasswordRequestDTO;
 import com.blogen.api.v1.model.UserDTO;
 import com.blogen.api.v1.model.UserListDTO;
 import com.blogen.domain.User;
@@ -72,12 +73,31 @@ public class UserServiceImpl implements UserService {
     public UserDTO updateUser( Long id,  UserDTO userDTO ) {
         User user = validateUserId( id );
         userMapper.updateUserFromDTO( userDTO, user );
-        // TODO separate change password url check if password sent
-        user = checkAndEncryptPassword( user );
         User savedUser = userRepository.save( user );
         UserDTO returnDto = userMapper.userToUserDto( savedUser );
         returnDto.setUserUrl( UserService.buildUserUrl( savedUser ) );
         return returnDto;
+    }
+
+    /**
+     * save a {@link User} to the repository
+     * @param user to save
+     * @return the saves User entity
+     */
+    @Override
+    public User saveUser( User user ) {
+        user = checkAndEncryptPassword( user );
+        return userRepository.save( user );
+    }
+
+    @Transactional
+    @Override
+    public void changePassword( Long id, PasswordRequestDTO dto ) {
+        User user = validateUserId( id );
+        user.setPassword( dto.getPassword() );
+        user = checkAndEncryptPassword( user );
+        User savedUser = userRepository.save( user );
+        //TODO might possibly need to reset Spring's Authentication object
     }
 
     /**
@@ -96,16 +116,6 @@ public class UserServiceImpl implements UserService {
         return userRepository.findById( id );
     }
 
-    /**
-     * save a {@link User} to the repository
-     * @param user to save
-     * @return the saves User entity
-     */
-    @Override
-    public User saveUser( User user ) {
-        user = checkAndEncryptPassword( user );
-        return userRepository.save( user );
-    }
 
     @Override
     public String buildAvatarUrl( User user ) {

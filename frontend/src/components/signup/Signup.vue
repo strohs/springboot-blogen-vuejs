@@ -20,7 +20,7 @@
             <b-card-body>
 
 
-              <app-user-profile-form v-bind="user" @submit="doSignUp"></app-user-profile-form>
+              <app-signup-form v-bind="user" @submit="doSignUp"></app-signup-form>
 
             </b-card-body>
           </b-card>
@@ -33,13 +33,13 @@
 
 <script>
   import axios from '../../axios-auth'
-  import UserProfileForm from './UserProfileForm'
+  import SignupForm from './SignupForm'
   import { handleAxiosError } from '../../common'
 
   export default {
-    name: 'UserProfile',
+    name: 'Signup',
     components: {
-      appUserProfileForm: UserProfileForm
+      appSignupForm: SignupForm
     },
     data () {
       return {

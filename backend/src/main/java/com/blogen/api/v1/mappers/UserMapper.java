@@ -36,6 +36,7 @@ public interface UserMapper {
     void updateUserFromDTO( UserDTO userDTO, @MappingTarget User user );
 
     default List<String> asStrings( List<Role> roles) {
+        // intentionally initialized to null
         List<String> strings = null;
         if ( roles != null ) {
             strings = new ArrayList<>();
@@ -47,9 +48,9 @@ public interface UserMapper {
     }
 
     default List<Role> asRoles(List<String> strings) {
-        List<Role> roles = null;
+        // set roles to empty list so that MapStruct does not automatically map it to null
+        List<Role> roles = new ArrayList<>();
         if ( strings != null ) {
-            roles = new ArrayList<>();
             strings.forEach( s -> {
                 Role r = new Role();
                 r.setRole( s );

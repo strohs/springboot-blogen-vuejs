@@ -31,6 +31,13 @@
                     :state="userNameValidator.state" @input="validateUserName" required></b-form-input>
     </b-form-group>
 
+    <b-form-group id="passwordGroup2" label="Password" label-for="password2"
+                  :state="passwordValidator.state" :invalid-feedback="passwordValidator.invalidFeedback"
+                  :valid-feedback="passwordValidator.validFeedback">
+      <b-form-input id="password2" type="password" v-model="user.password" placeholder=""
+                    :state="passwordValidator.state" @input="validatePassword"required>
+      </b-form-input>
+    </b-form-group>
 
     <b-button :to="{ name: 'home'}" type="button" variant="secondary">Cancel</b-button>
     <b-button  :disabled="!allFieldsValid" type="button" variant="primary" @click="doSubmit">Submit</b-button>
@@ -43,12 +50,13 @@
   import emailValidator from '../../validators/emailValidator'
 
   export default {
-    name: 'UserProfileForm',
+    name: 'SignupForm',
     props: {
       firstName: '',
       lastName: '',
       userName: '',
-      email: ''
+      email: '',
+      password: ''
     },
     data () {
       return {
@@ -56,12 +64,14 @@
           firstName: this.firstName,
           lastName: this.lastName,
           email: this.email,
-          userName: this.userName
+          userName: this.userName,
+          password: this.password
         },
         formError: false,
         userNameValidator: { state: null, invalidFeedback: '', validFeedback: '' },
         firstNameValidator: { state: null, invalidFeedback: '', validFeedback: '' },
         lastNameValidator: { state: null, invalidFeedback: '', validFeedback: '' },
+        passwordValidator: { state: null, invalidFeedback: '', validFeedback: '' },
         emailValidator: { state: null, invalidFeedback: '', validFeedback: '' }
       }
     },
@@ -78,6 +88,9 @@
       validateLastName (val) {
         this.lastNameValidator = textLengthValidator(val, 1)
       },
+      validatePassword (val) {
+        this.passwordValidator = textLengthValidator(val, 8)
+      },
       validateEmail (val) {
         this.emailValidator = emailValidator(val)
       }
@@ -85,7 +98,7 @@
     computed: {
       allFieldsValid () {
         return (this.userNameValidator.state && this.firstNameValidator.state && this.lastNameValidator.state &&
-          this.emailValidator.state)
+          this.emailValidator.state && this.passwordValidator.state)
       }
     }
   }

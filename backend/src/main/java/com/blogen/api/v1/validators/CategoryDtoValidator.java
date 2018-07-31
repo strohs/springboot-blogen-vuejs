@@ -24,7 +24,7 @@ public class CategoryDtoValidator implements Validator {
 
         CategoryDTO categoryDTO = (CategoryDTO) target;
 
-        //these are PostDTO fields which are required
+        //these are dto fields which are required
         ValidationUtils.rejectIfEmptyOrWhitespace( errors, "name","required.name","category name is a required field but was null or empty" );
 
         //category id will be ignored...for now

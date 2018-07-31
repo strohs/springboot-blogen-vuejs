@@ -1,6 +1,7 @@
 package com.blogen.api.v1.mappers;
 
 import com.blogen.api.v1.model.UserDTO;
+import com.blogen.domain.Role;
 import com.blogen.domain.User;
 import org.junit.Before;
 import org.junit.Test;
@@ -26,12 +27,23 @@ public class UserMapperTest {
     private static final String EMAIL = "jdoe@cox.net";
     private static final String PASSWORD = "sEcReT";
     private static final String AVATAR_IMAGE = "avatar1.jpg";
-    User user;
+    private static final String ADMIN_ROLE = "ADMIN";
+    private static final String USER_ROLE = "USER";
+    private User user;
+    private Role adminRole;
+    private Role userRole;
+
 
     private UserMapper userMapper = UserMapper.INSTANCE;
 
     @Before
     public void setUp() throws Exception {
+        adminRole = new Role();
+        userRole = new Role();
+        adminRole.setId( 1L );
+        adminRole.setRole( ADMIN_ROLE );
+        userRole.setId( 2L );
+        userRole.setRole( USER_ROLE );
         user = new User();
         user.setId( ID );
         user.setFirstName( FIRSTNAME );
@@ -39,6 +51,9 @@ public class UserMapperTest {
         user.setUserName( USERNAME );
         user.setEmail( EMAIL );
         user.setPassword( PASSWORD );
+        user.addRole( adminRole );
+        user.addRole( userRole );
+
     }
 
     @Test
@@ -60,8 +75,8 @@ public class UserMapperTest {
     @Test
     public void userDtoToUser() {
         //given
-        List<String> roles = Arrays.asList("USER","ADMIN");
-        UserDTO userDTO = new UserDTO( ID, FIRSTNAME,LASTNAME,USERNAME,EMAIL,PASSWORD,AVATAR_IMAGE, roles,  null );
+        List<String> roles = Arrays.asList( "USER", "ADMIN" );
+        UserDTO userDTO = new UserDTO( ID, FIRSTNAME, LASTNAME, USERNAME, EMAIL, PASSWORD, AVATAR_IMAGE, roles, null );
 
         //when
         User user = userMapper.userDtoToUser( userDTO );
@@ -78,14 +93,38 @@ public class UserMapperTest {
     @Test
     public void userDtoToUser_withNullId_shouldSetUserIdToNull() {
         //given
-        List<String> roles = Arrays.asList("USER","ADMIN");
-        UserDTO userDTO = new UserDTO( null,FIRSTNAME,LASTNAME,USERNAME,EMAIL,PASSWORD,AVATAR_IMAGE, roles,null );
+        List<String> roles = Arrays.asList( "USER", "ADMIN" );
+        UserDTO userDTO = new UserDTO( null, FIRSTNAME, LASTNAME, USERNAME, EMAIL, PASSWORD, AVATAR_IMAGE, roles, null );
 
         //when
         User user = userMapper.userDtoToUser( userDTO );
 
         //then
         assertNotNull( user );
-        assertThat( user.getId(), is( nullValue() ));
+        assertThat( user.getId(), is( nullValue() ) );
+    }
+
+    @Test
+    public void should_mapAllRoles_when_mappingUserToUserDTO() {
+        //given - a user with two roles (from @SetUp above)
+
+        //when
+        UserDTO dto = userMapper.userToUserDto( user );
+
+        //then
+        assertNotNull( dto.getRoles() );
+        assertThat( dto.getRoles().size(), equalTo(2));
+    }
+
+    @Test
+    public void userDTO_shouldHave_USER_ROLE_when_mappingUserToUserDTO() {
+        //given - a user with the "USER" Role (from @SetUp above)
+
+        //when
+        UserDTO dto = userMapper.userToUserDto( user );
+
+        //then
+        assertNotNull( dto.getRoles() );
+        assertThat( dto.getRoles().contains( USER_ROLE ), is(true));
     }
 }
