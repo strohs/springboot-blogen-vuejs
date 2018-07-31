@@ -18,7 +18,7 @@
 
       <b-navbar-nav class="ml-auto">
         <b-nav-item-dropdown :text="'Welcome ' + getAuthUser.userName" left v-if="isAuthenticated">
-          <b-dropdown-item to="/profile">
+          <b-dropdown-item to="/userProfile">
             <icon name="user-cog"></icon>
             Profile
           </b-dropdown-item>

@@ -41,16 +41,14 @@
           <div class="row my-4">
             <div class="col">
               <transition appear name="fade" mode="out-in">
-                <app-post-media v-bind="post">
-                </app-post-media>
+                <app-post-media v-bind="post"></app-post-media>
               </transition>
 
 
               <div class="row my-2" v-for="child in post.children" :key="child.id">
                 <div class="col-md-6 offset-md-2">
                   <transition appear name="fade" mode="out-in">
-                    <app-post-media v-bind="child">
-                    </app-post-media>
+                    <app-post-media v-bind="child"></app-post-media>
                   </transition>
                 </div>
               </div>

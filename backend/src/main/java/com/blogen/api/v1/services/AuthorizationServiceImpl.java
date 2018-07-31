@@ -76,7 +76,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
     @Override
     public AuthenticationResponse authenticateAndLoginUser( LoginRequestDTO loginDTO ) {
         AuthenticationResponse authResponse;
-        List<String> roles = new ArrayList<>(); // holds user roles
+        //List<String> roles = new ArrayList<>(); // holds user roles
         try {
             UsernamePasswordAuthenticationToken userPassAuthToken = new UsernamePasswordAuthenticationToken( loginDTO.getUsername(), loginDTO.getPassword() );
             //authenticate username and password with authentication manager

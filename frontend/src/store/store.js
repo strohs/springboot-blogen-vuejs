@@ -15,6 +15,8 @@ export const store = new Vuex.Store({
       lastName: '',
       userName: '',
       email: '',
+      password: '',
+      avatarImage: '',
       roles: []
     },
     // categories holds a list of the current blogen categories, they are used across multiple components
@@ -160,12 +162,6 @@ export const store = new Vuex.Store({
     }
   },
   actions: {
-    saveUserProfile: ({commit}) => {
-      // TODO save profile might be done in the component
-      // save user profile changes to db
-      // axios.put...
-      // commit('SET_USER', savedUser );
-    },
     doLogout: ({commit}) => {
       commit('LOGOUT')
       commit('RESET_USER')
@@ -286,6 +282,16 @@ export const store = new Vuex.Store({
           console.log(`deletePost url:${url} response:`, res.data)
           const indices = context.getters.getPostIndicesById(id)
           context.commit('DELETE_POST', indices)
+        })
+        .catch(error => {
+          handleAxiosError(error)
+        })
+    },
+    fetchAvatarFileNames: (context) => {
+      return axios.get('/api/v1/userPrefs/avatars')
+        .then(res => {
+          console.log('fetch avatars response:', res)
+          return res.data
         })
         .catch(error => {
           handleAxiosError(error)

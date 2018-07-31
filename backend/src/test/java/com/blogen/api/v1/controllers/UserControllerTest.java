@@ -4,6 +4,7 @@ import com.blogen.api.v1.model.UserDTO;
 import com.blogen.api.v1.model.UserListDTO;
 import com.blogen.api.v1.services.PostService;
 import com.blogen.api.v1.services.UserService;
+import com.blogen.api.v1.validators.UpdateUserValidator;
 import com.blogen.exceptions.BadRequestException;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -34,6 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @RunWith(SpringRunner.class)
 @WebMvcTest( controllers = {UserController.class}, secure = false)
+@Import( {UpdateUserValidator.class} )
 public class UserControllerTest {
 
     @MockBean
@@ -122,7 +125,7 @@ public class UserControllerTest {
 
         given( userService.updateUser( anyLong(), any(UserDTO.class) )).willReturn( updateUserDTO1 );
 
-        mockMvc.perform( patch( UserController.BASE_URL + "/1" )
+        mockMvc.perform( put( UserController.BASE_URL + "/1" )
                 .contentType( MediaType.APPLICATION_JSON )
                 .content( asJsonString( updateUserDTO1 ) ) )
                 .andExpect( status().isOk() )
@@ -134,7 +137,7 @@ public class UserControllerTest {
 
         given( userService.updateUser( anyLong(), any(UserDTO.class) )).willThrow( new BadRequestException( "invalid id" ) );
 
-        mockMvc.perform( patch( UserController.BASE_URL + "/67334" )
+        mockMvc.perform( put( UserController.BASE_URL + "/67334" )
                 .contentType( MediaType.APPLICATION_JSON )
                 .content( asJsonString( updateUserDTO1 ) ) )
                 .andExpect( status().isBadRequest() )
@@ -146,7 +149,7 @@ public class UserControllerTest {
 
         given( userService.updateUser( anyLong(), any(UserDTO.class) )).willThrow( new BadRequestException( "username exists" ) );
 
-        mockMvc.perform( patch( UserController.BASE_URL + "/1" )
+        mockMvc.perform( put( UserController.BASE_URL + "/1" )
                 .contentType( MediaType.APPLICATION_JSON )
                 .content( asJsonString( updateUserDTO1 ) ) )
                 .andExpect( status().isBadRequest() )

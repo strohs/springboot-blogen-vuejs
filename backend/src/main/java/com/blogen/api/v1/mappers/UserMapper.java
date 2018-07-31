@@ -36,16 +36,20 @@ public interface UserMapper {
     void updateUserFromDTO( UserDTO userDTO, @MappingTarget User user );
 
     default List<String> asStrings( List<Role> roles) {
-        List<String> strings = new ArrayList<>();
+        List<String> strings = null;
         if ( roles != null ) {
-            roles.forEach( role -> strings.add( role.getRole()) );
+            strings = new ArrayList<>();
+            for (Role role : roles) {
+                strings.add( role.getRole() );
+            }
         }
         return strings;
     }
 
     default List<Role> asRoles(List<String> strings) {
-        List<Role> roles = new ArrayList<>();
+        List<Role> roles = null;
         if ( strings != null ) {
+            roles = new ArrayList<>();
             strings.forEach( s -> {
                 Role r = new Role();
                 r.setRole( s );

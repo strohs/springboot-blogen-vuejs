@@ -59,7 +59,7 @@
     },
     data () {
       return {
-        // will hold a url to either the users avatar or the image the user posted
+        // image will hold a url to either the users avatar or the image the user posted
         image: constants.API_SERVER_URL + this.user.avatarUrl
       }
     },

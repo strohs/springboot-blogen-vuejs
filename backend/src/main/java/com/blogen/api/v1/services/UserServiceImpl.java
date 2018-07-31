@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -66,14 +67,12 @@ public class UserServiceImpl implements UserService {
     }
 
 
-
+    @Transactional
     @Override
     public UserDTO updateUser( Long id,  UserDTO userDTO ) {
         User user = validateUserId( id );
-        //userName cannot be updated and should not be sent
-        if ( userDTO.getUserName() != null ) throw new BadRequestException( "userName cannot be updated in this version of the API" );
         userMapper.updateUserFromDTO( userDTO, user );
-        //check if password sent
+        // TODO separate change password url check if password sent
         user = checkAndEncryptPassword( user );
         User savedUser = userRepository.save( user );
         UserDTO returnDto = userMapper.userToUserDto( savedUser );

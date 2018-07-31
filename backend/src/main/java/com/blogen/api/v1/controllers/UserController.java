@@ -5,12 +5,16 @@ import com.blogen.api.v1.model.UserDTO;
 import com.blogen.api.v1.model.UserListDTO;
 import com.blogen.api.v1.services.PostService;
 import com.blogen.api.v1.services.UserService;
+import com.blogen.api.v1.validators.UpdateUserValidator;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 /**
  * Controller for REST operations in Blogen {@link com.blogen.domain.User}
@@ -27,12 +31,20 @@ public class UserController {
 
     private UserService userService;
     private PostService postService;
+    private UpdateUserValidator updateUserValidator;
 
     @Autowired
     public UserController( UserService userService,
-                           PostService postService ) {
+                           PostService postService,
+                           UpdateUserValidator updateUserValidator ) {
         this.userService = userService;
         this.postService = postService;
+        this.updateUserValidator = updateUserValidator;
+    }
+
+    @InitBinder("userDTO")
+    public void setupBinder( WebDataBinder binder ) {
+        binder.addValidators( updateUserValidator );
     }
 
     @ApiOperation( value = "get a list of all users", produces = "application/json")
@@ -64,9 +76,9 @@ public class UserController {
     }
 
     @ApiOperation( value = "update field(s) of an existing user", consumes = "application/json", produces = "application/json")
-    @PatchMapping( "/{id}" )
+    @PutMapping( "/{id}" )
     @ResponseStatus( HttpStatus.OK )
-    public UserDTO updateUser( @PathVariable("id") Long id, @RequestBody UserDTO userDTO ) {
+    public UserDTO updateUser( @PathVariable("id") Long id, @Valid @RequestBody UserDTO userDTO ) {
         log.debug( "update user id=" + id + " userDTO=" + userDTO );
         return userService.updateUser( id, userDTO );
     }
