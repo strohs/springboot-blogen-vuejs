@@ -12,7 +12,7 @@
     <b-collapse is-nav id="nav_collapse">
       <b-navbar-nav>
         <b-nav-item to="/posts" class="mx-2" active-class v-if="isAuthenticated">Posts</b-nav-item>
-        <b-nav-item to="/users" class="mx-2" active-class v-if="isAuthenticated">My Posts</b-nav-item>
+        <b-nav-item :to="{ name: 'users', params: { userId: getAuthUserId } }" class="mx-2" active-class v-if="isAuthenticated">User Posts</b-nav-item>
         <b-nav-item to="/categories" class="mx-2" active-class v-if="isAuthenticated && isAdmin">Categories</b-nav-item>
       </b-navbar-nav>
 

@@ -287,6 +287,26 @@ export const store = new Vuex.Store({
           handleAxiosError(error)
         })
     },
+    fetchPostsByUser: (context, {id, pageNum, pageLimit, categoryId}) => {
+      const url = `/api/v1/users/${id}/posts`
+      axios.get(url, {
+        params: {
+          page: pageNum,
+          limit: pageLimit,
+          category: categoryId
+        }
+      })
+        .then(res => {
+          console.log(`get posts for user:${id} response:`, res)
+          context.commit('SET_POSTS', res.data.posts)
+          context.commit('SET_PAGE_INFO', res.data.pageInfo)
+          return res.data
+        })
+        .catch(error => {
+          handleAxiosError(error)
+          throw error
+        })
+    },
     fetchAvatarFileNames: (context) => {
       return axios.get('/api/v1/userPrefs/avatars')
         .then(res => {

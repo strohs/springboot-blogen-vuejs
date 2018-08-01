@@ -9,7 +9,7 @@
     <h5 class="font-weight-bold">{{ title }}</h5>
     <h6>Posted By:
       <small>
-        <b-link :to="{ name: 'users', params: { id: user.id } }">{{user.userName}}</b-link>
+        <b-link :to="{ name: 'users', params: { userId: user.id } }">{{user.userName}}</b-link>
       </small>
       in
       <small class="font-italic">{{ category.name }}</small>
