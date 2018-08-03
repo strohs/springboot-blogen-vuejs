@@ -15,12 +15,10 @@ public class PrincipalServiceImpl implements PrincipalService {
     @Override
     public String getPrincipalUserName() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String username;
         if (principal instanceof UserDetails ) {
-            username = ((UserDetails)principal).getUsername();
+            return ((UserDetails)principal).getUsername();
         } else {
-            username = principal.toString();
+            return principal.toString();
         }
-        return username;
     }
 }

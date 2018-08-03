@@ -146,8 +146,9 @@
       }
     },
     created () {
-      // get a list of all categories and store in vuex
+      // get a list of all categories and user avaters and store in vuex
       this.$store.dispatch('fetchAndStoreCategories', {pageNum: 0, pageLimit: 10})
+      this.$store.dispatch('fetchAvatarFileNames')
       this.fetchPosts(0)
     }
   }

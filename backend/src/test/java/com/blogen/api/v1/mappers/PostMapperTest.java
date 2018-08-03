@@ -4,10 +4,7 @@ import com.blogen.api.v1.model.CategoryDTO;
 import com.blogen.api.v1.model.PostDTO;
 import com.blogen.api.v1.model.PostUserDTO;
 import com.blogen.builders.Builder;
-import com.blogen.domain.Category;
-import com.blogen.domain.Post;
-import com.blogen.domain.User;
-import com.blogen.domain.UserPrefs;
+import com.blogen.domain.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -67,6 +64,8 @@ public class PostMapperTest {
 
     @Before
     public void setUp() throws Exception {
+        Avatar avatar1 = Avatar.builder().id( USER1_ID ).fileName( USER1_AVATAR ).build();
+        Avatar avatar2 = Avatar.builder().id( USER2_ID ).fileName( USER2_AVATAR ).build();
 
         Category cat1 = new Category();
         cat1.setId( CAT1_ID );
@@ -81,7 +80,7 @@ public class PostMapperTest {
         user1.setUserName( USER1_USERNAME );
         user1.setEmail( USER1_EMAIL );
         UserPrefs user1Prefs = new UserPrefs();
-        user1Prefs.setAvatarImage( USER1_AVATAR );
+        user1Prefs.setAvatar( avatar1 );
         user1.setUserPrefs( user1Prefs );
 
         User user2 = new User();
@@ -89,7 +88,7 @@ public class PostMapperTest {
         user2.setUserName( USER2_USERNAME );
         user2.setEmail( USER1_EMAIL );
         UserPrefs user2Prefs = new UserPrefs();
-        user2Prefs.setAvatarImage( USER2_AVATAR );
+        user2Prefs.setAvatar( avatar2 );
         user2.setUserPrefs( user2Prefs );
 
         parent = new Post();

@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from '../axios-auth'
 import {handleAxiosError} from '../common'
+import constants from '../common/constants'
 
 Vue.use(Vuex)
 
@@ -41,7 +42,9 @@ export const store = new Vuex.Store({
       totalPages: 0,      // total pages available using the current filter criteria
       pageNumber: 0,      // the page number of data that was requested (0 based indices)
       pageSize: 0         // the maximum number of parent posts that will be displayed on a page
-    }
+    },
+    // avatar file names used within this application
+    avatars: []
   },
   getters: {
     getAuthToken: state => {
@@ -58,6 +61,9 @@ export const store = new Vuex.Store({
     },
     getCategories: state => {
       return state.categories
+    },
+    getAvatarUrlByFileName: (state) => (fileName) => {
+      return constants.DEFAULT_AVATAR_URL + '/' + fileName
     },
     getPostById: (state) => (id) => {
       for (const post of state.posts) {
@@ -159,6 +165,9 @@ export const store = new Vuex.Store({
     },
     'SET_CURRENT_PAGE_NUM' (state, pageNum) {
       state.pageInfo.pageNumber = pageNum
+    },
+    'SET_AVATARS' (state, avatarsArr) {
+      state.avatars = avatarsArr
     }
   },
   actions: {
@@ -307,14 +316,15 @@ export const store = new Vuex.Store({
           throw error
         })
     },
-    fetchAvatarFileNames: (context) => {
-      return axios.get('/api/v1/userPrefs/avatars')
+    fetchAvatarFileNames: ({commit}) => {
+      axios.get('/api/v1/userPrefs/avatars')
         .then(res => {
-          console.log('fetch avatars response:', res)
-          return res.data
+          console.log('fetch avatar file name response:', res)
+          commit('SET_AVATARS', res.data.avatars)
         })
         .catch(error => {
           handleAxiosError(error)
+          throw (error)
         })
     }
   }

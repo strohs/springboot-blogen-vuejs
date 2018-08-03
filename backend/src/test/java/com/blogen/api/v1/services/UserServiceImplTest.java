@@ -8,6 +8,7 @@ import com.blogen.builders.Builder;
 import com.blogen.domain.User;
 import com.blogen.exceptions.BadRequestException;
 import com.blogen.repositories.UserRepository;
+import com.blogen.services.AvatarService;
 import com.blogen.services.security.EncryptionService;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,6 +39,9 @@ public class UserServiceImplTest {
     private UserRepository userRepository;
 
     @Mock
+    private AvatarService avatarService;
+
+    @Mock
     private EncryptionService encryptionService;
 
     private UserMapper userMapper = UserMapper.INSTANCE;
@@ -55,7 +59,7 @@ public class UserServiceImplTest {
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks( this );
-        userService = new UserServiceImpl( userRepository, encryptionService, userMapper );
+        userService = new UserServiceImpl( userRepository, avatarService, encryptionService, userMapper );
         user1 = Builder.buildUser( 1L, "johndoe", "John","Doe", "jdoe@gmail.com","","123abc");
         updatedUser1 = Builder.buildUser( 1L, "johndoe", "John","Doe", "jdoe@gmail.com","","123abc");
         user1Url = UserController.BASE_URL + "/1";
@@ -134,11 +138,11 @@ public class UserServiceImplTest {
         newUserDTO.setRoles( roles );
         newUserDTO.setFirstName( "NewFirstName" );
         updatedUser1.setFirstName( "NewFirstName" );
-        
-        given( userRepository.findById(anyLong()) ).willReturn( Optional.of( user1 ) );
+
+        given( userService.findById( anyLong() )).willReturn( Optional.of( user1 ) );
         given( userRepository.save( any(User.class) )).willReturn( updatedUser1 );
 
-        UserDTO savedDTO = userService.updateUser( 1L, newUserDTO );
+        UserDTO savedDTO = userService.updateUser( user1, newUserDTO );
 
         then( userRepository ).should().save( any( User.class ) );
         assertThat( savedDTO.getFirstName(), is( newUserDTO.getFirstName()) );

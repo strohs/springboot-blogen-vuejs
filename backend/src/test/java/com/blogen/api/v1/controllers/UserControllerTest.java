@@ -6,6 +6,7 @@ import com.blogen.api.v1.services.PostService;
 import com.blogen.api.v1.services.UserService;
 import com.blogen.api.v1.validators.PasswordValidator;
 import com.blogen.api.v1.validators.UpdateUserValidator;
+import com.blogen.domain.User;
 import com.blogen.exceptions.BadRequestException;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,6 +21,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
+import java.util.Optional;
 
 import static com.blogen.api.v1.controllers.AbstractRestControllerTest.asJsonString;
 import static org.hamcrest.CoreMatchers.is;
@@ -124,7 +126,8 @@ public class UserControllerTest {
     @Test
     public void should_returnOK_when_updateUserWithValidRequestDTO() throws Exception {
 
-        given( userService.updateUser( anyLong(), any(UserDTO.class) )).willReturn( updateUserDTO1 );
+        given( userService.findById( anyLong() )).willReturn( Optional.of(new User()));
+        given( userService.updateUser( any( User.class), any(UserDTO.class) )).willReturn( updateUserDTO1 );
 
         mockMvc.perform( put( UserController.BASE_URL + "/1" )
                 .contentType( MediaType.APPLICATION_JSON )
@@ -136,19 +139,19 @@ public class UserControllerTest {
     @Test
     public void should_returnBadRequest_when_updateUserWithInvalidID() throws Exception {
 
-        given( userService.updateUser( anyLong(), any(UserDTO.class) )).willThrow( new BadRequestException( "invalid id" ) );
+        given( userService.findById( anyLong() )).willThrow( new BadRequestException( "user does not exist with id:67334" ) );
 
         mockMvc.perform( put( UserController.BASE_URL + "/67334" )
                 .contentType( MediaType.APPLICATION_JSON )
                 .content( asJsonString( updateUserDTO1 ) ) )
                 .andExpect( status().isBadRequest() )
-                .andExpect( jsonPath( "$.globalError[0].message", is( "invalid id" ) ));
+                .andExpect( jsonPath( "$.globalError[0].message", is( "user does not exist with id:67334" ) ));
     }
 
     @Test
     public void should_returnBadRequest_when_updateUserWithUserNameThatExists() throws Exception {
-
-        given( userService.updateUser( anyLong(), any(UserDTO.class) )).willThrow( new BadRequestException( "username exists" ) );
+        given( userService.findById( anyLong() )).willReturn( Optional.of(new User()));
+        given( userService.updateUser( any(User.class), any(UserDTO.class) )).willThrow( new BadRequestException( "username exists" ) );
 
         mockMvc.perform( put( UserController.BASE_URL + "/1" )
                 .contentType( MediaType.APPLICATION_JSON )

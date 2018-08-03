@@ -1,18 +1,19 @@
 package com.blogen.api.v1.services;
 
-import com.blogen.api.v1.controllers.UserController;
 import com.blogen.api.v1.mappers.UserMapper;
 import com.blogen.api.v1.model.PasswordRequestDTO;
 import com.blogen.api.v1.model.UserDTO;
 import com.blogen.api.v1.model.UserListDTO;
+import com.blogen.domain.Avatar;
 import com.blogen.domain.User;
 import com.blogen.domain.UserPrefs;
 import com.blogen.exceptions.BadRequestException;
 import com.blogen.repositories.UserRepository;
+import com.blogen.services.AvatarService;
 import com.blogen.services.security.EncryptionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -30,19 +31,19 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
 
     private UserRepository userRepository;
+    private AvatarService avatarService;
     private EncryptionService encryptionService;
     private UserMapper userMapper;
 
-    @Value("${app.avatar.dir}")
-    private String AVATAR_DIR;
 
-    private static final String DEFAULT_AVATAR = "avatar0.jpg";
 
     @Autowired
     public UserServiceImpl( UserRepository userRepository,
+                            AvatarService avatarService,
                             EncryptionService encryptionService,
                             UserMapper userMapper ) {
         this.userRepository = userRepository;
+        this.avatarService = avatarService;
         this.userMapper = userMapper;
         this.encryptionService = encryptionService;
     }
@@ -68,44 +69,40 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    @Transactional
+    // only the authenticated user can update their own user information, OR admins can always change user info
     @Override
-    public UserDTO updateUser( Long id,  UserDTO userDTO ) {
-        User user = validateUserId( id );
+    //@Transactional
+    @PreAuthorize( "hasAuthority('ADMIN') || #user.getUserName() == authentication.name" )
+    public UserDTO updateUser( User user, UserDTO userDTO ) {
         userMapper.updateUserFromDTO( userDTO, user );
+        if ( userDTO.getAvatarImage() != null ) {
+            Avatar avatar = avatarService.getAvatarByFileName( userDTO.getAvatarImage() )
+                    .orElseThrow( () -> new BadRequestException( "avatar image does not exits:" + userDTO.getAvatarImage() ) );
+            user.getUserPrefs().setAvatar( avatar );
+        }
         User savedUser = userRepository.save( user );
         UserDTO returnDto = userMapper.userToUserDto( savedUser );
         returnDto.setUserUrl( UserService.buildUserUrl( savedUser ) );
         return returnDto;
     }
 
-    /**
-     * save a {@link User} to the repository
-     * @param user to save
-     * @return the saves User entity
-     */
+
     @Override
     public User saveUser( User user ) {
-        user = checkAndEncryptPassword( user );
+        checkAndEncryptPassword( user );
         return userRepository.save( user );
     }
 
+    // only the authenticated user can change their password, OR admins can change all passwords
+    @PreAuthorize( "hasAuthority('ADMIN') || #user.getUserName() == authentication.name" )
     @Transactional
     @Override
-    public void changePassword( Long id, PasswordRequestDTO dto ) {
-        User user = validateUserId( id );
+    public void changePassword( User user, PasswordRequestDTO dto ) {
         user.setPassword( dto.getPassword() );
-        user = checkAndEncryptPassword( user );
-        User savedUser = userRepository.save( user );
-        //TODO might possibly need to reset Spring's Authentication object
+        checkAndEncryptPassword( user );
+        userRepository.save( user );
     }
 
-    /**
-     * gets a {@link User} by their username
-     *
-     * @param name - username to search for
-     * @return a {@link User} having the specified username
-     */
     @Override
     public Optional<User> findByUserName( String name ) {
         return Optional.ofNullable( userRepository.findByUserName( name ) );
@@ -117,20 +114,16 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    @Override
-    public String buildAvatarUrl( User user ) {
-        return AVATAR_DIR + "/" + user.getUserPrefs().getAvatarImage();
-    }
+
     /**
      * encrypts the user password if it was set on the User object
      * @param user
      * @return the User object with the encryptedPassword field set
      */
-    private User checkAndEncryptPassword( User user ) {
+    private void checkAndEncryptPassword( User user ) {
         if ( user.getPassword() != null ) {
             user.setEncryptedPassword( encryptionService.encrypt( user.getPassword() ) );
         }
-        return user;
     }
 
     /**
@@ -139,39 +132,24 @@ public class UserServiceImpl implements UserService {
      * @return the {@link User} corresponding to the passed in ID
      * @throws BadRequestException if the user was not found in the repository
      */
-    private User validateUserId( Long id ) throws BadRequestException {
+    public User validateUserId( Long id ) throws BadRequestException {
         User user = userRepository.findById( id )
-                .orElseThrow( () -> new BadRequestException( "user with id=" + id + " does not exist" ) );
+                .orElseThrow( () -> new BadRequestException( "user does not exist with id:" + id ) );
         return user;
     }
 
 
     /**
-     * build a default user preferences object with default avatar image set
+     * build a default user preferences object with default avatar image
      * @return
      */
-    private UserPrefs buildDefaultUserPrefs() {
+    public UserPrefs buildDefaultUserPrefs() {
         UserPrefs userPrefs = new UserPrefs();
-        userPrefs.setAvatarImage( DEFAULT_AVATAR );
+        Avatar defaultAvatar = avatarService.getAvatarByFileName( AvatarService.DEFAULT_AVATAR )
+                .orElseThrow( () -> new BadRequestException( "default avatar image not found" ) );
+        userPrefs.setAvatar( defaultAvatar );
         return userPrefs;
     }
 
 
-
-    /**
-     * merge non-null fields of UserDTO into the fields of the passed in User
-     * @param dto
-     * @param user
-     * @return
-     */
-//// NOTE we are now Using MapStruct NullValueCheckStrategy.ALWAYS instead of this value
-//    private User mergeUserDtoToUser( UserDTO dto, User user ) {
-//        if ( dto.getFirstName() != null ) user.setFirstName( dto.getFirstName() );
-//        if ( dto.getLastName() != null ) user.setLastName( dto.getLastName() );
-//        if ( dto.getEmail() != null ) user.setEmail( dto.getEmail() );
-//        if ( dto.getPassword() != null ) user.setPassword( dto.getPassword() );
-//        if ( dto.getAvatarImage() != null ) user.getUserPrefs().setAvatarImage( dto.getAvatarImage() );
-//        //userName cannot be changed once a user is created;
-//        return user;
-//    }
 }

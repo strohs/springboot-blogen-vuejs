@@ -6,6 +6,7 @@ import com.blogen.api.v1.model.LoginRequestDTO;
 import com.blogen.api.v1.model.UserDTO;
 import com.blogen.domain.Role;
 import com.blogen.domain.User;
+import com.blogen.domain.UserPrefs;
 import com.blogen.exceptions.BadRequestException;
 import com.blogen.services.RoleService;
 import com.blogen.services.security.EncryptionService;
@@ -24,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Service for signing-up new users and for logging in users
  *
  * Author: Cliff
  */
@@ -56,12 +58,12 @@ public class AuthorizationServiceImpl implements AuthorizationService {
     public UserDTO signUpUser( UserDTO userDTO ) {
         //TODO check for existing username
         //required fields validated in controller
-        userDTO.setAvatarImage( DEFAULT_AVATAR_IMAGE );
         Role userRole = roleService.getByName( "USER" );
-        //TODO userDtoToUser is setting User.roles to null becuase userDTO has no roles
         User user = userMapper.userDtoToUser( userDTO );
         user.setEncryptedPassword( encryptionService.encrypt( user.getPassword() ) );
         user.addRole( userRole );
+        UserPrefs prefs = userService.buildDefaultUserPrefs();
+        user.setUserPrefs( prefs );
         User savedUser;
         try {
             savedUser = userService.saveUser( user );

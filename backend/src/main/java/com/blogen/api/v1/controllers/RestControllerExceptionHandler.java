@@ -11,6 +11,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -55,8 +56,8 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
     }
 
     //return a 401 code when a user provides invalid login credentials are token
-    @ExceptionHandler( {BadCredentialsException.class} )
-    public ResponseEntity<Object> handleBadCredentialsException( Exception exception, WebRequest request ) {
+    @ExceptionHandler( {BadCredentialsException.class, AccessDeniedException.class} )
+    public ResponseEntity<Object> handleUnauthorizedException( Exception exception, WebRequest request ) {
         log.error( exception.getMessage() );
         ApiGlobalError globalError = new ApiGlobalError( exception.getMessage() );
         List<ApiGlobalError> globalErrors = Arrays.asList( globalError );

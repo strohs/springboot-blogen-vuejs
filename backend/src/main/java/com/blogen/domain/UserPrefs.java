@@ -1,5 +1,7 @@
 package com.blogen.domain;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -12,7 +14,9 @@ import javax.persistence.*;
  */
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity
+@Builder
 public class UserPrefs {
 
     @Id
@@ -22,15 +26,16 @@ public class UserPrefs {
     @OneToOne
     User user;
 
-    //avatar image file name
-    String avatarImage;
+    //the users Avatar
+    @OneToOne(fetch = FetchType.EAGER)
+    Avatar avatar;
 
     @Override
     public String toString() {
         return "UserPrefs{" +
                 "id=" + id +
                 ", userName=" + (user != null ?  user.getUserName() : "null") +
-                ", avatarImage='" + avatarImage + '\'' +
+                ", avatar='" + (avatar != null ?  avatar.getFileName() : "null") +
                 '}';
     }
 }

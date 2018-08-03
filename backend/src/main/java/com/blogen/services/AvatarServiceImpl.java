@@ -1,16 +1,16 @@
 package com.blogen.services;
 
-import com.blogen.repositories.UserPrefsRepository;
+import com.blogen.domain.Avatar;
+import com.blogen.domain.User;
+import com.blogen.exceptions.NotFoundException;
+import com.blogen.repositories.AvatarRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 /**
  * Services for working with Avatar image files
@@ -21,15 +21,14 @@ import java.util.stream.Collectors;
 @Service
 public class AvatarServiceImpl implements AvatarService {
 
-    //TODO move this to properties file
-    //image directory containing Avatar Images
-    private static final String AVATAR_IMG_DIR = "classpath:static/avatars*";
+    @Value("${app.avatar.dir}")
+    private String AVATAR_DIR;
 
-    private UserPrefsRepository userPrefsRepository;
+    private AvatarRepository avatarRepository;
 
     @Autowired
-    public AvatarServiceImpl( UserPrefsRepository userPrefsRepository ) {
-        this.userPrefsRepository = userPrefsRepository;
+    public AvatarServiceImpl( AvatarRepository avatarRepository ) {
+        this.avatarRepository = avatarRepository;
     }
 
     /**
@@ -39,7 +38,22 @@ public class AvatarServiceImpl implements AvatarService {
      */
     @Override
     public List<String> getAllAvatarImageNames() {
-        return userPrefsRepository.findDistinctAvatarImages();
+        return avatarRepository.findAllAvatarFileNames();
+    }
+
+    @Override
+    public Optional<Avatar> getAvatarByFileName( String fileName ) {
+        Optional<Avatar> opa = Optional.empty();
+        if ( fileName != null ) {
+            opa = avatarRepository.findByFileName( fileName );
+        }
+        return opa;
+    }
+
+
+    @Override
+    public String buildAvatarUrl( User user ) {
+        return AVATAR_DIR + "/" + user.getUserPrefs().getAvatar().getFileName();
     }
 
 }

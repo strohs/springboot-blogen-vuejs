@@ -15,6 +15,7 @@ import com.blogen.exceptions.NotFoundException;
 import com.blogen.repositories.CategoryRepository;
 import com.blogen.repositories.PostRepository;
 import com.blogen.repositories.UserRepository;
+import com.blogen.services.AvatarService;
 import com.blogen.services.PrincipalService;
 import com.blogen.services.utils.PageRequestBuilder;
 import org.junit.Before;
@@ -58,6 +59,9 @@ public class PostServiceImplTest {
     private UserService userService;
 
     @Mock
+    private AvatarService avatarService;
+
+    @Mock
     private PageRequestBuilder pageRequestBuilder;
 
     @Mock
@@ -98,7 +102,8 @@ public class PostServiceImplTest {
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks( this );
-        postService = new PostServiceImpl( pageRequestBuilder, postRepository, categoryRepository, userService, postMapper, postRequestMapper, principalService );
+        postService = new PostServiceImpl( pageRequestBuilder, postRepository, categoryRepository,
+                userService, avatarService, postMapper, postRequestMapper, principalService );
     }
 
     @Test

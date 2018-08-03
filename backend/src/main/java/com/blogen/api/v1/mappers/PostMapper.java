@@ -35,12 +35,13 @@ public interface PostMapper {
     Category categoryDtoToCategory( CategoryDTO categoryDTO );
 
     default PostUserDTO userToPostUserDto( User user ) {
-        PostUserDTO postUser = new PostUserDTO();
-        postUser.setId( user.getId() );
-        postUser.setUserName( user.getUserName() );
-        postUser.setUserUrl( UserService.buildUserUrl( user ) );
-        postUser.setAvatarUrl( user.getUserPrefs().getAvatarImage() );
-        return postUser;
+        PostUserDTO postUserDTO = new PostUserDTO();
+        postUserDTO.setId( user.getId() );
+        postUserDTO.setUserName( user.getUserName() );
+        postUserDTO.setUserUrl( UserService.buildUserUrl( user ) );
+        //TODO should relative URL be passed instead of filename
+        postUserDTO.setAvatarUrl( user.getUserPrefs().getAvatar().getFileName() );
+        return postUserDTO;
     }
 
     User postUserDtoToUser( PostUserDTO postUserDTO );

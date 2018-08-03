@@ -1,6 +1,7 @@
 package com.blogen.api.v1.mappers;
 
 import com.blogen.api.v1.model.UserPrefsDTO;
+import com.blogen.domain.Avatar;
 import com.blogen.domain.UserPrefs;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,9 +29,10 @@ public class UserPrefsMapperTest {
     @Test
     public void userPrefsToUserPrefsDto() {
         //given
+        Avatar avatar = Avatar.builder().id( 1L ).fileName( AVATAR_IMAGE ).build();
         UserPrefs userPrefs = new UserPrefs();
         userPrefs.setId( ID );
-        userPrefs.setAvatarImage( AVATAR_IMAGE );
+        userPrefs.setAvatar( avatar );
 
         //when
         UserPrefsDTO userPrefsDTO = userPrefsMapper.userPrefsToUserPrefsDto( userPrefs );
@@ -43,6 +45,7 @@ public class UserPrefsMapperTest {
     @Test
     public void userPrefsDtoToUserPrefs() {
         //given
+        Avatar avatar = Avatar.builder().id( 1L ).fileName( AVATAR_IMAGE ).build();
         UserPrefsDTO userPrefsDTO = new UserPrefsDTO( ID, AVATAR_IMAGE );
 
         //when
@@ -50,6 +53,6 @@ public class UserPrefsMapperTest {
 
         assertNotNull( userPrefs );
         assertThat( userPrefs.getId(), is(ID) );
-        assertThat( userPrefs.getAvatarImage(), is( AVATAR_IMAGE ) );
+        assertThat( userPrefs.getAvatar().getFileName(), is( AVATAR_IMAGE ) );
     }
 }

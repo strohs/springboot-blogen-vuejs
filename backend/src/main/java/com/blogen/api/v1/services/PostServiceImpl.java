@@ -12,6 +12,7 @@ import com.blogen.exceptions.NotFoundException;
 import com.blogen.repositories.CategoryRepository;
 import com.blogen.repositories.PostRepository;
 import com.blogen.repositories.UserRepository;
+import com.blogen.services.AvatarService;
 import com.blogen.services.PrincipalService;
 import com.blogen.services.security.UserDetailsImpl;
 import com.blogen.services.utils.PageRequestBuilder;
@@ -22,7 +23,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,18 +48,23 @@ public class PostServiceImpl implements PostService {
     private PostRepository postRepository;
     private CategoryRepository categoryRepository;
     private UserService userService;
+    private AvatarService avatarService;
     private PostMapper postMapper;
     private PostRequestMapper postRequestMapper;
     private PrincipalService principalService;
 
+
+
     @Autowired
     public PostServiceImpl( PageRequestBuilder pageRequestBuilder, PostRepository postRepository,
-                            CategoryRepository categoryRepository, UserService userService, PostMapper postMapper,
+                            CategoryRepository categoryRepository, UserService userService,
+                            AvatarService avatarService, PostMapper postMapper,
                             PostRequestMapper postRequestMapper, PrincipalService principalService ) {
         this.pageRequestBuilder = pageRequestBuilder;
         this.postRepository = postRepository;
         this.categoryRepository = categoryRepository;
         this.userService = userService;
+        this.avatarService = avatarService;
         this.postMapper = postMapper;
         this.postRequestMapper = postRequestMapper;
         this.principalService = principalService;
@@ -213,7 +222,7 @@ public class PostServiceImpl implements PostService {
     private PostDTO buildReturnDto( Post post ) {
         PostDTO postDTO = postMapper.postToPostDto( post );
         postDTO.setPostUrl( buildPostUrl( post ) );
-        postDTO.getUser().setAvatarUrl( userService.buildAvatarUrl( post.getUser() ) );
+        postDTO.getUser().setAvatarUrl( avatarService.buildAvatarUrl( post.getUser() ) );
         //if post is a child post, set the parentPostUrl
         if ( post.getParent() != null  ) postDTO.setParentPostUrl( buildPostUrl( post.getParent() ));
         if ( post.getChildren() != null ) {
@@ -221,7 +230,7 @@ public class PostServiceImpl implements PostService {
                 PostDTO childDTO = postDTO.getChildren().get( i );
                 Post child = post.getChildren().get( i );
                 childDTO.setPostUrl( buildPostUrl( post.getChildren().get( i ) ) );
-                childDTO.getUser().setAvatarUrl( userService.buildAvatarUrl( child.getUser() ) );
+                childDTO.getUser().setAvatarUrl( avatarService.buildAvatarUrl( child.getUser() ) );
                 childDTO.setParentPostUrl( buildParentPostUrl( child ) );
             }
         }

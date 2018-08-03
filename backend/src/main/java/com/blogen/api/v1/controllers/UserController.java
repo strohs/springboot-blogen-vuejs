@@ -8,6 +8,8 @@ import com.blogen.api.v1.services.PostService;
 import com.blogen.api.v1.services.UserService;
 import com.blogen.api.v1.validators.PasswordValidator;
 import com.blogen.api.v1.validators.UpdateUserValidator;
+import com.blogen.domain.User;
+import com.blogen.exceptions.BadRequestException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -90,7 +92,9 @@ public class UserController {
     @ResponseStatus( HttpStatus.OK )
     public UserDTO updateUser( @PathVariable("id") Long id, @Valid @RequestBody UserDTO userDTO ) {
         log.debug( "update user id=" + id + " userDTO=" + userDTO );
-        return userService.updateUser( id, userDTO );
+        User user = userService.findById( id )
+                .orElseThrow( () -> new BadRequestException( "user does not exist with id:" + id ) );
+        return userService.updateUser( user, userDTO );
     }
 
     @ApiOperation( value = "change a users password", consumes = "application/json")
@@ -98,6 +102,8 @@ public class UserController {
     @ResponseStatus( HttpStatus.OK )
     public void updatePassword( @PathVariable("id") Long id, @Valid @RequestBody PasswordRequestDTO passwordRequestDTO ) {
         log.debug( "change password user id=" + id + " passwordDTO= " + passwordRequestDTO );
-        userService.changePassword( id, passwordRequestDTO );
+        User user = userService.findById( id )
+                .orElseThrow( () ->  new BadRequestException( "user does not exist with id:" + id ) );
+        userService.changePassword( user, passwordRequestDTO );
     }
 }

@@ -27,6 +27,7 @@ public class Bootstrapper implements ApplicationListener<ContextRefreshedEvent> 
     private UserPrefsRepository userPrefsRepository;
     private PostRepository postRepository;
     private RoleRepository roleRepository;
+    private AvatarRepository avatarRepository;
 
     private static final String IMG_SERVICE = "https://picsum.photos/300/200";
     private static final String IMG_SERVICE_BUSINESS = "https://picsum.photos/300/200/?image=1070";
@@ -40,12 +41,13 @@ public class Bootstrapper implements ApplicationListener<ContextRefreshedEvent> 
     public Bootstrapper( CategoryRepository categoryRepository,
                          UserPrefsRepository userPrefsRepository,
                          PostRepository postRepository,
-                         RoleRepository roleRepository) {
+                         RoleRepository roleRepository,
+                         AvatarRepository avatarRepository ) {
         this.categoryRepository = categoryRepository;
         this.userPrefsRepository = userPrefsRepository;
-        //this.userService = userService;
         this.postRepository = postRepository;
         this.roleRepository = roleRepository;
+        this.avatarRepository = avatarRepository;
     }
 
     @Autowired
@@ -66,45 +68,40 @@ public class Bootstrapper implements ApplicationListener<ContextRefreshedEvent> 
 
 
         //BUILD CATEGORIES
-        //Category all = CategoryBuilder.build( "All Categories" );
-        //Category my = CategoryBuilder.build( "My Categories" );
         Category business = CategoryBuilder.build( "Business" );
         Category webDev = CategoryBuilder.build( "Web Development" );
         Category tech = CategoryBuilder.build( "Tech Gadgets" );
         Category health = CategoryBuilder.build( "Health & Fitness");
-
-        //categoryRepository.save( all );
-        //categoryRepository.save( my );
         categoryRepository.save( business );
         categoryRepository.save( webDev );
         categoryRepository.save( tech );
         categoryRepository.save( health );
 
-
+        //Build Avatars - (these files should exist in the /static/avatars/ directory
+        Avatar av0 = Avatar.builder().fileName( "avatar0.jpg" ).build();
+        av0 = avatarRepository.save( av0 );
+        Avatar av1 = Avatar.builder().fileName( "avatar1.jpg" ).build();
+        av1 = avatarRepository.save( av1 );
+        Avatar av2 = Avatar.builder().fileName( "avatar2.jpg" ).build();
+        av2 = avatarRepository.save( av2 );
+        Avatar av3 = Avatar.builder().fileName( "avatar3.jpg" ).build();
+        av3 = avatarRepository.save( av3 );
+        Avatar av4 = Avatar.builder().fileName( "avatar4.jpg" ).build();
+        av4 = avatarRepository.save( av4 );
+        Avatar av5 = Avatar.builder().fileName( "avatar5.jpg" ).build();
+        av5 = avatarRepository.save( av5 );
+        Avatar av6 = Avatar.builder().fileName( "avatar6.jpg" ).build();
+        av6 = avatarRepository.save( av6 );
+        Avatar av7 = Avatar.builder().fileName( "avatar7.jpg" ).build();
+        av7 = avatarRepository.save( av7 );
 
         //BUILD USER PREFS
-        UserPrefsBuilder upb = new UserPrefsBuilder( "avatar3.jpg" );
-        UserPrefs upJohn = upb.build();
-        //userPrefsRepository.save( upJohn );
+        UserPrefs upJohn = UserPrefs.builder().avatar( av3 ).build();
+        UserPrefs upAdmin = UserPrefs.builder().avatar( av2 ).build();
+        UserPrefs upMaggie = UserPrefs.builder().avatar( av1 ).build();
+        UserPrefs upWilliam = UserPrefs.builder().avatar( av4 ).build();
+        UserPrefs upElizabeth = UserPrefs.builder().avatar( av5 ).build();
 
-        upb = new UserPrefsBuilder( "avatar2.jpg" );
-        UserPrefs upAdmin = upb.build();
-        //userPrefsRepository.save( upAdmin );
-
-        upb = new UserPrefsBuilder( "avatar1.jpg" );
-        UserPrefs upMaggie = upb.build();
-        //userPrefsRepository.save( upMaggie );
-
-        upb = new UserPrefsBuilder( "avatar4.jpg");
-        UserPrefs upWilliam = upb.build();
-        //userPrefsRepository.save( upWilliam );
-
-        upb = new UserPrefsBuilder( "avatar5.jpg");
-        UserPrefs upElizabeth = upb.build();
-        //userPrefsRepository.save( upElizabeth );
-
-
-        
         //BUILD USERS
         //
         //retrieve the roles we created

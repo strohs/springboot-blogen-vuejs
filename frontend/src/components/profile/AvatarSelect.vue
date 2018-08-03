@@ -22,8 +22,6 @@
 </template>
 
 <script>
-  import constants from '../../common/constants'
-
   export default {
     name: 'AvatarSelect',
     props: ['value'],
@@ -34,20 +32,14 @@
       }
     },
     methods: {
-      fetchAvatarFileNames () {
-        this.$store.dispatch('fetchAvatarFileNames')
-          .then(data => {
-            this.avatars = data.avatars
-          })
-      }
     },
     computed: {
       avatarUrl () {
-        return constants.DEFAULT_AVATAR_URL + '/' + this.avatarImage
+        return this.$store.getters.getAvatarUrlByFileName(this.avatarImage)
       }
     },
     created () {
-      this.fetchAvatarFileNames()
+      this.avatars = this.$store.state.avatars
     }
   }
 </script>

@@ -24,15 +24,15 @@ public interface UserMapper {
 
     UserMapper INSTANCE = Mappers.getMapper( UserMapper.class );
 
-    @Mapping( target = "avatarImage", source = "userPrefs.avatarImage")
+    @Mapping( target = "avatarImage", source = "userPrefs.avatar.fileName")
     @Mapping( target = "userUrl", expression = "java(com.blogen.api.v1.services.UserService.buildUserUrl(user))")
     @Mapping( target = "password", ignore = true)
     UserDTO userToUserDto( User user );
 
-    @Mapping( target = "userPrefs.avatarImage", source = "avatarImage")
+    @Mapping( target = "userPrefs.avatar.fileName", source = "avatarImage")
     User userDtoToUser( UserDTO userDTO );
     
-    @Mapping( source = "avatarImage", target = "userPrefs.avatarImage")
+    @Mapping( source = "avatarImage", target = "userPrefs.avatar.fileName")
     void updateUserFromDTO( UserDTO userDTO, @MappingTarget User user );
 
     default List<String> asStrings( List<Role> roles) {

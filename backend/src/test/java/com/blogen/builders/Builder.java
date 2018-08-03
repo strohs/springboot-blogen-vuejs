@@ -37,9 +37,10 @@ public class Builder {
     }
 
     public static UserPrefs buildUserPrefs( Long id, String avatarName ) {
+        Avatar avatar = Avatar.builder().id( 1L ).fileName( avatarName ).build();
         UserPrefs prefs = new UserPrefs();
         prefs.setId( id );
-        prefs.setAvatarImage( avatarName );
+        prefs.setAvatar( avatar );
         return prefs;
     }
 

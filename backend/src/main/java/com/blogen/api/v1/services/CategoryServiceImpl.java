@@ -13,6 +13,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -24,8 +25,12 @@ import java.util.List;
  *   we can get a list of all categories
  *   get a specific category
  *   create a new category
+ *   change the name of a category
  *
- * NOTE: Deleting or Updating a category is not supported in this API
+ * Only Blogen Admins can perform CRUD ops on categories
+ *
+ * NOTE: Deleting categories is not supported in this API...for now
+ *
  * @author Cliff
  */
 @Service
@@ -43,19 +48,6 @@ public class CategoryServiceImpl implements CategoryService {
         this.categoryMapper = categoryMapper;
         this.pageRequestBuilder = pageRequestBuilder;
     }
-
-//    @Override
-//    public CategoryListDTO getAllCategories() {
-//        List<Category> categories = categoryRepository.findAll();
-//        List<CategoryDTO> dtos = categories
-//                .stream()
-//                .map( category -> {
-//                    CategoryDTO dto = categoryMapper.categoryToCategoryDto( category );
-//                    dto.setCategoryUrl( CategoryService.buildCategoryUrl( category ) );
-//                    return dto;
-//                } ).collect( Collectors.toList());
-//        return new CategoryListDTO( dtos, null );
-//    }
 
     @Override
     public CategoryListDTO getCategories( int pageNum, int pageSize ) {
@@ -80,7 +72,7 @@ public class CategoryServiceImpl implements CategoryService {
         return categoryDTO;
     }
 
-    //TODO only administrators can create categories
+    @PreAuthorize( "hasAuthority('ADMIN')" )
     @Override
     public CategoryDTO createNewCategory( CategoryDTO categoryDTO ) {
         CategoryDTO savedDTO = null;
@@ -96,7 +88,7 @@ public class CategoryServiceImpl implements CategoryService {
         return savedDTO;
     }
 
-    //TODO only admins can update categories
+    @PreAuthorize( "hasAuthority('ADMIN')" )
     @Override
     public CategoryDTO updateCategory( Long id, CategoryDTO categoryDTO ) {
         Category category = categoryRepository.findById( id )

@@ -68,7 +68,8 @@
     computed: {
       ...mapGetters([
         'isAdmin',
-        'getAuthUserId'
+        'getAuthUserId',
+        'getAvatarByFileName'
       ]),
       avatarUrl () {
         return constants.API_SERVER_URL + this.user.avatarUrl
