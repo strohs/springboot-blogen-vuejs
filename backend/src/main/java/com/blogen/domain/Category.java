@@ -1,8 +1,6 @@
 package com.blogen.domain;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -12,7 +10,9 @@ import java.time.LocalDateTime;
  * @author Cliff
  */
 @Data
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode( exclude = "id")
 @Entity
 public class Category {

@@ -298,7 +298,7 @@ export const store = new Vuex.Store({
     },
     fetchPostsByUser: (context, {id, pageNum, pageLimit, categoryId}) => {
       const url = `/api/v1/users/${id}/posts`
-      axios.get(url, {
+      return axios.get(url, {
         params: {
           page: pageNum,
           limit: pageLimit,
@@ -321,6 +321,17 @@ export const store = new Vuex.Store({
         .then(res => {
           console.log('fetch avatar file name response:', res)
           commit('SET_AVATARS', res.data.avatars)
+        })
+        .catch(error => {
+          handleAxiosError(error)
+          throw (error)
+        })
+    },
+    fetchUserInfo: ({commit}, id) => {
+      return axios.get(`/api/v1/users/${id}`)
+        .then(res => {
+          console.log('fetch user info response:', res)
+          return res.data
         })
         .catch(error => {
           handleAxiosError(error)

@@ -146,8 +146,11 @@ public class PostServiceImpl implements PostService {
     public PostDTO saveUpdatePost( Long id, PostRequestDTO requestDTO ) {
         Post postToUpdate = postRepository.findById( id ).orElseThrow( () ->
                 new BadRequestException( "Post with id " + id + " was not found" ) );
-        //TODO might be able to do this with POST mapper
-        postToUpdate = mergePostRequestDtoToPost( postToUpdate, requestDTO );
+        // validate category id exists
+        validateCategoryId( requestDTO.getCategoryId() );
+        // merge non-null fields of the DTO into postToUpdate
+        postRequestMapper.updatePostFromPostRequestDTO( requestDTO, postToUpdate );
+        // set the created timestamp
         postToUpdate.setCreated( LocalDateTime.now() );
         Post savedPost = postRepository.save( postToUpdate );
         return buildReturnDto( savedPost );
@@ -244,19 +247,19 @@ public class PostServiceImpl implements PostService {
      * @param source PostRequestDTO containing the non-null fields you want to merge
      * @return a Post object containing the merged fields
      */
-    private Post mergePostRequestDtoToPost( Post target, PostRequestDTO source ) {
-        if ( source.getImageUrl() != null )
-            target.setImageUrl( source.getImageUrl() );
-        if ( source.getCategoryId() != null ) {
-            Category category = validateCategoryId( source.getCategoryId() );
-            target.setCategory( category );
-        }
-        if ( source.getTitle() != null )
-            target.setTitle( source.getTitle() );
-        if ( source.getText() != null )
-            target.setText( source.getText() );
-        return target;
-    }
+//    private Post mergePostRequestDtoToPost( Post target, PostRequestDTO source ) {
+//        if ( source.getImageUrl() != null )
+//            target.setImageUrl( source.getImageUrl() );
+//        if ( source.getCategoryId() != null ) {
+//            Category category = validateCategoryId( source.getCategoryId() );
+//            target.setCategory( category );
+//        }
+//        if ( source.getTitle() != null )
+//            target.setTitle( source.getTitle() );
+//        if ( source.getText() != null )
+//            target.setText( source.getText() );
+//        return target;
+//    }
 
     /**
      * validate that a category name exists in the repository

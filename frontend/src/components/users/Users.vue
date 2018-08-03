@@ -8,11 +8,18 @@
           <h2>
             <b-img thumbnail fluid width="50" alt="avatar image" :src="avatarUrl"></b-img>
             Latest Posts from
-            <small>{{ getUserName }}</small>
+            <small>{{ user.userName }}</small>
           </h2>
         </div>
       </div>
     </header>
+
+    <!-- Status Alert -->
+    <div class="container">
+      <div class="row my-4 justify-content-center">
+        <app-status-alert v-bind="status"></app-status-alert>
+      </div>
+    </div>
 
     <div class="container">
       <b-card-group columns class="mt-4">
@@ -46,33 +53,47 @@
           code: 200,
           message: '',
           show: false
+        },
+        user: {
+          id: -1,
+          userName: '',
+          avatarImage: ''
         }
       }
     },
     computed: {
       ...mapState([
         'posts',
-        'pageInfo',
-        'user'
+        'pageInfo'
       ]),
       avatarUrl () {
-        // first post will always be a parent post containing the user info we want
-        return constants.API_SERVER_URL + this.posts[0].user.avatarUrl
-      },
-      getUserName () {
-        if (this.posts[0].user) {
-          return this.posts[0].user.userName
-        }
+        return constants.DEFAULT_AVATAR_URL + '/' + this.user.avatarImage
       }
     },
     methods: {
       fetchPostsByUser (id, pageNum, pageLimit, categoryId) {
         this.$store.dispatch('fetchPostsByUser', {id, pageNum, pageLimit, categoryId})
           .then(data => {
-            console.log('RESPONSE')
+            if (data.posts === undefined || data.posts.length === 0) {
+              console.log('no posts made for user id:', id)
+              this.status.code = 301
+              this.status.message = 'This user has not made any recent posts'
+              this.displayStatusAlert()
+            }
           })
           .catch(error => {
             // TODO some other error occurred, may need global alert box
+            this.status.code = error.response.status
+            this.status.message = error.response.data.globalError[0].message
+            this.displayStatusAlert()
+          })
+      },
+      async fetchUserInfo (userId) {
+        await this.$store.dispatch('fetchUserInfo', userId)
+          .then(data => {
+            this.user = data
+          })
+          .catch(error => {
             this.status.code = error.response.status
             this.status.message = error.response.data.globalError[0].message
             this.displayStatusAlert()
@@ -88,6 +109,7 @@
     },
     created () {
       this.fetchPostsByUser(this.userId, 0, 9, -1)
+      this.fetchUserInfo(this.userId)
     }
   }
 </script>
