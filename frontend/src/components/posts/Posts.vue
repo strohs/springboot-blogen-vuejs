@@ -62,7 +62,7 @@
     </section>
 
     <!-- PAGINATION -->
-    <b-pagination class="ml-4 mt-5"
+    <b-pagination class="ml-4 py-8"
                   v-model="currentNavPage"
                   :total-rows="pageInfo.totalElements"
                   :per-page="pageInfo.pageSize"

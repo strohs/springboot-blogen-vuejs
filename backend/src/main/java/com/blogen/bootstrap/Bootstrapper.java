@@ -19,7 +19,7 @@ import java.util.Random;
  *  @author Cliff
  */
 @Slf4j
-@Component
+//@Component
 public class Bootstrapper implements ApplicationListener<ContextRefreshedEvent> {
 
     private CategoryRepository categoryRepository;
@@ -249,7 +249,7 @@ public class Bootstrapper implements ApplicationListener<ContextRefreshedEvent> 
     @Transactional
     @Override
     public void onApplicationEvent( ContextRefreshedEvent event ) {
-        initData();
-        log.info("Finished bootstrapping data");
+       //initData();
+       //log.info("Finished bootstrapping data");
     }
 }

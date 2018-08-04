@@ -5,7 +5,7 @@
 
 export const defaultUsers = [
   {
-    user_name: 'mgill',
+    user_name: 'mcgill',
     pw: 'password'
   },
   {

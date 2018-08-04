@@ -21,7 +21,7 @@ import java.util.Optional;
 @Profile("jdbc")
 public class AvatarRepositoryImpl implements AvatarRepository {
 
-    private final String FETCH_SQL_BY_ID = "SELECT id,fileName FROM avatar WHERE id = ?";
+    private final String FETCH_SQL_BY_ID = "SELECT id,file_name FROM avatar WHERE id = ?";
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -60,7 +60,7 @@ public class AvatarRepositoryImpl implements AvatarRepository {
         public Avatar mapRow( ResultSet rs, int rowNum ) throws SQLException {
             return Avatar.builder()
                     .id( rs.getLong( "id" ) )
-                    .fileName( rs.getString( "fileName" ) )
+                    .fileName( rs.getString( "file_name" ) )
                     .build();
         }
     }
