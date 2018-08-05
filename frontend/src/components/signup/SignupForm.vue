@@ -48,6 +48,7 @@
 <script>
   import textLengthValidator from '../../validators/textLengthValidator'
   import emailValidator from '../../validators/emailValidator'
+  import userNameExistsValidator from '../../validators/userNameExistsValidator'
 
   export default {
     name: 'SignupForm',
@@ -81,6 +82,15 @@
       },
       validateUserName (val) {
         this.userNameValidator = textLengthValidator(val, 2)
+        if (this.userNameValidator.state) {
+          userNameExistsValidator(val)
+            .then(validator => {
+              this.userNameValidator = validator
+            })
+            .catch(validator => {
+              this.userNameValidator = validator
+            })
+        }
       },
       validateFirstName (val) {
         this.firstNameValidator = textLengthValidator(val, 1)
@@ -97,8 +107,8 @@
     },
     computed: {
       allFieldsValid () {
-        return (this.userNameValidator.state && this.firstNameValidator.state && this.lastNameValidator.state &&
-          this.emailValidator.state && this.passwordValidator.state)
+        return (this.userNameValidator.state && this.firstNameValidator.state &&
+          this.lastNameValidator.state && this.emailValidator.state && this.passwordValidator.state)
       }
     }
   }

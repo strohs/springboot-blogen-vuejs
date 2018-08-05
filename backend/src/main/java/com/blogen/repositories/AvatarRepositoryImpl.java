@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Optional;
 
 /**
+ * This is an example implementation of the AvatarRepository using jdbcTemplate. It is not used in the app.
+ *
  * Author: Cliff
  */
 @Repository
@@ -54,6 +56,9 @@ public class AvatarRepositoryImpl implements AvatarRepository {
     }
 
 
+    /**
+     * maps an Avatar table row into a Avatar domain object
+     */
     class AvatarMapper implements RowMapper<Avatar> {
 
         @Override

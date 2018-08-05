@@ -7,6 +7,8 @@ import com.blogen.api.v1.model.UserDTO;
 import com.blogen.api.v1.services.AuthorizationService;
 import com.blogen.api.v1.services.PostService;
 import com.blogen.api.v1.validators.UserDtoSignupValidator;
+import com.blogen.exceptions.BadRequestException;
+import com.blogen.exceptions.NotFoundException;
 import com.blogen.services.AvatarService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -76,4 +78,14 @@ public class AuthorizationController {
         return postService.getPosts( -1L, 0, limit );
     }
 
+    @ApiOperation( value = "check if a user name exists, return HTTP Status 200 if it does, else returns 404", produces = "application/json")
+    @GetMapping("/username/{name}")
+    @ResponseStatus(HttpStatus.OK)
+    public void userNameExists( @PathVariable("name") String userName ) {
+        Boolean userExists = authorizationService.userNameExists( userName );
+        log.debug( "check user name exists: {} = {}", userName, userExists );
+        if ( !userExists ) {
+            throw new NotFoundException( "user name not found: " + userName );
+        }
+    }
 }

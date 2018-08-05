@@ -95,4 +95,8 @@ public class AuthorizationServiceImpl implements AuthorizationService {
         return authResponse;
     }
 
+    @Override
+    public Boolean userNameExists( String userName ) {
+        return userService.findByUserName( userName ).isPresent();
+    }
 }
