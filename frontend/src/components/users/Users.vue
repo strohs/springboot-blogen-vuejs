@@ -35,7 +35,7 @@
 </template>
 
 <script>
-  import constants from '../../common/constants'
+  import constants from '../../common/constants.js'
   import StatusAlert from '../common/StatusAlert'
   import {mapState} from 'vuex'
 
@@ -82,7 +82,7 @@
             }
           })
           .catch(error => {
-            // TODO some other error occurred, may need global alert box
+            // TODO some other error occurred, may need global alert component
             this.status.code = error.response.status
             this.status.message = error.response.data.globalError[0].message
             this.displayStatusAlert()

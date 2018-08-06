@@ -1,4 +1,4 @@
-import router from './router'
+import router from '../router/index'
 
 function handleAxiosError (error) {
   if (error.response) {

@@ -14,8 +14,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Profile( {"dev"} )
 public class WebMvcConfig implements WebMvcConfigurer {
 
-    //TODO may be able to enable CORS this via WebPack settings, so this configuration may not be needed
-
     private final long MAX_AGE_SECS = 3600;
 
     // Note that CORS has also been enabled in the SpringSecConfig

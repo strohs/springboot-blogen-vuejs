@@ -9,7 +9,7 @@
 <script>
   import PostCard from './PostCard'
   import axios from '../../axios-auth'
-  import {handleAxiosError} from '../../common'
+  import { handleAxiosError } from '../../common/errorHandlers'
 
   export default {
     name: 'PostCards',

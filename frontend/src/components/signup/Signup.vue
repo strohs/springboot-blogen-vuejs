@@ -34,7 +34,7 @@
 <script>
   import axios from '../../axios-auth'
   import SignupForm from './SignupForm'
-  import { handleAxiosError } from '../../common'
+  import { handleAxiosError } from '../../common/errorHandlers'
 
   export default {
     name: 'Signup',

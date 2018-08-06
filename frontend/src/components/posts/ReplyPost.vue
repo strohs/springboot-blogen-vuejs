@@ -21,7 +21,7 @@
 
 <script>
   import PostForm from './PostForn'
-  import constants from '../../common/constants'
+  import constants from '../../common/constants.js'
 
   export default {
     name: 'ReplyPost',

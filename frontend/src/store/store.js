@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from '../axios-auth'
-import {handleAxiosError} from '../common'
+import {handleAxiosError} from '../common/errorHandlers'
 import constants from '../common/constants'
 
 Vue.use(Vuex)

@@ -76,7 +76,7 @@
 
 <script>
   import axios from '../../axios-auth'
-  import { handleAxiosError } from '../../common'
+  import { handleAxiosError } from '../../common/errorHandlers'
   import CategoryFilterButton from './CategoryFilterButton'
   import NewPost from './NewPost'
   import PostSearch from './PostSearch'

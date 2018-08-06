@@ -49,7 +49,7 @@
   import axios from '../../axios-auth'
   import UserProfileForm from './UserProfileForm'
   import StatusAlert from '../common/StatusAlert'
-  import {handleAxiosError} from '../../common'
+  import { handleAxiosError } from '../../common/errorHandlers'
   import EditPassword from './EditPassword'
   // import { mapState } from 'vuex'
 

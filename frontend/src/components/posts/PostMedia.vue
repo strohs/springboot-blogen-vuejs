@@ -33,7 +33,7 @@
 </template>
 
 <script>
-  import constants from '../../common/constants'
+  import constants from '../../common/constants.js'
   import {dateLongFormat} from '../../filters/dateFormatFilter'
   import { mapGetters } from 'vuex'
   import ReplyPost from './ReplyPost'
