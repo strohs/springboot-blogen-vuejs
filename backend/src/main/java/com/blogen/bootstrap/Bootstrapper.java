@@ -24,7 +24,6 @@ public class Bootstrapper implements ApplicationListener<ContextRefreshedEvent> 
 
     private CategoryRepository categoryRepository;
     private UserService userService;
-    private UserPrefsRepository userPrefsRepository;
     private PostRepository postRepository;
     private RoleRepository roleRepository;
     private AvatarRepository avatarRepository;
@@ -39,12 +38,10 @@ public class Bootstrapper implements ApplicationListener<ContextRefreshedEvent> 
 
     @Autowired
     public Bootstrapper( CategoryRepository categoryRepository,
-                         UserPrefsRepository userPrefsRepository,
                          PostRepository postRepository,
                          RoleRepository roleRepository,
                          AvatarRepository avatarRepository ) {
         this.categoryRepository = categoryRepository;
-        this.userPrefsRepository = userPrefsRepository;
         this.postRepository = postRepository;
         this.roleRepository = roleRepository;
         this.avatarRepository = avatarRepository;
