@@ -12,6 +12,7 @@ import com.blogen.domain.User;
 import com.blogen.exceptions.BadRequestException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.Authorization;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -59,7 +60,7 @@ public class UserController {
         binder.addValidators( passwordValidator );
     }
 
-    @ApiOperation( value = "get a list of all users", produces = "application/json")
+    @ApiOperation( value = "get a list of all users", produces = "application/json", authorizations = { @Authorization(value="apiKey") })
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public UserListDTO getAllUsers() {
@@ -67,7 +68,7 @@ public class UserController {
         return userService.getAllUsers();
     }
 
-    @ApiOperation( value = "get a specific user by id", produces = "application/json")
+    @ApiOperation( value = "get a specific user by id", produces = "application/json", authorizations = { @Authorization(value="apiKey") })
     @GetMapping( "/{id}" )
     @ResponseStatus( HttpStatus.OK )
     public UserDTO getUser( @PathVariable("id") Long id ) {
@@ -75,7 +76,7 @@ public class UserController {
         return userService.getUser( id );
     }
 
-    @ApiOperation( value = "get posts made by a user", produces = "application/json")
+    @ApiOperation( value = "get posts made by a user", produces = "application/json", authorizations = { @Authorization(value="apiKey") })
     @GetMapping( "/{id}/posts" )
     @ResponseStatus( HttpStatus.OK )
     public PostListDTO getUserPosts( @PathVariable("id") Long id,
@@ -87,7 +88,7 @@ public class UserController {
         return postService.getPostsForUser( id, category, page, limit );
     }
 
-    @ApiOperation( value = "update field(s) of an existing user", consumes = "application/json", produces = "application/json")
+    @ApiOperation( value = "update field(s) of an existing user", consumes = "application/json", produces = "application/json", authorizations = { @Authorization(value="apiKey") })
     @PutMapping( "/{id}" )
     @ResponseStatus( HttpStatus.OK )
     public UserDTO updateUser( @PathVariable("id") Long id, @Valid @RequestBody UserDTO userDTO ) {
@@ -97,7 +98,7 @@ public class UserController {
         return userService.updateUser( user, userDTO );
     }
 
-    @ApiOperation( value = "change a users password", consumes = "application/json")
+    @ApiOperation( value = "change a users password", consumes = "application/json", authorizations = { @Authorization(value="apiKey") })
     @PutMapping( "/{id}/password" )
     @ResponseStatus( HttpStatus.OK )
     public void updatePassword( @PathVariable("id") Long id, @Valid @RequestBody PasswordRequestDTO passwordRequestDTO ) {

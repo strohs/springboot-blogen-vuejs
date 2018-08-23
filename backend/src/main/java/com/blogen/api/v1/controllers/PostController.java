@@ -7,6 +7,7 @@ import com.blogen.api.v1.services.PostService;
 import com.blogen.api.v1.validators.PostRequestDtoValidator;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.Authorization;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -42,7 +43,7 @@ public class PostController {
         binder.addValidators( postRequestDtoValidator );
     }
 
-    @ApiOperation( value = "get a list of parent posts and any child posts belonging to a parent", produces = "application/json")
+    @ApiOperation( value = "get a list of parent posts and any child posts belonging to a parent", produces = "application/json", authorizations = { @Authorization(value="apiKey") })
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public PostListDTO getPosts( @RequestParam(value = "limit", defaultValue = "5") int limit,
@@ -52,7 +53,7 @@ public class PostController {
         return postService.getPosts( category, page, limit );
     }
 
-    @ApiOperation( value = "search posts for the passed in text", produces = "application/json")
+    @ApiOperation( value = "search posts for the passed in text", produces = "application/json", authorizations = { @Authorization(value="apiKey") })
     @GetMapping( "/search/{text}" )
     @ResponseStatus(HttpStatus.OK)
     public PostListDTO searchPosts( @PathVariable(value = "text") String text,
@@ -61,7 +62,7 @@ public class PostController {
         return postService.searchPosts( text,limit );
     }
 
-    @ApiOperation( value = "get a post by id", produces = "application/json")
+    @ApiOperation( value = "get a post by id", produces = "application/json", authorizations = { @Authorization(value="apiKey") })
     @GetMapping( "/{id}" )
     @ResponseStatus( HttpStatus.OK )
     public PostDTO getPost( @PathVariable("id") Long id) {
@@ -69,7 +70,7 @@ public class PostController {
         return postService.getPost( id );
     }
 
-    @ApiOperation( value = "create a new parent post", consumes = "application/json", produces = "application/json")
+    @ApiOperation( value = "create a new parent post", consumes = "application/json", produces = "application/json", authorizations = { @Authorization(value="apiKey") })
     @PostMapping
     @ResponseStatus( HttpStatus.CREATED )
     public PostDTO createPost( @Valid @RequestBody PostRequestDTO dto ) {
@@ -77,7 +78,7 @@ public class PostController {
         return postService.createNewPost( dto );
     }
 
-    @ApiOperation( value = "create a new child post", consumes = "application/json", produces = "application/json")
+    @ApiOperation( value = "create a new child post", consumes = "application/json", produces = "application/json", authorizations = { @Authorization(value="apiKey") })
     @PostMapping( "/{id}")
     @ResponseStatus( HttpStatus.CREATED )
     public PostDTO createChildPost( @PathVariable("id") Long parentId, @Valid @RequestBody PostRequestDTO postRequestDTO ) {
@@ -85,7 +86,7 @@ public class PostController {
         return postService.createNewChildPost( parentId, postRequestDTO );
     }
 
-    @ApiOperation( value = "replace an existing post with new post data", consumes = "application/json", produces = "application/json")
+    @ApiOperation( value = "replace an existing post with new post data", consumes = "application/json", produces = "application/json", authorizations = { @Authorization(value="apiKey") })
     @PutMapping( "/{id}" )
     @ResponseStatus( HttpStatus.OK )
     public PostDTO updatePost( @PathVariable("id") Long id, @Valid @RequestBody PostRequestDTO postRequestDTO ) {
@@ -93,7 +94,7 @@ public class PostController {
         return postService.saveUpdatePost( id, postRequestDTO );
     }
 
-    @ApiOperation( value = "update field(s) of an existing post", consumes = "application/json", produces = "application/json")
+    @ApiOperation( value = "update field(s) of an existing post", consumes = "application/json", produces = "application/json", authorizations = { @Authorization(value="apiKey") })
     @PatchMapping( "/{id}" )
     @ResponseStatus( HttpStatus.OK )
     public PostDTO patchPost( @PathVariable( "id" ) Long id, @RequestBody PostRequestDTO postRequestDTO ) {
@@ -101,7 +102,7 @@ public class PostController {
         return postService.saveUpdatePost( id, postRequestDTO );
     }
 
-    @ApiOperation( value = "delete a post" )
+    @ApiOperation( value = "delete a post", authorizations = { @Authorization(value="apiKey") } )
     @DeleteMapping( "/{id}")
     @ResponseStatus( HttpStatus.OK )
     public void deletePost( @PathVariable("id") Long id ) {

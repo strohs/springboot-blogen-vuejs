@@ -3,6 +3,8 @@ package com.blogen.api.v1.controllers;
 import com.blogen.api.v1.model.AvatarResponse;
 import com.blogen.services.AvatarService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.Authorization;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,6 +33,7 @@ public class UserPrefsController {
         this.avatarService = avatarService;
     }
 
+    @ApiOperation( value = "a list of all Avatar file names", produces = "application/json", authorizations = { @Authorization(value="apiKey") })
     @GetMapping( "/avatars" )
     public AvatarResponse avatarImageFileNames() {
         return AvatarResponse.builder()

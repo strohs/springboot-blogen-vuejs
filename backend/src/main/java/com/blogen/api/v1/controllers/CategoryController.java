@@ -6,9 +6,9 @@ import com.blogen.api.v1.services.CategoryService;
 import com.blogen.api.v1.validators.CategoryDtoValidator;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.Authorization;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
@@ -51,7 +51,7 @@ public class CategoryController {
 //        return categoryService.getAllCategories();
 //    }
 
-    @ApiOperation( value = "get a page of categories", produces = "application/json")
+    @ApiOperation( value = "get a page of categories", produces = "application/json", authorizations = { @Authorization(value="apiKey") })
     @GetMapping
     @ResponseStatus( HttpStatus.OK )
     public CategoryListDTO getCategories( @RequestParam(value = "page", defaultValue = "0") int pageNum,
@@ -60,7 +60,7 @@ public class CategoryController {
         return categoryService.getCategories( pageNum, pageLimit );
     }
 
-    @ApiOperation( value = "get a specific category by id", produces = "application/json")
+    @ApiOperation( value = "get a specific category by id", produces = "application/json", authorizations = { @Authorization(value="apiKey") })
     @GetMapping( "/{id}")
     @ResponseStatus( HttpStatus.OK )
     public CategoryDTO getCategory( @PathVariable("id") Long id ) {
@@ -68,7 +68,7 @@ public class CategoryController {
         return categoryService.getCategory( id );
     }
 
-    @ApiOperation( value = "create a new category", produces = "application/json", consumes = "application/json")
+    @ApiOperation( value = "create a new category", produces = "application/json", consumes = "application/json", authorizations = { @Authorization(value="apiKey") })
     @PostMapping
     @ResponseStatus( HttpStatus.CREATED )
     public CategoryDTO createNewCategory( @Valid @RequestBody CategoryDTO categoryDTO ) {
@@ -76,7 +76,7 @@ public class CategoryController {
         return categoryService.createNewCategory( categoryDTO );
     }
 
-    @ApiOperation( value = "replace an existing category with new category data", consumes = "application/json", produces = "application/json")
+    @ApiOperation( value = "replace an existing category with new category data", consumes = "application/json", produces = "application/json", authorizations = { @Authorization(value="apiKey") })
     @PutMapping( "/{id}" )
     @ResponseStatus( HttpStatus.OK )
     public CategoryDTO updateCategory( @PathVariable("id") Long id, @Valid @RequestBody CategoryDTO categoryDTO ) {
