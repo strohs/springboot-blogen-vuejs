@@ -50,7 +50,7 @@
 
     <!-- Modal Component -->
     <b-modal id="authTokenModal" title="Your Current Authentication Token:">
-      <b-form-textarea size="sm" plaintext :value="getAuthToken"></b-form-textarea>
+      <b-form-textarea size="sm" rows="4" plaintext :value="getAuthToken"></b-form-textarea>
     </b-modal>
 
   </b-navbar>

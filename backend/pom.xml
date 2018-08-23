@@ -18,7 +18,7 @@
         <java.version>1.8</java.version>
         <org.mapstruct.version>1.2.0.Final</org.mapstruct.version>
         <lombok.version>1.18.0</lombok.version>
-        <springfox-swagger.version>2.9.2</springfox-swagger.version>
+        <springfox-swagger.version>2.7.0</springfox-swagger.version>
         <json.web.token.version>0.9.1</json.web.token.version>
     </properties>
 
