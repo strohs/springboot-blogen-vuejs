@@ -34,6 +34,15 @@
       </div>
     </section>
 
+    <!-- PAGINATION -->
+    <b-pagination class="ml-4 py-8"
+                  v-model="currentNavPage"
+                  :total-rows="pageInfo.totalElements"
+                  :per-page="pageInfo.pageSize"
+                  @change="fetchPage"
+    >
+    </b-pagination>
+
     <!-- List of Posts and child posts -->
     <section id="posts" class="py-2">
       <div class="container-fluid">
@@ -61,14 +70,7 @@
       </div>
     </section>
 
-    <!-- PAGINATION -->
-    <b-pagination class="ml-4 py-8"
-                  v-model="currentNavPage"
-                  :total-rows="pageInfo.totalElements"
-                  :per-page="pageInfo.pageSize"
-                  @change="fetchPage"
-    >
-    </b-pagination>
+
 
 
   </section>
