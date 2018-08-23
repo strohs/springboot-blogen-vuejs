@@ -34,7 +34,7 @@ public class SwaggerConfig {
     }
 
     private ApiInfo metaData() {
-        Contact contact = new Contact( "Cliff","https://github.com/strohs/springboot-blogen-vuejs","notreal@example.com" );
+        Contact contact = new Contact( "Blogen Admin","https://github.com/strohs/springboot-blogen-vuejs","notreal@example.com" );
 
         return new ApiInfo(
                 "Blogen REST API",
