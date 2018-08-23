@@ -22,6 +22,11 @@
             <icon name="user-cog"></icon>
             Profile
           </b-dropdown-item>
+          <b-dropdown-divider></b-dropdown-divider>
+          <b-dropdown-item-button v-b-modal.authTokenModal>
+            <icon name="lock"></icon>
+            Authentication Token
+          </b-dropdown-item-button>
         </b-nav-item-dropdown>
 
         <b-nav-item to="/signup" class="mx-2" v-if="!isAuthenticated">
@@ -43,7 +48,13 @@
       </b-navbar-nav>
     </b-collapse>
 
+    <!-- Modal Component -->
+    <b-modal id="authTokenModal" title="Your Current Authentication Token:">
+      <b-form-textarea size="sm" plaintext :value="getAuthToken"></b-form-textarea>
+    </b-modal>
+
   </b-navbar>
+
 
 
 </template>
@@ -62,7 +73,8 @@
         'isAuthenticated',
         'isAdmin',
         'getAuthUser',
-        'getAuthUserId'
+        'getAuthUserId',
+        'getAuthToken'
       ])
     }
   }

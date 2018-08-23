@@ -15,6 +15,7 @@ import 'vue-awesome/icons/pencil-alt'
 import 'vue-awesome/icons/keyboard'
 import 'vue-awesome/icons/plus'
 import 'vue-awesome/icons/folder'
+import 'vue-awesome/icons/lock'
 
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'

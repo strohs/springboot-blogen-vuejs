@@ -24,7 +24,7 @@ export const store = new Vuex.Store({
     categories: [
       {id: 0, name: '', categoryUrl: ''}
     ],
-    // holds a page worth of posts
+    // holds one page worth of posts
     posts: [{
       id: 0,
       text: '',
@@ -38,10 +38,10 @@ export const store = new Vuex.Store({
       children: []
     }],
     pageInfo: {          // pageInfo is returned by the API on each page request
-      totalElements: 0,   // total posts available using the current filter criteria
+      totalElements: 0,   // total threads available using the current filter criteria
       totalPages: 0,      // total pages available using the current filter criteria
       pageNumber: 0,      // the page number of data that was requested (0 based indices)
-      pageSize: 0         // the maximum number of parent posts that will be displayed on a page
+      pageSize: 0         // shows the number of threads that will be displayed on a page
     },
     // avatar file names used within this application
     avatars: []
