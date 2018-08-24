@@ -20,12 +20,13 @@ import java.io.IOException;
 @Component
 @Slf4j
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
+
     @Override
     public void commence( HttpServletRequest httpServletRequest,
                           HttpServletResponse httpServletResponse,
                           AuthenticationException e ) throws IOException, ServletException {
-        log.error("Responding with unauthorized error. Message {}", e.getMessage());
+        log.error("Unauthorized error. JWT is missing or expired. Message {}", e.getMessage());
         httpServletResponse.sendError( HttpServletResponse.SC_UNAUTHORIZED,
-                "You're not authorized to access this resource.");
+                "You're not authorized to access this resource. Your authorization token is missing or expired");
     }
 }

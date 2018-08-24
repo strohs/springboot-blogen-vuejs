@@ -17,8 +17,12 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * gets the JWT token from the request, validates it, loads the user associated with the token, and passes
- * it to Spring Security
+ * A web filter that validates a JSON Web Token. This class performs the following:
+ *   1. Gets the JWT token from the HTTP request
+ *   2. validates it
+ *   3. loads the user details associated with the token (token contains the user's database ID in the subject)
+ *   4. Creates a UsernamePasswordAuthenticationToken (UPAT) containing the user details
+ *   5. sets the UPAT in the SecurityContext
  *
  * Author: Cliff
  */

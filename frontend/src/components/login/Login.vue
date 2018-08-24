@@ -99,6 +99,7 @@
               console.log('user:', res.data.user)
               this.$store.commit('SET_AUTH_TOKEN', res.data.accessToken)
               this.$store.commit('SET_USER', res.data.user)
+              // set the JWT as a bearer token for each request made with axios
               axios.defaults.headers.common['Authorization'] = 'Bearer ' + res.data.accessToken
               this.$router.push({name: 'posts'})
             } else {

@@ -8,7 +8,7 @@ Blogen is a fictional micro-blogging website that I use to try out various Sprin
  engine. This new version swaps out thymeleaf in favor of Vue.js, turning the website into a single 
  page web application. 
  Additionally, [JSON Web Tokens](https://jwt.io/introduction/) (JWT) are used to provide authorization to logged in 
- users and grant them the use of the Blogen REST API. 
+ users and grant them access to the website ant the use of the Blogen REST API. 
 
 The website functionality remains unchanged and you can read about it on the 
 [original](https://github.com/strohs/springboot-blogen) project page. In a nutshell, Blogen is an imaginary community
@@ -23,6 +23,15 @@ of users that start threads of discussion on a variety of subjects (called categ
 Special thanks to [jonashackt](https://github.com/jonashackt/spring-boot-vuejs) for showing how to integrate Vue.js
 with Spring Boot.
 
+
+### Prerequisites
+* at least Java 8 (haven't tested with versions of java greater than 8)
+* a working [Node.js](https://nodejs.org/) installation (I used version 8.11.3 LTS)
+* Apache maven OR you can use the included maven wrapper:
+    * 'mvnw.cmd' if you are running on windows
+    * 'mvnw' if you are running on a *nix operating system 
+
+
 ### Installation and Running
 * mvn clean install
 * mvn --projects backend spring-boot:run
@@ -30,7 +39,24 @@ with Spring Boot.
 
 ### Project Structure
 
-### JSON Web Token information
+
+### JSON Web Token Information
+This version of Blogen uses [JSON Web Token](https://jwt.io/introduction/) (JWT) to authorize access to the 
+Blogen Website and REST api. I am using the [java-jwt](https://github.com/auth0/java-jwt) library to create 
+and verify the JWT with a default expiration of 30 minutes (configurable in application.properties).
+
+#### Authorization flow
+* Once a user logs in to Blogen with their username and password, they are provided with a JWT. 
+* The JWT must be sent with every HTTP request in order to access the website and REST api. 
+The server (Spring Boot) does not store the token.
+    * The token is sent within the HTTP Authorization header using the *Bearer* schema. For example
+        * `Authorization: Bearer fgnkjewrt3459hhh34rt.df93249odfgksdflhweurl4598gfufgdlhgdf9345...`
+* The token payload contains the user's internal database ID as the JWT subject. A Spring web 
+filter has been written to look for the JWT and use the userID contained within it to authenticate 
+and authorize the user with Spring security. 
+(see the [JwtAuthenticationFilter](https://github.com/strohs/springboot-blogen-vuejs/blob/master/backend/src/main/java/com/blogen/services/security/JwtAuthenticationFilter.java)  
+
+
 
 ### REST API additions
 * Swagger UI is [here](http://localhost:8080/swagger-ui.html#/) once you start the project
