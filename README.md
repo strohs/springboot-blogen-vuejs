@@ -4,17 +4,17 @@ This is a [Vue.js](https://vuejs.org) version of my [Blogen](https://github.com/
 
 Blogen is a fictional micro-blogging website that I use to try out various Spring Framework functionality as well as
  various other backend/frontend technologies. The [original](https://github.com/strohs/springboot-blogen) version 
- of Blogen uses Spring Boot along with [thymeleaf](https://www.thymeleaf.org/) as the server-side templating 
- engine. This new version swaps out thymeleaf in favor of Vue.js, turning the website into a single 
- page web application. 
- Additionally, [JSON Web Tokens](https://jwt.io/introduction/) (JWT) are used to provide authorization to logged in 
- users and grant them access to the website and the Blogen REST API. 
+ of Blogen uses Spring Boot along with [thymeleaf](https://www.thymeleaf.org/).  This new version swaps out 
+ thymeleaf in favor of Vue.js. Vue handles the "view" and spring boot basically becomes a "wrapper" for the
+  REST Api that Vue connects to.
+ Additionally, [JSON Web Tokens](https://jwt.io/introduction/) (JWT) have been added to the project in order 
+ to provide authorization to logged in users and grant them access to the website and the REST API. 
 
 The website functionality remains unchanged and you can read about it on the 
 [original](https://github.com/strohs/springboot-blogen) project page. In a nutshell, Blogen is an imaginary community
 of users that start threads of discussion on different subjects (called categories). This version of Blogen
- allows you to sign-up a new user, or you can use a pre-existing user (the pre-existing user names and passwords 
-  are available on the login page by clicking the question mark button). 
+ allows you to sign-up a new user, perform CRUD operations on threads and posts that you make, and perform basic 
+ filtering operations on those threads and posts. 
   Once logged in, you can then edit, or delete the threads you start, or reply to other user's threads. 
   Blogen is essentially a basic message board using Vue.js and styled with Bootstrap. Additionally, you can 
   change your user profile settings via the profile button on the top navbar. If you log in as the admin user, 
