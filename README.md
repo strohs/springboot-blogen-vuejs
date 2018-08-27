@@ -14,10 +14,7 @@ The website functionality remains unchanged and you can read about it on the
 [original](https://github.com/strohs/springboot-blogen) project page. In a nutshell, Blogen is an imaginary community
 of users that start threads of discussion on different subjects (called categories). This version of Blogen
  allows you to sign-up a new user, perform CRUD operations on threads and posts that you make, and perform basic 
- filtering operations on those threads and posts. 
-  Once logged in, you can then edit, or delete the threads you start, or reply to other user's threads. 
-  Blogen is essentially a basic message board using Vue.js and styled with Bootstrap. Additionally, you can 
-  change your user profile settings via the profile button on the top navbar. If you log in as the admin user, 
+ filtering operations on those threads and posts. If you log in as the admin user, 
   you can edit or delete any threads (not just your own) as well as edit/create new categories for users.  
 
 Special thanks to [jonashackt](https://github.com/jonashackt/spring-boot-vuejs) for explaining how to integrate Vue.js
