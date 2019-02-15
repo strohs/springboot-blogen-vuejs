@@ -76,9 +76,7 @@ menu in the upper right of the navbar. Once you've copied the token, navigate to
 green authenticate button. In the dialog box that appears you must enter your token prefixed with "Bearer " (note
 that there is a space after Bearer), for example:
 * `Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIzIiwiaWF0IjoxNTM1MzMzNTQ0LCJleHAiOjE1MzUzMzUzNDR9......`
-  
-
-### DynamoDB Branch
+ 
 
 ### Spring Profiles
 * `dev` - using the 'dev' profile will enable CORS support for the Vue/npm development server. This is only
