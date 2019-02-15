@@ -23,7 +23,7 @@ with Spring Boot.
 
 ### Installation and Running
 #### Build Prerequisites
-* at least Java 8 (haven't tested with versions of java greater than 8)
+* at least Java 8 (later versions of Java will not build some of the packages used in this project)
 * Apache maven installation *OR* you can use the included maven wrapper `mvnw` (in the project's root directory):
     * `mvnw.cmd` if you are running on windows
     * `mvnw` if you are running on a *nix operating system 
