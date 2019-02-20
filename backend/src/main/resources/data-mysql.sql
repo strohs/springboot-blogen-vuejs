@@ -23,7 +23,7 @@ insert into category (id, name, created) values (4, 'Web Development', current_t
 
 # users
 insert into user (id, email, enabled, encrypted_password, first_name, last_name, user_name, user_prefs_id )
-  VALUES (1,'admin@blogen.com',true, '{bcrypt}$2a$10$KFGHLT74AQ6QsEa42m2p9e7SaiLGcrjiYYue8KjSZJZTGicKUog.m', 'Carl', 'Sagan','admin',1);
+ VALUES (1,'admin@blogen.com',true, '{bcrypt}$2a$10$KFGHLT74AQ6QsEa42m2p9e7SaiLGcrjiYYue8KjSZJZTGicKUog.m', 'Carl', 'Sagan','admin',1);
 insert into user (id, email, enabled, encrypted_password, first_name, last_name, user_name, user_prefs_id )
   VALUES (2,'johndoe@gmail.com',true, '{bcrypt}$2a$10$OND.oWEP5h/MW9XtkLgus.L2trjets5OoqSQvp6W6oo0BiVdgzW3a', 'John', 'Doe','johndoe',2);
 insert into user (id, email, enabled, encrypted_password, first_name, last_name, user_name, user_prefs_id )
