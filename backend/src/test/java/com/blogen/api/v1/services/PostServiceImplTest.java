@@ -181,16 +181,16 @@ public class PostServiceImplTest {
     }
 
     @Test
-    public void should_createNewParentPost_whenGivenValidRequestDTO() {
+    public void should_createNewParentPost_when_valid_RequestDTO() {
         Post post1 = buildPost1();
         PostDTO postDTO1 = buildPost1DTO();
         PostRequestDTO requestDTO = buildPostRequest1DTO();
-        String principalName = USER_NAME;
+        Long principalID = 1L;
 
         given( categoryRepository.findById( requestDTO.getCategoryId() )).willReturn( Optional.of(post1.getCategory() ));
-        given( userService.findByUserName( principalName )).willReturn( Optional.of( post1.getUser() ));
+        given( userService.findById( principalID )).willReturn( Optional.of( post1.getUser() ));
         given( postRepository.save( post1 )).willReturn( post1 );
-        given( principalService.getPrincipalUserName() ).willReturn( USER_NAME );
+        given( principalService.getPrincipalUserId() ).willReturn( Optional.of(1L) );
         given( postMapper.postToPostDto( post1 )).willReturn( postDTO1 );
         given( postRequestMapper.postRequestDtoToPost( requestDTO ) ).willReturn( post1 );
 
@@ -198,12 +198,12 @@ public class PostServiceImplTest {
         PostDTO postDTO = postService.createNewPost( requestDTO );
 
         then( categoryRepository ).should().findById( requestDTO.getCategoryId() );
-        then( userService ).should().findByUserName( principalName );
+        then( userService ).should().findById( principalID );
         then( postRepository ).should().save( post1 );
         assertThat( postDTO, is( notNullValue()) );
         assertThat( postDTO.getText(), is( requestDTO.getText()) );
         assertThat( postDTO.getTitle(), is( requestDTO.getTitle()) );
-        assertThat( postDTO.getUser().getUserName(), is( principalName ) );
+        assertThat( postDTO.getUser().getId(), is( principalID ) );
         assertThat( postDTO.getCategory().getId(), is( requestDTO.getCategoryId() ) );
     }
 
@@ -246,12 +246,11 @@ public class PostServiceImplTest {
         PostDTO childDTO = buildChild1DTO();
         PostDTO savedPostDTO = buildPost1DTO();
         savedPostDTO.setChildren( Arrays.asList( childDTO ) );
-        String principalName = USER_NAME;
 
         given( postRepository.findById( POST1_ID ) ).willReturn( Optional.of( parentPost1 ) );
         given( categoryRepository.findById( requestDTO.getCategoryId() )).willReturn( Optional.of(child1.getCategory()) );
-        given( principalService.getPrincipalUserName() ).willReturn( principalName );
-        given( userService.findByUserName( principalName )).willReturn( Optional.of( child1.getUser() ));
+        given( principalService.getPrincipalUserId() ).willReturn( Optional.of( 1L ) );
+        given( userService.findById( 1L )).willReturn( Optional.of( child1.getUser() ));
         given( postRequestMapper.postRequestDtoToPost( requestDTO ) ).willReturn( child1 );
         given( postMapper.postToPostDto( parentPost1 )).willReturn( parentPostDTO );
         given( postMapper.postToPostDto( child1 )).willReturn( childDTO );
@@ -262,7 +261,7 @@ public class PostServiceImplTest {
 
         then( postRepository ).should().findById( POST1_ID );
         then( categoryRepository ).should().findById( requestDTO.getCategoryId() );
-        then( userService ).should().findByUserName( principalName );
+        then( userService ).should().findById( 1L );
         then( postRepository ).should().saveAndFlush( parentPost1 );
         assertThat( savedDTO, is( notNullValue() ));
         assertThat( savedDTO.getChildren().size(), is( 1 ));
@@ -290,15 +289,13 @@ public class PostServiceImplTest {
         savedPost.setTitle( POST2_TITLE );
         PostDTO savedPostDTO = buildPost1DTO();
         savedPostDTO.setTitle( POST2_TITLE );
-        String principalName = USER_NAME;
 
         given( postRepository.findById( post.getId() )).willReturn( Optional.of( post ) );
         given( postRepository.save( post )).willReturn( savedPost );
         given( categoryRepository.findById( requestDTO.getCategoryId() )).willReturn( Optional.of( post.getCategory() ));
         given( postRequestMapper.postRequestDtoToPost( requestDTO ) ).willReturn( post );
         given( postMapper.postToPostDto( savedPost )).willReturn( savedPostDTO );
-        given( principalService.getPrincipalUserName() ).willReturn( principalName );
-        //given( userRepository.findByUserName( anyString() )).willReturn( post.getUser() );
+        given( principalService.getPrincipalUserId() ).willReturn( Optional.of( 1L ) );
 
         PostDTO savedDTO = postService.saveUpdatePost( POST1_ID, requestDTO );
 

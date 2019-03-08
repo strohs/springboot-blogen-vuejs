@@ -7,15 +7,15 @@ import com.nimbusds.jwt.SignedJWT;
 import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONArray;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
-import java.util.Arrays;
 import java.util.Base64;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -26,24 +26,66 @@ import java.util.List;
  * a scope set to "api" which will grant them access to the blogen REST API.
  */
 @Slf4j
-@Component
-public class JwtTokenProviderImpl implements JwtTokenProvider {
+@Service
+public class BlogenJwtService {
 
-    // the tokens expiration time in milliseconds
-    private int jwtExpirationMs;
-    private PrivateKey privateKey;
+    private int defaultExpirationMs;
+    private PrivateKey defaultPrivateKey;
 
+    public class Builder {
+        private String subject;
+        private List<String> scopes;
+        private int expirationMs;
+        private PrivateKey privateKey;
 
-    public JwtTokenProviderImpl(@Value("${app.jwtExpirationMs}") int jwtExpirationMs,
-                                @Value("${app.jwtPrivateKey}") String privateKeyStr) {
-        this.privateKey = decodeKey(privateKeyStr);
-        this.jwtExpirationMs = jwtExpirationMs;
+        Builder(String subject, List<String> scopes, int expirationMs, PrivateKey privateKey) {
+            this.subject = subject;
+            this.scopes = scopes;
+            this.expirationMs = expirationMs;
+            this.privateKey = privateKey;
+        }
+
+        public Builder withSubject(String subject) {
+            this.subject = subject;
+            return this;
+        }
+
+        public Builder withScopes(List<String> scopes) {
+            this.scopes = scopes;
+            return this;
+        }
+
+        public Builder withExpirationMs(int expirationMs) {
+            this.expirationMs = expirationMs;
+            return this;
+        }
+
+        public Builder withPrivateKey(String privateKeyStr) {
+            this.privateKey = decodeKey(privateKeyStr);
+            return this;
+        }
+
+        public String buildToken() {
+            return generateToken(subject, scopes, expirationMs, privateKey);
+        }
     }
 
-    @Override
-    public String generateToken( String subject, List<String> scopes) {
+    public Builder builder() {
+        return new Builder("subject", Collections.emptyList(), defaultExpirationMs, defaultPrivateKey);
+    }
+
+    public BlogenJwtService(@Value("${app.jwtExpirationMs}") int defaultExpirationMs,
+                            @Value("${app.jwtPrivateKey}") String defaultPrivateKeyStr) {
+        this.defaultPrivateKey = decodeKey(defaultPrivateKeyStr);
+        this.defaultExpirationMs = defaultExpirationMs;
+    }
+
+    private String generateToken(String subject,
+                                 List<String> scopes,
+                                 int expirationMs,
+                                 PrivateKey privateKey) {
         Date now = new Date();
-        Date expiryDate = new Date( now.getTime() + jwtExpirationMs);
+        Date expiryDate = new Date( now.getTime() + expirationMs);
 
         try {
             JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.RS256).type(JOSEObjectType.JWT).build();
@@ -53,8 +95,8 @@ public class JwtTokenProviderImpl implements JwtTokenProvider {
             JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
                     .subject( subject )
                     .claim("scope", scopesArr )
-                    .issueTime( now )
-                    .expirationTime(expiryDate)
+                    .issueTime( now)
+                    .expirationTime( expiryDate )
                     .build();
             SignedJWT signedJWT = new SignedJWT(header, claimsSet);
             signedJWT.sign(signer);
@@ -70,7 +112,7 @@ public class JwtTokenProviderImpl implements JwtTokenProvider {
      * @param encodedKey - base64 encoded private key string
      * @return - java.security.PrivateKey
      */
-    private PrivateKey decodeKey(String encodedKey) {
+    private static PrivateKey decodeKey(String encodedKey) {
         byte[] bytes = Base64.getDecoder().decode(encodedKey.getBytes());
         PKCS8EncodedKeySpec ks = new PKCS8EncodedKeySpec(bytes);
         try {
@@ -80,6 +122,6 @@ public class JwtTokenProviderImpl implements JwtTokenProvider {
             log.error("could not decode private RSA key: {}", e.getMessage());
             throw new IllegalStateException("could not generate private RSA key");
         }
-
     }
+
 }

@@ -16,6 +16,9 @@ import io.swagger.annotations.Authorization;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
@@ -91,20 +94,22 @@ public class UserController {
     @ApiOperation( value = "update field(s) of an existing user", consumes = "application/json", produces = "application/json", authorizations = { @Authorization(value="apiKey") })
     @PutMapping( "/{id}" )
     @ResponseStatus( HttpStatus.OK )
-    public UserDTO updateUser( @PathVariable("id") Long id, @Valid @RequestBody UserDTO userDTO ) {
+    public UserDTO updateUser(@PathVariable("id") Long id,
+                              @Valid @RequestBody UserDTO userDTO, Authentication authentication) {
         log.debug( "update user id=" + id + " userDTO=" + userDTO );
         User user = userService.findById( id )
                 .orElseThrow( () -> new BadRequestException( "user does not exist with id:" + id ) );
-        return userService.updateUser( user, userDTO );
+        return userService.updateUser( user, userDTO);
     }
 
     @ApiOperation( value = "change a users password", consumes = "application/json", authorizations = { @Authorization(value="apiKey") })
     @PutMapping( "/{id}/password" )
     @ResponseStatus( HttpStatus.OK )
-    public void updatePassword( @PathVariable("id") Long id, @Valid @RequestBody PasswordRequestDTO passwordRequestDTO ) {
+    public void updatePassword( @PathVariable("id") Long id,
+                                @Valid @RequestBody PasswordRequestDTO passwordRequestDTO) {
         log.debug( "change password user id=" + id + " passwordDTO= " + passwordRequestDTO );
         User user = userService.findById( id )
                 .orElseThrow( () ->  new BadRequestException( "user does not exist with id:" + id ) );
-        userService.changePassword( user, passwordRequestDTO );
+        userService.changePassword( user, passwordRequestDTO);
     }
 }

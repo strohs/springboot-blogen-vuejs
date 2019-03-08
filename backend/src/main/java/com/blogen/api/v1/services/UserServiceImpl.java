@@ -14,6 +14,8 @@ import com.blogen.services.security.EncryptionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -72,8 +74,8 @@ public class UserServiceImpl implements UserService {
     // only the authenticated user can update their own user information, OR admins can always change user info
     @Override
     //@Transactional
-    @PreAuthorize( "hasAuthority('SCOPE_ADMIN') || #user.getUserName() == authentication.name" )
-    public UserDTO updateUser( User user, UserDTO userDTO ) {
+    @PreAuthorize( "hasAuthority('SCOPE_ADMIN') || #user.getId().toString() == authentication.principal.getClaimAsString('sub')" )
+    public UserDTO updateUser(User user, UserDTO userDTO) {
         userMapper.updateUserFromDTO( userDTO, user );
         if ( userDTO.getAvatarImage() != null ) {
             Avatar avatar = avatarService.getAvatarByFileName( userDTO.getAvatarImage() )
@@ -94,10 +96,10 @@ public class UserServiceImpl implements UserService {
     }
 
     // only the authenticated user can change their password, OR admins can change all passwords
-    @PreAuthorize( "hasAuthority('SCOPE_ADMIN') || #user.getUserName() == authentication.name" )
+    @PreAuthorize( "hasAuthority('SCOPE_ADMIN') || #user.getId().toString() == authentication.principal.getClaimAsString('sub')" )
     @Transactional
     @Override
-    public void changePassword( User user, PasswordRequestDTO dto ) {
+    public void changePassword( User user, PasswordRequestDTO dto) {
         user.setPassword( dto.getPassword() );
         checkAndEncryptPassword( user );
         userRepository.save( user );

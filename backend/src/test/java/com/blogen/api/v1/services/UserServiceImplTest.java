@@ -15,10 +15,12 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.oauth2.jwt.Jwt;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
+import java.util.*;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -43,6 +45,9 @@ public class UserServiceImplTest {
 
     @Mock
     private EncryptionService encryptionService;
+
+    @Mock
+    private Jwt jwt;
 
     private UserMapper userMapper = UserMapper.INSTANCE;
 
@@ -138,6 +143,7 @@ public class UserServiceImplTest {
         newUserDTO.setRoles( roles );
         newUserDTO.setFirstName( "NewFirstName" );
         updatedUser1.setFirstName( "NewFirstName" );
+
 
         given( userService.findById( anyLong() )).willReturn( Optional.of( user1 ) );
         given( userRepository.save( any(User.class) )).willReturn( updatedUser1 );

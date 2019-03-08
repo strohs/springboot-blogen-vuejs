@@ -6,6 +6,7 @@ import com.blogen.api.v1.model.UserDTO;
 import com.blogen.api.v1.model.UserListDTO;
 import com.blogen.domain.User;
 import com.blogen.domain.UserPrefs;
+import org.springframework.security.oauth2.jwt.Jwt;
 
 import java.util.Optional;
 
@@ -35,7 +36,7 @@ public interface UserService {
      * @param userDTO - DTO containing user fields to update
      * @return a UserDTO containing the User's updated information
      */
-    UserDTO updateUser( User user, UserDTO userDTO );
+    UserDTO updateUser( User user, UserDTO userDTO);
 
     /**
      * fetch a {@link User} from the repository, by their userName

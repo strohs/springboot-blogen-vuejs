@@ -10,13 +10,12 @@ import com.blogen.domain.User;
 import com.blogen.exceptions.BadRequestException;
 import com.blogen.services.RoleService;
 import com.blogen.services.security.EncryptionService;
-import com.blogen.services.security.JwtTokenProviderImpl;
+import com.blogen.services.security.BlogenJwtService;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.security.authentication.AuthenticationManager;
 
 import java.util.Arrays;
 
@@ -45,7 +44,7 @@ public class AuthorizationServiceTest {
     private EncryptionService encryptionService;
 
     @Mock
-    private JwtTokenProviderImpl jwtTokenProvider;
+    private BlogenJwtService jwtTokenProvider;
 
     private UserMapper userMapper = UserMapper.INSTANCE;
 

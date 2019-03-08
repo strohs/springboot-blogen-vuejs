@@ -114,17 +114,8 @@ public class SpringSecConfig extends WebSecurityConfigurerAdapter {
                         .permitAll()
                     .antMatchers("/api/**")
                         .hasAuthority("SCOPE_API")
-                .antMatchers("/",
-                        "/favicon.ico",
-                        "/**/*.png",
-                        "/**/*.gif",
-                        "/**/*.svg",
-                        "/**/*.jpg",
-                        "/**/*.html",
-                        "/**/*.css",
-                        "/**/*.js").permitAll()
                 .anyRequest()
-                    .permitAll()
+                    .authenticated()
                     .and()
                 .oauth2ResourceServer()
                     .jwt()

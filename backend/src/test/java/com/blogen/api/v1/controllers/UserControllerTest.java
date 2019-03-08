@@ -8,15 +8,18 @@ import com.blogen.api.v1.validators.PasswordValidator;
 import com.blogen.api.v1.validators.UpdateUserValidator;
 import com.blogen.domain.User;
 import com.blogen.exceptions.BadRequestException;
+import com.blogen.services.security.BlogenJwtService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -53,10 +56,13 @@ public class UserControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+
     private UserDTO userDTO1;
     private UserDTO userDTO2;
     private UserDTO newUserDTO;
     private UserDTO updateUserDTO1;
+    @Mock
+    private Jwt jwt;
 
     @Before
     public void setUp() throws Exception {

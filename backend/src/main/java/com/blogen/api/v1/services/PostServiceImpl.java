@@ -3,7 +3,9 @@ package com.blogen.api.v1.services;
 import com.blogen.api.v1.controllers.PostController;
 import com.blogen.api.v1.mappers.PostMapper;
 import com.blogen.api.v1.mappers.PostRequestMapper;
-import com.blogen.api.v1.model.*;
+import com.blogen.api.v1.model.PostDTO;
+import com.blogen.api.v1.model.PostListDTO;
+import com.blogen.api.v1.model.PostRequestDTO;
 import com.blogen.domain.Category;
 import com.blogen.domain.Post;
 import com.blogen.domain.User;
@@ -11,29 +13,22 @@ import com.blogen.exceptions.BadRequestException;
 import com.blogen.exceptions.NotFoundException;
 import com.blogen.repositories.CategoryRepository;
 import com.blogen.repositories.PostRepository;
-import com.blogen.repositories.UserRepository;
 import com.blogen.services.AvatarService;
 import com.blogen.services.PrincipalService;
-import com.blogen.services.security.UserDetailsImpl;
 import com.blogen.services.utils.PageRequestBuilder;
 import lombok.extern.slf4j.Slf4j;
-import org.aspectj.weaver.ast.Not;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Service for performing RESTful CRUD operations on Blogen {@link com.blogen.domain.Post}
@@ -197,14 +192,15 @@ public class PostServiceImpl implements PostService {
      * @return
      */
     private Post buildNewPost( PostRequestDTO requestDTO ) {
-        // get the currently authenticated userName
-        String userName = principalService.getPrincipalUserName();
+        // get the currently authenticated userID
+        Long userId = principalService.getPrincipalUserId()
+                .orElseThrow(() -> new BadRequestException( "jwt user id does not exist in database"));
         Post post = postRequestMapper.postRequestDtoToPost( requestDTO );
         post.setCreated( LocalDateTime.now() );
         Category category = categoryRepository.findById( requestDTO.getCategoryId() )
                 .orElseThrow( () -> new BadRequestException( "Category does not exist with id:" + requestDTO.getCategoryId() ) );
-        User user = userService.findByUserName( userName )
-                .orElseThrow( () -> new BadRequestException( "User not found with name " + userName ) );
+        User user = userService.findById( userId )
+                .orElseThrow( () -> new BadRequestException( "User not found with id " + userId ) );
         post.setCategory( category );
         post.setUser( user );
         return post;

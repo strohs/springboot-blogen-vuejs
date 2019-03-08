@@ -11,11 +11,10 @@ import com.blogen.exceptions.BadRequestException;
 import com.blogen.services.RoleService;
 import com.blogen.services.security.BlogenAuthority;
 import com.blogen.services.security.EncryptionService;
-import com.blogen.services.security.JwtTokenProvider;
+import com.blogen.services.security.BlogenJwtService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 
@@ -35,19 +34,19 @@ public class AuthorizationServiceImpl implements AuthorizationService {
     private RoleService roleService;
     private UserMapper userMapper;
     private EncryptionService encryptionService;
-    private JwtTokenProvider tokenProvider;
+    private BlogenJwtService tokenService;
 
     private static final String DEFAULT_AVATAR_IMAGE = "avatar0.jpg";
 
     @Autowired
     public AuthorizationServiceImpl(UserService userService, RoleService roleService,
                                     UserMapper userMapper, EncryptionService encryptionService,
-                                    JwtTokenProvider tokenProvider ) {
+                                    BlogenJwtService tokenService) {
         this.userService = userService;
         this.roleService = roleService;
         this.userMapper = userMapper;
         this.encryptionService = encryptionService;
-        this.tokenProvider = tokenProvider;
+        this.tokenService = tokenService;
     }
     
     @Override
@@ -88,14 +87,15 @@ public class AuthorizationServiceImpl implements AuthorizationService {
 
     /**
      * builds a JWT from Blogen User data. The JWT will build a "scope" claim containing the user's roles, plus
-     * we will add an additional API scope, granting the user access to the blogen API
+     * an additional API scope, granting the user access to the blogen API
      * @param user - Blogen {@link User} data
      * @return - a JWT in compact form (BASE64 encoded)
      */
     private String buildJwt(User user) {
         List<String> scopes = user.getRoles().stream().map(Role::getRole).collect(Collectors.toList());
         scopes.add( BlogenAuthority.API.toString() );
-        return tokenProvider.generateToken( Long.toString(user.getId()), scopes );
+        String tok = tokenService.builder().withScopes(scopes).withSubject( Long.toString(user.getId()) ).buildToken();
+        return tok;
     }
 
     @Override
