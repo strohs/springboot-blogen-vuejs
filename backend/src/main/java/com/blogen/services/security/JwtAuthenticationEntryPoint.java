@@ -13,7 +13,7 @@ import java.io.IOException;
 /**
  * This method is called whenever an exception is thrown due to an unauthenticated user trying to access a
  * resource that requires authentication. We’ll simply respond with a 401 error saying that the user is not
- * authorized to access the resource.
+ * authorized to access the resource. They will need to log back in in order to get a new (JWT) token
  *
  * Author: Cliff
  */
@@ -25,7 +25,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
     public void commence( HttpServletRequest httpServletRequest,
                           HttpServletResponse httpServletResponse,
                           AuthenticationException e ) throws IOException, ServletException {
-        log.error("Unauthorized error. JWT is missing or expired. Message {}", e.getMessage());
+        log.error("Unauthorized error. Credentials are missing or expired. Message {}", e.getMessage());
         httpServletResponse.sendError( HttpServletResponse.SC_UNAUTHORIZED,
                 "You're not authorized to access this resource. Your authorization token is missing or expired");
     }

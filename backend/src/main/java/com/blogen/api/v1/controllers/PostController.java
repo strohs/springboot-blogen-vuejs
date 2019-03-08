@@ -11,6 +11,7 @@ import io.swagger.annotations.Authorization;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
@@ -48,7 +49,7 @@ public class PostController {
     @ResponseStatus(HttpStatus.OK)
     public PostListDTO getPosts( @RequestParam(value = "limit", defaultValue = "5") int limit,
                                  @RequestParam(value = "page", defaultValue = "0") int page,
-                                 @RequestParam(value = "category", defaultValue = "-1") Long category) {
+                                 @RequestParam(value = "category", defaultValue = "-1") Long category, Authentication auth) {
         log.debug( "getPosts page={} limit={} category={}", page, limit, category );
         return postService.getPosts( category, page, limit );
     }

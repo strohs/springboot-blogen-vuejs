@@ -1,6 +1,6 @@
 package com.blogen.api.v1.controllers;
 
-import com.blogen.api.v1.model.AuthenticationResponse;
+import com.blogen.api.v1.model.LoginResponse;
 import com.blogen.api.v1.model.LoginRequestDTO;
 import com.blogen.api.v1.model.PostListDTO;
 import com.blogen.api.v1.model.UserDTO;
@@ -63,7 +63,7 @@ public class AuthorizationController {
     public ResponseEntity<?> login( @RequestBody @Valid LoginRequestDTO loginDTO ) {
         log.debug( "login user loginDTO {}",loginDTO );
         //log.debug( "request body->{}", );
-        AuthenticationResponse authResponse = authorizationService.authenticateAndLoginUser( loginDTO );
+        LoginResponse authResponse = authorizationService.authenticateAndLoginUser( loginDTO );
         log.debug( "AuthResponse {}", authResponse );
         return ResponseEntity.ok( authResponse );
     }

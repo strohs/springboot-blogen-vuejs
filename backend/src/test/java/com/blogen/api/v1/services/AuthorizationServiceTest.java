@@ -10,7 +10,7 @@ import com.blogen.domain.User;
 import com.blogen.exceptions.BadRequestException;
 import com.blogen.services.RoleService;
 import com.blogen.services.security.EncryptionService;
-import com.blogen.services.security.JwtTokenProvider;
+import com.blogen.services.security.JwtTokenProviderImpl;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -45,10 +45,7 @@ public class AuthorizationServiceTest {
     private EncryptionService encryptionService;
 
     @Mock
-    private AuthenticationManager authenticationManager;
-
-    @Mock
-    private JwtTokenProvider jwtTokenProvider;
+    private JwtTokenProviderImpl jwtTokenProvider;
 
     private UserMapper userMapper = UserMapper.INSTANCE;
 
@@ -56,7 +53,7 @@ public class AuthorizationServiceTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks( this );
         authorizationService = new AuthorizationServiceImpl( userService, roleService, userMapper,
-                encryptionService, authenticationManager, jwtTokenProvider);
+                encryptionService, jwtTokenProvider);
     }
 
     @Test

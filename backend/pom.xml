@@ -19,7 +19,7 @@
         <org.mapstruct.version>1.2.0.Final</org.mapstruct.version>
         <lombok.version>1.18.0</lombok.version>
         <springfox-swagger.version>2.9.2</springfox-swagger.version>
-        <json.web.token.version>0.9.1</json.web.token.version>
+        <spring-security.version>5.2.0.BUILD-SNAPSHOT</spring-security.version>
     </properties>
 
     <dependencies>
@@ -46,6 +46,14 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-oauth2-resource-server</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-oauth2-jose</artifactId>
         </dependency>
 
         <!-- devtools also enable the h2-console by default -->
@@ -100,11 +108,11 @@
         </dependency>
 
         <!-- JSON Web Token Support -->
-        <dependency>
-            <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt</artifactId>
-            <version>${json.web.token.version}</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>io.jsonwebtoken</groupId>-->
+            <!--<artifactId>jjwt</artifactId>-->
+            <!--<version>${json.web.token.version}</version>-->
+        <!--</dependency>-->
 
 
         <dependency>

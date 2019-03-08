@@ -72,7 +72,7 @@ public class UserServiceImpl implements UserService {
     // only the authenticated user can update their own user information, OR admins can always change user info
     @Override
     //@Transactional
-    @PreAuthorize( "hasAuthority('ADMIN') || #user.getUserName() == authentication.name" )
+    @PreAuthorize( "hasAuthority('SCOPE_ADMIN') || #user.getUserName() == authentication.name" )
     public UserDTO updateUser( User user, UserDTO userDTO ) {
         userMapper.updateUserFromDTO( userDTO, user );
         if ( userDTO.getAvatarImage() != null ) {
@@ -94,7 +94,7 @@ public class UserServiceImpl implements UserService {
     }
 
     // only the authenticated user can change their password, OR admins can change all passwords
-    @PreAuthorize( "hasAuthority('ADMIN') || #user.getUserName() == authentication.name" )
+    @PreAuthorize( "hasAuthority('SCOPE_ADMIN') || #user.getUserName() == authentication.name" )
     @Transactional
     @Override
     public void changePassword( User user, PasswordRequestDTO dto ) {

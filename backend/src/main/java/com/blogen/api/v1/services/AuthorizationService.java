@@ -1,9 +1,8 @@
 package com.blogen.api.v1.services;
 
-import com.blogen.api.v1.model.AuthenticationResponse;
+import com.blogen.api.v1.model.LoginResponse;
 import com.blogen.api.v1.model.LoginRequestDTO;
 import com.blogen.api.v1.model.UserDTO;
-import com.blogen.exceptions.NotFoundException;
 
 /**
  * Service for new user sign-up and user log-ins
@@ -25,7 +24,7 @@ public interface AuthorizationService {
      * @param loginRequestDTO
      * @return a String representation of the authenticated user's JSON Web Token
      */
-    AuthenticationResponse authenticateAndLoginUser( LoginRequestDTO loginRequestDTO );
+    LoginResponse authenticateAndLoginUser(LoginRequestDTO loginRequestDTO );
 
     /**
      * Checks if the given userName exists in our User table

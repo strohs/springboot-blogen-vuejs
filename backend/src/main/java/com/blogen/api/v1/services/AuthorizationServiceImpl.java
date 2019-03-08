@@ -1,7 +1,7 @@
 package com.blogen.api.v1.services;
 
 import com.blogen.api.v1.mappers.UserMapper;
-import com.blogen.api.v1.model.AuthenticationResponse;
+import com.blogen.api.v1.model.LoginResponse;
 import com.blogen.api.v1.model.LoginRequestDTO;
 import com.blogen.api.v1.model.UserDTO;
 import com.blogen.domain.Role;
@@ -9,6 +9,7 @@ import com.blogen.domain.User;
 import com.blogen.domain.UserPrefs;
 import com.blogen.exceptions.BadRequestException;
 import com.blogen.services.RoleService;
+import com.blogen.services.security.BlogenAuthority;
 import com.blogen.services.security.EncryptionService;
 import com.blogen.services.security.JwtTokenProvider;
 import lombok.extern.slf4j.Slf4j;
@@ -16,13 +17,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Service for signing-up new users and for logging in users
@@ -37,20 +35,18 @@ public class AuthorizationServiceImpl implements AuthorizationService {
     private RoleService roleService;
     private UserMapper userMapper;
     private EncryptionService encryptionService;
-    private AuthenticationManager authenticationManager;
     private JwtTokenProvider tokenProvider;
 
     private static final String DEFAULT_AVATAR_IMAGE = "avatar0.jpg";
 
     @Autowired
-    public AuthorizationServiceImpl( UserService userService, RoleService roleService,
-                                     UserMapper userMapper, EncryptionService encryptionService,
-                                     AuthenticationManager authenticationManager, JwtTokenProvider tokenProvider ) {
+    public AuthorizationServiceImpl(UserService userService, RoleService roleService,
+                                    UserMapper userMapper, EncryptionService encryptionService,
+                                    JwtTokenProvider tokenProvider ) {
         this.userService = userService;
         this.roleService = roleService;
         this.userMapper = userMapper;
         this.encryptionService = encryptionService;
-        this.authenticationManager = authenticationManager;
         this.tokenProvider = tokenProvider;
     }
     
@@ -77,22 +73,29 @@ public class AuthorizationServiceImpl implements AuthorizationService {
     }
 
     @Override
-    public AuthenticationResponse authenticateAndLoginUser( LoginRequestDTO loginDTO ) {
-        AuthenticationResponse authResponse;
-        try {
-            UsernamePasswordAuthenticationToken userPassAuthToken = new UsernamePasswordAuthenticationToken( loginDTO.getUsername(), loginDTO.getPassword() );
-            //authenticate username and password with authentication manager
-            Authentication auth = authenticationManager.authenticate( userPassAuthToken );
-            SecurityContextHolder.getContext().setAuthentication( auth );
-            //if username and password are authenticated, generate and return a JSON Web Token, and the user's details
-            User user = userService.findByUserName( loginDTO.getUsername() )
-                    .orElseThrow( () -> new BadCredentialsException( "username not found during authentication" ) );
-            authResponse = new AuthenticationResponse( tokenProvider.generateToken( auth ),
-                    userMapper.userToUserDto( user ) );
-        } catch (BadCredentialsException bce ) {
-            throw new BadCredentialsException( "bad username or password" );
+    public LoginResponse authenticateAndLoginUser(LoginRequestDTO loginDTO ) {
+        // check if username exists
+        final User user = userService.findByUserName(loginDTO.getUsername())
+                .orElseThrow(() -> new BadCredentialsException("bad username or password"));
+        // check if password matches
+        if (!encryptionService.checkPassword( loginDTO.getPassword(), user.getEncryptedPassword() )) {
+            throw new BadCredentialsException("bad username or password");
         }
-        return authResponse;
+        // create a JWT from User data and grant them access to the API
+        String token = buildJwt(user);
+        return new LoginResponse( token, userMapper.userToUserDto( user ));
+    }
+
+    /**
+     * builds a JWT from Blogen User data. The JWT will build a "scope" claim containing the user's roles, plus
+     * we will add an additional API scope, granting the user access to the blogen API
+     * @param user - Blogen {@link User} data
+     * @return - a JWT in compact form (BASE64 encoded)
+     */
+    private String buildJwt(User user) {
+        List<String> scopes = user.getRoles().stream().map(Role::getRole).collect(Collectors.toList());
+        scopes.add( BlogenAuthority.API.toString() );
+        return tokenProvider.generateToken( Long.toString(user.getId()), scopes );
     }
 
     @Override

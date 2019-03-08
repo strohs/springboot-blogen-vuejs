@@ -1,12 +1,11 @@
 package com.blogen.config;
 
 import com.blogen.services.security.JwtAuthenticationEntryPoint;
-import com.blogen.services.security.JwtAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -21,7 +20,14 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtProcessors;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+
+import java.security.KeyFactory;
+import java.security.interfaces.RSAPublicKey;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.Base64;
 
 /**
  * Spring Security Configuration - original NON-REST API security config
@@ -33,13 +39,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SpringSecConfig extends WebSecurityConfigurerAdapter {
 
+    @Value("${app.jwtPublicKey}")
+    private String jwtPublicKey;
+
     @Autowired
     private JwtAuthenticationEntryPoint unauthorizedHandler;
-
-    @Bean
-    public JwtAuthenticationFilter jwtAuthenticationFilter() {
-        return new JwtAuthenticationFilter();
-    }
 
     @Autowired
     @Qualifier("daoAuthenticationProvider")
@@ -53,7 +57,6 @@ public class SpringSecConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        //This is new as of Spring Security 5, seems to use bcrypt as the default password encoder
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 
@@ -68,15 +71,29 @@ public class SpringSecConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(WebSecurity web) throws Exception {
-        //this will allow swagger UI and h2-console through spring-security
+        //this will allow swagger UI, h2-console, and image files through spring-security
         web.ignoring().antMatchers("/v2/api-docs", "/swagger-resources/configuration/ui", "/swagger-resources",
                 "/swagger-resources/configuration/security", "/swagger-ui.html", "/webjars/**", "/console/*",
-                "/h2-console/**", "/actuator/**");
+                "/h2-console/**", "/actuator/**","/",
+                "/favicon.ico", "/**/*.png", "/**/*.gif", "/**/*.svg", "/**/*.jpg", "/**/*.html", "/**/*.css", "/**/*.js");
     }
 
     @Autowired
     public void configureAuthManager(AuthenticationManagerBuilder authenticationManagerBuilder){
         authenticationManagerBuilder.authenticationProvider( daoAuthenticationProvider );
+    }
+
+    @Bean
+    JwtDecoder jwtDecoder() throws Exception {
+        // decodes a JWT from compact claims representation format into a Jwt object
+        return new NimbusJwtDecoder(JwtProcessors.withPublicKey(key()).build());
+    }
+
+    //generates the PublicKey used to verify the JWTs used in Blogen
+    private RSAPublicKey key() throws Exception {
+        byte[] bytes = Base64.getDecoder().decode(jwtPublicKey.getBytes());
+        return (RSAPublicKey) KeyFactory.getInstance("RSA")
+                .generatePublic(new X509EncodedKeySpec(bytes));
     }
 
 
@@ -93,7 +110,11 @@ public class SpringSecConfig extends WebSecurityConfigurerAdapter {
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                     .and()
                 .authorizeRequests()
-                    .antMatchers("/",
+                    .antMatchers("/api/v1/auth/**")
+                        .permitAll()
+                    .antMatchers("/api/**")
+                        .hasAuthority("SCOPE_API")
+                .antMatchers("/",
                         "/favicon.ico",
                         "/**/*.png",
                         "/**/*.gif",
@@ -101,33 +122,14 @@ public class SpringSecConfig extends WebSecurityConfigurerAdapter {
                         "/**/*.jpg",
                         "/**/*.html",
                         "/**/*.css",
-                        "/**/*.js")
-                    .permitAll()
-                .antMatchers("/api/v1/auth/**")
-                    .permitAll()
-//                .antMatchers("/api/user/checkUsernameAvailability", "/api/user/checkEmailAvailability")
-//                    .permitAll()
+                        "/**/*.js").permitAll()
                 .anyRequest()
-                    .authenticated();
+                    .permitAll()
+                    .and()
+                .oauth2ResourceServer()
+                    .jwt()
+                        .decoder(jwtDecoder());
 
-        // Add our custom JWT security filter before UsernamePasswordAuthFilter
-        httpSecurity.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
-
-//        httpSecurity
-//                .authorizeRequests()
-//                    .antMatchers( "/admin/**" )
-//                    .hasAuthority( "ADMIN" )
-//                .and()
-//                .authorizeRequests()
-//                    .antMatchers(
-//                            "/",
-//                            "/users/**",
-//                            "/api/**").permitAll()
-//                 .anyRequest().authenticated();
-//                .and()
-//                .formLogin().loginPage("/login").permitAll()
-//                .and()
-//                .logout().permitAll();
 
 //        httpSecurity.csrf().disable();
         httpSecurity.headers().frameOptions().disable();
