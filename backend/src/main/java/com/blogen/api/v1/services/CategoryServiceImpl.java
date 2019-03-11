@@ -52,7 +52,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryListDTO getCategories( int pageNum, int pageSize ) {
         PageRequest pageRequest = pageRequestBuilder.buildPageRequest( pageNum, pageSize, Sort.Direction.DESC,"id" );
-        //retrieve the posts
+        //retrieve a "page" of posts
         Page<Category> page = categoryRepository.findAllBy( pageRequest );
 
         List<CategoryDTO> catDTOS = new ArrayList<>();

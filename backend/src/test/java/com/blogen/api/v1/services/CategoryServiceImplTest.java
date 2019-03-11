@@ -4,7 +4,6 @@ import com.blogen.api.v1.controllers.CategoryController;
 import com.blogen.api.v1.mappers.CategoryMapper;
 import com.blogen.api.v1.model.CategoryDTO;
 import com.blogen.api.v1.model.CategoryListDTO;
-import com.blogen.builders.Builder;
 import com.blogen.domain.Category;
 import com.blogen.exceptions.BadRequestException;
 import com.blogen.repositories.CategoryRepository;
@@ -13,18 +12,23 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
+import static org.mockito.Mockito.times;
 
 /**
  * Unit Tests for the Category REST Service
@@ -40,44 +44,57 @@ public class CategoryServiceImplTest {
     @Mock
     private PageRequestBuilder pageRequestBuilder;
 
+    @Mock
     private CategoryMapper categoryMapper = CategoryMapper.INSTANCE;
 
-    private Category cat_1;
-    private Category cat_2;
-    private Category newCat;
-    private CategoryDTO newCatDTO;
+    private Category businessCat;
+    private Category healthCat;
+    private Category techCat;
+    private CategoryDTO businessCatDto;
+    private CategoryDTO healthCatDto;
+    private CategoryDTO techCatDto;
 
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks( this );
         categoryService = new CategoryServiceImpl( categoryRepository, categoryMapper, pageRequestBuilder );
-        cat_1 = Builder.buildCategory( 1L, "Business");
-        cat_2 = Builder.buildCategory( 2L,"Health & Wellness" );
-        newCat = Builder.buildCategory( 3L, "New Category" );
-        newCatDTO = new CategoryDTO( 3L,"New Category", null );
+        businessCat = Category.builder().id(1L).name("Business").created(LocalDateTime.now()).build();
+        healthCat = Category.builder().id(2L).name("Health & Wellness").created(LocalDateTime.now()).build();
+        techCat = Category.builder().id(3L).name("Technology").created(LocalDateTime.now()).build();
+        businessCatDto = CategoryDTO.builder().id(1L).name("Business").build();
+        healthCatDto = CategoryDTO.builder().id(2L).name("Health & Wellness").build();
+        techCatDto = CategoryDTO.builder().id(3L).name("Technology").build();
     }
 
-//    @Test
-//    public void should_returnTwoCategories_when_getAllCategories() {
-//        List<Category> categories = Arrays.asList( cat_1,cat_2 );
-//
-//        given( categoryRepository.findAll() ).willReturn( categories );
-//
-//        CategoryListDTO categoryListDTO = categoryService.getAllCategories();
-//
-//        then( categoryRepository ).should().findAll();
-//        assertThat( categoryListDTO, is( notNullValue() ) );
-//        assertThat( categoryListDTO.getCategories().size(), is(2) );
-//    }
+    @Test
+    public void should_return_list_of_three_categories_when_getCategories_with_pageSize_of_3() {
+        List<Category> categories = Arrays.asList(businessCat,healthCat,techCat);
+        PageRequest pageRequest = PageRequest.of(0,3,Sort.Direction.DESC, "id");
+        Page<Category> page = new PageImpl(categories);
+
+        given( pageRequestBuilder.buildPageRequest(0, 3, Sort.Direction.DESC, "id")).willReturn(pageRequest);
+        given( categoryMapper.categoryToCategoryDto(businessCat)).willReturn(businessCatDto);
+        given( categoryMapper.categoryToCategoryDto(healthCat)).willReturn(healthCatDto);
+        given( categoryMapper.categoryToCategoryDto(techCat)).willReturn(techCatDto);
+        given( categoryRepository.findAllBy(pageRequest)).willReturn(page);
+
+        CategoryListDTO categoryListDTOs = categoryService.getCategories(0,3);
+
+        then( categoryRepository ).should().findAllBy(pageRequest);
+        then( categoryMapper ).should( times(3) ).categoryToCategoryDto( any(Category.class) );
+        then( pageRequestBuilder ).should().buildPageRequest(0,3, Sort.Direction.DESC, "id");
+        assertThat( categoryListDTOs.getCategories(), hasSize(3) );
+    }
 
     @Test
-    public void should_getOneCategory_withCorrectCategoryUrl_when_getCategory() {
-        Long catId = 1L;
-        given( categoryRepository.findById( anyLong() ) ).willReturn( Optional.of( cat_1 ) );
+    public void should_return_one_category_with_CategoryUrl_when_getCategory() {
 
-        CategoryDTO dto = categoryService.getCategory( catId );
+        given( categoryRepository.findById( anyLong() ) ).willReturn( Optional.of(businessCat) );
+        given( categoryMapper.categoryToCategoryDto(any(Category.class))).willReturn( businessCatDto );
 
-        then( categoryRepository ).should().findById(anyLong());
+        CategoryDTO dto = categoryService.getCategory( 1L );
+
+        then( categoryRepository ).should().findById(1L);
         assertThat( dto, is( notNullValue() ));
         assertThat( dto.getCategoryUrl(), is( CategoryController.BASE_URL + "/1") );
     }
@@ -92,14 +109,21 @@ public class CategoryServiceImplTest {
     }
 
     @Test
-    public void ahould_createNewCategory_when_createNewCategoryWithValidCategoryDTO() {
-        given( categoryRepository.save( any( Category.class ) )).willReturn( newCat );
+    public void should_createNewCategory_when_given_newCategoryDTO() {
+        Category newCat = Category.builder().id(5L).name("New Category").created(LocalDateTime.now()).build();
+        CategoryDTO newCatDTO = new CategoryDTO(5L,"New Category", CategoryController.BASE_URL + "/5" );
 
+        given( categoryRepository.save( any(Category.class))).willReturn(newCat);
+        given( categoryMapper.categoryDtoToCategory( any(CategoryDTO.class) )).willReturn(newCat);
+        given( categoryMapper.categoryToCategoryDto( any(Category.class) )).willReturn(newCatDTO);
+
+        // when
         CategoryDTO dto = categoryService.createNewCategory( newCatDTO );
 
-        then( categoryRepository ).should().save( any( Category.class ) );
-        assertThat( dto, is( notNullValue()) );
-        assertThat( dto.getName(), is( newCat.getName()) );
-        assertThat( dto.getCategoryUrl(), is( CategoryController.BASE_URL + "/" + newCat.getId()));
+        then( categoryRepository ).should().save( newCat );
+        assertThat( dto, is( notNullValue() ));
+        assertThat( dto.getId(), is(5L) );
+        assertThat( dto.getName(), is("New Category") );
+        assertThat( dto.getCategoryUrl(), is( CategoryController.BASE_URL + "/" + newCat.getId() ));
     }
 }

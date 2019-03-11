@@ -20,25 +20,30 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * creates JSON Web Tokens for use by Blogen. The tokens are signed using RSA256.
+ * creates JSON Web Tokens for use by Blogen. The tokens are signed using a RSA256.
  *
  * These tokens will typically have the subject set to the user's ID within the Blogen database, and will have
  * a scope set to "api" which will grant them access to the blogen REST API.
+ *
+ * You may create a token directly by calling the generateToken() method and supplying the required method parameters,
+ * OR use the BlogenJetService.Builder. The builder requires, at a minimum, a subject and a list of scopes. The
+ * privateKey and expirationMs will default to values configured in the applications.properties
  */
 @Slf4j
 @Service
-public class BlogenJwtService {
+public class BlogenJwtService implements JwtService {
 
     private int defaultExpirationMs;
+    private String defaultPrivateKeyStr;
     private PrivateKey defaultPrivateKey;
 
     public class Builder {
         private String subject;
         private List<String> scopes;
         private int expirationMs;
-        private PrivateKey privateKey;
+        private String privateKey;
 
-        Builder(String subject, List<String> scopes, int expirationMs, PrivateKey privateKey) {
+        Builder(String subject, List<String> scopes, int expirationMs, String privateKey) {
             this.subject = subject;
             this.scopes = scopes;
             this.expirationMs = expirationMs;
@@ -61,7 +66,7 @@ public class BlogenJwtService {
         }
 
         public Builder withPrivateKey(String privateKeyStr) {
-            this.privateKey = decodeKey(privateKeyStr);
+            this.privateKey = privateKeyStr;
             return this;
         }
 
@@ -71,25 +76,27 @@ public class BlogenJwtService {
     }
 
     public Builder builder() {
-        return new Builder("subject", Collections.emptyList(), defaultExpirationMs, defaultPrivateKey);
+        return new Builder("subject", Collections.emptyList(), defaultExpirationMs, defaultPrivateKeyStr);
     }
 
     public BlogenJwtService(@Value("${app.jwtExpirationMs}") int defaultExpirationMs,
                             @Value("${app.jwtPrivateKey}") String defaultPrivateKeyStr) {
+        this.defaultPrivateKeyStr = defaultPrivateKeyStr;
         this.defaultPrivateKey = decodeKey(defaultPrivateKeyStr);
         this.defaultExpirationMs = defaultExpirationMs;
     }
 
-    private String generateToken(String subject,
-                                 List<String> scopes,
-                                 int expirationMs,
-                                 PrivateKey privateKey) {
+    @Override
+    public String generateToken(String subject,
+                                List<String> scopes,
+                                int expirationMs,
+                                String privateKey) {
         Date now = new Date();
         Date expiryDate = new Date( now.getTime() + expirationMs);
 
         try {
             JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.RS256).type(JOSEObjectType.JWT).build();
-            JWSSigner signer = new RSASSASigner(privateKey);
+            JWSSigner signer = new RSASSASigner( decodeKey(privateKey) );
             JSONArray scopesArr = new JSONArray();
             scopesArr.addAll(scopes);
             JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()

@@ -95,7 +95,8 @@ public class UserController {
     @PutMapping( "/{id}" )
     @ResponseStatus( HttpStatus.OK )
     public UserDTO updateUser(@PathVariable("id") Long id,
-                              @Valid @RequestBody UserDTO userDTO, Authentication authentication) {
+                              @Valid @RequestBody UserDTO userDTO
+    ) {
         log.debug( "update user id=" + id + " userDTO=" + userDTO );
         User user = userService.findById( id )
                 .orElseThrow( () -> new BadRequestException( "user does not exist with id:" + id ) );
