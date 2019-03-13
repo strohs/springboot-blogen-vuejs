@@ -53,6 +53,11 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-oauth2-client</artifactId>
+            <version>5.1.4.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-oauth2-jose</artifactId>
         </dependency>
 
@@ -149,7 +154,7 @@
                             <overwrite>true</overwrite>
                             <resources>
                                 <resource>
-                                    <directory>${project.parent.basedir}/frontend/target/dist</directory>
+                                    <directory>${project.parent.basedir}/vue-frontend/target/dist</directory>
                                     <includes>
                                         <include>static/</include>
                                         <include>index.html</include>

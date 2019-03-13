@@ -25,7 +25,8 @@
     </properties>
 
     <modules>
-        <module>frontend</module>
+        <!--<module>frontend</module>-->
+        <module>vue-frontend</module>
         <module>backend</module>
     </modules>
 
