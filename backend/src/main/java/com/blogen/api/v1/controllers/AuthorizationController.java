@@ -17,7 +17,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 /**
- * Controller for handling new-user sign-ups and user log-ins
+ * Controller for handling endpoints that do NOT require users to be authenticated and authorized,
+ * i.e. new-user sign-ups and user log-ins
  *
  * Author: Cliff
  */
@@ -55,16 +56,6 @@ public class AuthorizationController {
         log.debug( "signup user userDTO=" + userDTO );
         return authorizationService.signUpUser( userDTO );
     }
-
-//    @ApiOperation( value = "login a user", consumes = "application/form", produces = "application/json")
-//    @PostMapping( "/login" )
-//    public ResponseEntity<?> login( @RequestBody @Valid LoginRequestDTO loginDTO ) {
-//        log.debug( "login user loginDTO {}",loginDTO );
-//        //log.debug( "request body->{}", );
-//        LoginResponse authResponse = authorizationService.authenticateAndLoginUser( loginDTO );
-//        log.debug( "AuthResponse {}", authResponse );
-//        return ResponseEntity.ok( authResponse );
-//    }
 
     @ApiOperation( value = "get the latest posts", produces = "application/json")
     @GetMapping( "/latestPosts" )
