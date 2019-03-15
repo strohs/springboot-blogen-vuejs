@@ -10,11 +10,11 @@
               <b-card-header>
                 <div class="row">
                   <h4>
-                    <icon class="mx-2" name="user-circle" scale="2"></icon>
+                    <font-awesome-icon class="mx-2" icon="user-circle" scale="2"></font-awesome-icon>
                     Account Login
                   </h4>
                   <b-link class="ml-auto mx-2" @click="showHelp = !showHelp">
-                    <icon name="question-circle" scale="1.5"></icon>
+                    <font-awesome-icon icon="question-circle" scale="1.5"></font-awesome-icon>
                   </b-link>
                 </div>
               </b-card-header>
@@ -24,7 +24,7 @@
                   {{ statusMessage }}
                 </b-alert>
 
-                <b-form @submit="doLogin">
+                <b-form v-on:submit.prevent="doLogin">
                   <b-form-group id="userNameGroup" label="User Name:" label-for="userName">
                     <b-form-input id="userName" type="text" v-model="login.username" required placeholder="username">
                     </b-form-input>
@@ -35,9 +35,18 @@
                     </b-form-input>
                   </b-form-group>
 
-                  <b-button block size="lg" type="submit" variant="primary">Login</b-button>
+                  <b-button block size="lg" type="submit" variant="primary">Login with Blogen</b-button>
 
                 </b-form>
+
+                <div class="row my-2 justify-content-center">
+                  <div class="col-md-4 mx-2">
+                    <b-button variant="danger">Login with Google</b-button>
+                  </div>
+                  <div class="col-md-4 mx-2">
+                    <b-button variant="dark" :href="githubLogin">Login with Github</b-button>
+                  </div>
+                </div>
               </b-card-body>
             </b-card>
             <!-- Login help -->
@@ -45,7 +54,7 @@
               <b-card-header header-text-variant="white" header-bg-variant="secondary">
                 <div class="row">
                   <h4>
-                    <icon class="mx-2" name="user-circle" scale="2"></icon>
+                    <font-awesome-icon class="mx-2" icon="user-circle"></font-awesome-icon>
                     Blogen Login Help
                   </h4>
 
@@ -65,7 +74,7 @@
 </template>
 
 <script>
-import axios from '../../axios-auth'
+// import axios from '../../axios-auth'
 // import {handleAxiosError} from '../../common'
 import { defaultUsers } from '../../common/defaultUsers'
 
@@ -81,6 +90,7 @@ export default {
         username: '',
         password: ''
       },
+      githubLogin: process.env.VUE_APP_GITHUB_LOGIN_URL,
       blogenUsers: defaultUsers,
       statusMessage: this.message,
       loginError: false,
@@ -88,31 +98,15 @@ export default {
     }
   },
   methods: {
-    doLogin (event) {
-      event.preventDefault()
+    async doLogin () {
       this.statusMessage = ''
-      axios.post('/api/v1/auth/login', this.login)
-        .then(res => {
-          // if we get an access token, save in in the store and set the authorization header in axios
-          if (res.data.accessToken) {
-            console.log('access token:', res.data.accessToken)
-            console.log('user:', res.data.user)
-            this.$store.commit('SET_AUTH_TOKEN', res.data.accessToken)
-            this.$store.commit('SET_USER', res.data.user)
-            // set the JWT as a bearer token for each request made with axios
-            axios.defaults.headers.common['Authorization'] = 'Bearer ' + res.data.accessToken
-            this.$router.push({ name: 'posts' })
-          } else {
-            console.log('expected an access token but none was sent')
-          }
+      await this.$store.dispatch('loginWithUsername', this.login)
+        .then(() => {
+          this.$router.push({ name: 'posts' })
         })
         .catch(error => {
-          if (error.response.status === 401) {
-            this.statusMessage = 'Invalid Username or Password'
-          } else {
-            this.statusMessage = 'Some other error occurred, please contact the server admin'
-            console.log('login error:', error.response.message)
-          }
+          console.log('error', error)
+          this.statusMessage = error.response.message
         })
     },
     doLogout () {
@@ -130,11 +124,20 @@ export default {
     if (this.logout === true) {
       this.doLogout()
     }
+    // check for token on query string
+    if (this.$route.query.token) {
+      console.log('got token', this.$route.query.token)
+      // call general purpose Vuex login method
+
+      // if using token, call spring rest api method (protected) to login with jwt in header
+    }
   }
 }
 </script>
 
 <style scoped>
+  @import './../../assets/css/bootstrap-social.css';
+
   .flip-enter-active, .flip-leave-active {
     transition: 0.3s ease-out;
   }

@@ -156,8 +156,11 @@
                                 <resource>
                                     <directory>${project.parent.basedir}/vue-frontend/target/dist</directory>
                                     <includes>
-                                        <include>static/</include>
+                                        <include>css/</include>
+                                        <include>js/</include>
+                                        <include>img/</include>
                                         <include>index.html</include>
+                                        <include>favicon.ico</include>
                                     </includes>
                                 </resource>
                             </resources>

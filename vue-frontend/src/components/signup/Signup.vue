@@ -4,7 +4,7 @@
       <div class="container">
         <div class="row">
           <div class="col-md-6">
-            <h1><icon name="user-plus" class="mr-2" scale="2"></icon>Blogen Sign-Up</h1>
+            <h1><font-awesome-icon icon="user-plus" class="mr-2" scale="2"></font-awesome-icon>Blogen Sign-Up</h1>
           </div>
         </div>
       </div>

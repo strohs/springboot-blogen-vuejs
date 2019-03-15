@@ -9,7 +9,7 @@
         <div class="row">
           <div class="col-md-6">
             <h1>
-              <icon name="user-cog" class="mr-2" scale="2"></icon>
+              <font-awesome-icon icon="user-cog" class="mr-2" scale="2"></font-awesome-icon>
               User Profile
             </h1>
           </div>

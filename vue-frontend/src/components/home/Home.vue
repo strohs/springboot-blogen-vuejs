@@ -18,7 +18,7 @@
       <div class="container">
         <div class="row">
           <div class="col-md text-md-left">
-            <h3><icon name="keyboard" scale="1.5"></icon> Latest Blogens:</h3>
+            <h3><font-awesome-icon icon="keyboard" scale="1.5"></font-awesome-icon> Latest Blogens:</h3>
           </div>
         </div>
       </div>

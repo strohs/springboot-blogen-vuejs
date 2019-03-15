@@ -1,20 +1,13 @@
 <template>
 
-      <img :src="blogenLogo" :width="width" :height="height" class="d-inline-block align-top" alt="Blogen Logo">
+      <img src="./../../assets/images/blogen-logo.png" :width="width" :height="height" class="d-inline-block align-top" alt="Blogen Logo">
 
 </template>
 
 <script>
-import constants from '../../common/constants.js'
-
 export default {
   name: 'BlogenLogo',
-  props: ['height', 'width'],
-  computed: {
-    blogenLogo () {
-      return constants.API_SERVER_URL + '/images' + '/blogen-logo.png'
-    }
-  }
+  props: ['height', 'width']
 }
 </script>
 

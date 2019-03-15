@@ -18,7 +18,10 @@ export default {
     appFooter: Footer
   },
   mounted () {
-    console.log('jwt=', this.$route.query.jwt)
+    if (this.$route.query.login) {
+      console.log('found login')
+    }
+    console.log('HEADERS:', window.config)
   }
 }
 </script>

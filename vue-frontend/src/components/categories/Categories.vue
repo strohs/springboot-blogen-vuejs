@@ -6,7 +6,7 @@
         <div class="row">
           <div class="col-md-6">
             <h1>
-              <icon class="mx-2" name="folder" scale="2"></icon>
+              <font-awesome-icon class="mx-2" icon="folder" scale="2"></font-awesome-icon>
               Categories
             </h1>
           </div>

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -34,26 +35,13 @@ import java.util.Base64;
  *
  * @author Cliff
  */
-@Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SpringSecConfig extends WebSecurityConfigurerAdapter {
 
-    @Value("${app.jwtPublicKey}")
-    private String jwtPublicKey;
-
-    @Autowired
-    private JwtAuthenticationEntryPoint unauthorizedHandler;
-
     @Autowired
     @Qualifier("daoAuthenticationProvider")
     private AuthenticationProvider daoAuthenticationProvider;
-
-    @Bean(BeanIds.AUTHENTICATION_MANAGER)
-    @Override
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
-    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -69,24 +57,59 @@ public class SpringSecConfig extends WebSecurityConfigurerAdapter {
         return daoAuthenticationProvider;
     }
 
+    @Bean(BeanIds.AUTHENTICATION_MANAGER)
     @Override
-    public void configure(WebSecurity web) throws Exception {
-        //this will allow swagger UI, h2-console, and image files through spring-security
-        web.ignoring().antMatchers("/v2/api-docs", "/swagger-resources/configuration/ui", "/swagger-resources",
-                "/swagger-resources/configuration/security", "/swagger-ui.html", "/webjars/**", "/console/*",
-                "/h2-console/**", "/actuator/**","/",
-                "/favicon.ico", "/**/*.png", "/**/*.gif", "/**/*.svg", "/**/*.jpg", "/**/*.html", "/**/*.css", "/**/*.js");
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
     }
 
-    @Autowired
-    public void configureAuthManager(AuthenticationManagerBuilder authenticationManagerBuilder){
-        authenticationManagerBuilder.authenticationProvider( daoAuthenticationProvider );
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        //super.configure(auth);
+        auth.authenticationProvider( daoAuthenticationProvider );
     }
+
+    @Value("${app.jwtPublicKey}")
+    private String jwtPublicKey;
+
+    @Autowired
+    private JwtAuthenticationEntryPoint unauthorizedHandler;
 
     @Bean
     JwtDecoder jwtDecoder() throws Exception {
         // decodes a JWT from compact claims representation format into a Jwt object
         return new NimbusJwtDecoder(JwtProcessors.withPublicKey(key()).build());
+    }
+
+    @Override
+    public void configure(WebSecurity web) throws Exception {
+        //this will allow swagger UI, h2-console, and image files through spring-security
+        web.ignoring().antMatchers("/v2/api-docs", "/swagger-resources/configuration/ui", "/swagger-resources",
+                "/swagger-resources/configuration/security", "/swagger-ui.html", "/webjars/**", "/console/*",
+                "/h2-console/**", "/actuator/**",
+                "/favicon.ico", "/**/*.png", "/**/*.gif", "/**/*.svg", "/**/*.jpg", "/**/*.html", "/**/*.css", "/**/*.js");
+    }
+
+    @Override
+    protected void configure(HttpSecurity httpSecurity) throws Exception {
+        httpSecurity
+                .cors()
+                    .and()
+                .csrf().disable()
+                .authorizeRequests()
+                    .antMatchers("/","/api/v1/auth/**","/blogen/login/form/**")
+                        .permitAll()
+                    .antMatchers("/api/**","/blogen/login/userinfo")
+                        .hasAuthority("SCOPE_API")
+                    .anyRequest()
+                        .authenticated()
+                    .and()
+                        .oauth2Login()
+                .and()
+                .oauth2ResourceServer()
+                    .authenticationEntryPoint(unauthorizedHandler)
+                    .jwt()
+                        .decoder(jwtDecoder());
     }
 
     //generates the PublicKey used to verify the JWTs used in Blogen
@@ -97,33 +120,18 @@ public class SpringSecConfig extends WebSecurityConfigurerAdapter {
     }
 
 
-    @Override
-    protected void configure(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity
-                .cors()
-                    .and()
-                .csrf().disable()
-                .exceptionHandling()
-                    .authenticationEntryPoint(unauthorizedHandler)
-                    .and()
-                .sessionManagement()
-                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                    .and()
-                .authorizeRequests()
-                    .antMatchers("/api/v1/auth/**")
-                        .permitAll()
-                    .antMatchers("/api/**")
-                        .hasAuthority("SCOPE_API")
-                .anyRequest()
-                    .authenticated()
-                    .and()
-                .oauth2ResourceServer()
-                    .jwt()
-                        .decoder(jwtDecoder());
 
-
-//        httpSecurity.csrf().disable();
-        httpSecurity.headers().frameOptions().disable();
-    }
-
+//    @Configuration
+//    @Order(2)
+//    public static class OAuthLoginConfig extends WebSecurityConfigurerAdapter {
+//
+//        @Override
+//        protected void configure(HttpSecurity httpSecurity) throws Exception {
+//            httpSecurity
+//                    .authorizeRequests()
+//                        .anyRequest().authenticated()
+//                        .and()
+//                    .oauth2Login();
+//        }
+//    }
 }

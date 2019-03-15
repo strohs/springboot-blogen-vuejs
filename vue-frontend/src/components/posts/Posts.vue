@@ -7,7 +7,7 @@
         <div class="row">
           <div class="col-sm-6">
                 <span>
-                    <h1><icon class="mx-2" name="pencil-alt" scale="1.5"></icon>Posts (<small>{{selectedCategory.name}}</small>)</h1>
+                    <h1><font-awesome-icon class="mx-2" icon="pencil-alt" ></font-awesome-icon>Posts (<small>{{selectedCategory.name}}</small>)</h1>
                 </span>
           </div>
         </div>

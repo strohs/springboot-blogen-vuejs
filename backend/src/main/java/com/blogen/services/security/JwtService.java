@@ -1,6 +1,5 @@
 package com.blogen.services.security;
 
-import java.security.PrivateKey;
 import java.util.List;
 
 public interface JwtService {

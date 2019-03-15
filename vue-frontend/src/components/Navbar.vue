@@ -19,28 +19,28 @@
       <b-navbar-nav class="ml-auto">
         <b-nav-item-dropdown :text="'Welcome ' + getAuthUser.userName" left v-if="isAuthenticated">
           <b-dropdown-item to="/userProfile">
-            <icon name="user-cog"></icon>
+            <font-awesome-icon icon="user-cog"></font-awesome-icon>
             Profile
           </b-dropdown-item>
           <b-dropdown-divider></b-dropdown-divider>
           <b-dropdown-item-button v-b-modal.authTokenModal>
-            <icon name="lock"></icon>
+            <font-awesome-icon icon="lock"></font-awesome-icon>
             Authentication Token
           </b-dropdown-item-button>
         </b-nav-item-dropdown>
 
         <b-nav-item to="/signup" class="mx-2" v-if="!isAuthenticated">
-          <icon name="user-plus"></icon>
+          <font-awesome-icon icon="user-plus"></font-awesome-icon>
           Sign-Up
         </b-nav-item>
 
         <b-nav-item to="/login" class="mx-2" v-if="!isAuthenticated">
-          <icon name="user-circle"></icon>
+          <font-awesome-icon icon="user-circle"></font-awesome-icon>
           Login
         </b-nav-item>
 
         <b-nav-item :to="{ name: 'login', params: { logout: true } }" class="mx-2" v-if="isAuthenticated">
-          <icon name="user-times"></icon>
+          <font-awesome-icon icon="user-times"></font-awesome-icon>
           Logout
         </b-nav-item>
 

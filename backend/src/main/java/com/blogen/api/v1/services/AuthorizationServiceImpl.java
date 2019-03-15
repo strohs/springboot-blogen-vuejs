@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -85,9 +86,41 @@ public class AuthorizationServiceImpl implements AuthorizationService {
         return new LoginResponse( token, userMapper.userToUserDto( user ));
     }
 
+    @Override
+    public String authenticateAndLoginUser(String username, String password) {
+        // check if username exists
+        final User user = userService.findByUserName(username)
+                .orElseThrow(() -> new BadCredentialsException("bad username or password"));
+        // check if password matches
+        if (!encryptionService.checkPassword( password, user.getEncryptedPassword() )) {
+            throw new BadCredentialsException("bad username or password");
+        }
+        // user is valid, generate a token from User data and grant them access to the API
+        return buildJwt(user);
+    }
+
+    @Override
+    public String loginGithubUser(OAuth2User oAuth2User) {
+        // check if this OAuth user already has an account with Blogen
+        String username = AuthorizationService.GITHUB_USER_PREFIX + oAuth2User.getAttributes().get("login");
+        if ( userNameExists(username) ) {
+            log.debug("github oauth2 user exists: {}, logging them in and generating token", username);
+            User user = userService.findByUserName(username).get();
+            return buildJwt( user );
+        } else {
+            // create a new user
+            UserDTO newUserDto = userMapper.githubOAuth2UserToUser( oAuth2User );
+            UserDTO savedUser = signUpUser( newUserDto );
+            log.debug("created new github oauth2 user {}", savedUser.getUserName());
+            return buildJwt( userService.findById(savedUser.getId()).get() );
+        }
+    }
+
+
     /**
-     * builds a JWT from Blogen User data. The JWT will build a "scope" claim containing the user's roles, plus
-     * an additional API scope, granting the user access to the blogen API
+     * builds a JWT from Blogen User data. The JWT will build a "scope" claim containing the user's spring security
+     * roles, plus an additional API scope, granting the user access to the Blogen API
+     *
      * @param user - Blogen {@link User} data
      * @return - a JWT in compact form (BASE64 encoded)
      */

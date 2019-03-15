@@ -1,6 +1,8 @@
 package com.blogen.api.v1.mappers;
 
 import com.blogen.api.v1.model.UserDTO;
+import com.blogen.api.v1.services.AuthorizationService;
+import com.blogen.api.v1.services.UserService;
 import com.blogen.domain.Role;
 import com.blogen.domain.User;
 import org.mapstruct.Mapper;
@@ -8,6 +10,8 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValueCheckStrategy;
 import org.mapstruct.factory.Mappers;
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +38,25 @@ public interface UserMapper {
     
     @Mapping( source = "avatarImage", target = "userPrefs.avatar.fileName")
     void updateUserFromDTO( UserDTO userDTO, @MappingTarget User user );
+
+    /**
+     * maps github oauth2 user information to a blogen UserDTO object
+     * @param oath2User
+     * @return
+     */
+    default UserDTO githubOAuth2UserToUser(OAuth2User oath2User){
+        //   avatar_uri = "https://......"
+        //
+        UserDTO user = new UserDTO();
+        user.setUserName( AuthorizationService.GITHUB_USER_PREFIX + oath2User.getAttributes().get("login"));
+        user.setFirstName( "anonymous" );
+        user.setLastName( "anonymous" );
+        user.setEmail( oath2User.getAttributes().getOrDefault("email", "github@example.com").toString() );
+        // ideally generate a random password and email it to them, BUT this is a just a PoC for now
+        user.setPassword("github");
+
+        return user;
+    }
 
     default List<String> asStrings( List<Role> roles) {
         // intentionally initialized to null

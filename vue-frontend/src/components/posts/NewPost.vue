@@ -3,7 +3,7 @@
   <div>
 
     <b-button block variant="primary" v-b-modal.newPostModal>
-      <icon class="mx-2" name="plus"></icon>
+      <font-awesome-icon class="mx-2" icon="plus"></font-awesome-icon>
       New Post
     </b-button>
 
