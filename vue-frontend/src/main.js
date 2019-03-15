@@ -1,6 +1,7 @@
 // The Vue build version to load with the `import` command
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue'
+import VueCookies from 'vue-cookies'
 import BootstrapVue from 'bootstrap-vue'
 import App from './App'
 import router from './router'
@@ -16,6 +17,7 @@ library.add(faUserCircle, faLock, faUserCog, faUserTimes, faUserPlus, faQuestion
 
 Vue.component('font-awesome-icon', FontAwesomeIcon)
 
+Vue.use(VueCookies)
 Vue.use(BootstrapVue)
 
 new Vue({

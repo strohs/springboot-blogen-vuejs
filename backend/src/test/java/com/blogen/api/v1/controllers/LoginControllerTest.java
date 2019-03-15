@@ -1,10 +1,13 @@
 package com.blogen.api.v1.controllers;
 
+import com.blogen.api.v1.services.AuthorizationService;
+import com.blogen.api.v1.services.UserService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -22,6 +25,12 @@ public class LoginControllerTest {
 
     @Autowired
     MockMvc mockMvc;
+
+    @MockBean
+    AuthorizationService authorizationService;
+
+    @MockBean
+    UserService userService;
 
     @Before
     public void setUp() throws Exception {

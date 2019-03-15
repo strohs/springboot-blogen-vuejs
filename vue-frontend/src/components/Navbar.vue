@@ -39,7 +39,10 @@
           Login
         </b-nav-item>
 
-        <b-nav-item :to="{ name: 'login', params: { logout: true } }" class="mx-2" v-if="isAuthenticated">
+        <b-nav-item
+          @click="logout"
+          class="mx-2"
+          v-if="isAuthenticated">
           <font-awesome-icon icon="user-times"></font-awesome-icon>
           Logout
         </b-nav-item>
@@ -57,13 +60,19 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 import BlogenLogo from './common/BlogenLogo'
 
 export default {
   name: 'Navbar',
   components: {
     appBlogenLogo: BlogenLogo
+  },
+  methods: {
+    logout () {
+      this.$store.dispatch('doLogout')
+      this.$router.push({ name: 'login', params: { message: 'you have been logged out' } })
+    }
   },
   computed: {
     ...mapGetters([
@@ -72,6 +81,9 @@ export default {
       'getAuthUser',
       'getAuthUserId',
       'getAuthToken'
+    ]),
+    ...mapActions([
+      'doLogout'
     ])
   }
 }

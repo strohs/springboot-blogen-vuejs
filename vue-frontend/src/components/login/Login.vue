@@ -74,15 +74,12 @@
 </template>
 
 <script>
-// import axios from '../../axios-auth'
-// import {handleAxiosError} from '../../common'
 import { defaultUsers } from '../../common/defaultUsers'
 
 export default {
   name: 'Login',
   props: {
-    logout: Boolean,
-    message: undefined
+    message: String
   },
   data () {
     return {
@@ -105,13 +102,9 @@ export default {
           this.$router.push({ name: 'posts' })
         })
         .catch(error => {
-          console.log('error', error)
+          console.log('login error', error)
           this.statusMessage = error.response.message
         })
-    },
-    doLogout () {
-      this.$store.dispatch('doLogout')
-      this.statusMessage = 'You have been logged out'
     }
   },
   computed: {
@@ -121,16 +114,6 @@ export default {
   },
   mounted () {
     this.login.username = this.$store.state.user.userName
-    if (this.logout === true) {
-      this.doLogout()
-    }
-    // check for token on query string
-    if (this.$route.query.token) {
-      console.log('got token', this.$route.query.token)
-      // call general purpose Vuex login method
-
-      // if using token, call spring rest api method (protected) to login with jwt in header
-    }
   }
 }
 </script>

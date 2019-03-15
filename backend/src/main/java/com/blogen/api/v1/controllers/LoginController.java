@@ -10,6 +10,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.annotation.RegisteredOAuth2AuthorizedClient;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -26,8 +27,9 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 /**
- * handles logins from OAuth2 sources as well as logins where the client sends a JSON Web Token as their
- * credential (rather than a username and password)
+ * Controller for the various ways users can login to Blogen:
+ *   via the login form (using a username and password)
+ *   via github and OAuth2
  *
  */
 @Slf4j
@@ -37,29 +39,18 @@ public class LoginController {
 
     public static final String BASE_URL = "/blogen/login";
 
-    @Value("${vue.dev.server.port:${server.port:8080}}")
-    private String redirectPort;
-
     private AuthorizationService authorizationService;
-    private UserService userService;
 
-    public LoginController(AuthorizationService authorizationService, UserService userService) {
+    public LoginController(AuthorizationService authorizationService) {
         this.authorizationService = authorizationService;
-        this.userService = userService;
     }
 
-    @GetMapping("/userinfo")
-    @ResponseBody
-    // todo move this into Authentication controller
-    public UserDTO getAuthenticatedUserInfo(@AuthenticationPrincipal Jwt jwt) {
-        log.debug("get authenticated user info for :{}", jwt.getSubject() );
-        return userService.getUser( Long.parseLong( jwt.getSubject() ));
-    }
 
     @PostMapping( "/form" )
+    @ResponseBody
     public ResponseEntity<String> loginUsernameAndPassword( @RequestBody @Valid LoginRequestDTO loginDTO ) {
-        log.debug( "login username:{} password:{}", loginDTO.getUsername(), loginDTO.getPassword() );
 
+        log.debug( "login username:{} password:{}", loginDTO.getUsername(), loginDTO.getPassword() );
         String token = authorizationService.authenticateAndLoginUser( loginDTO.getUsername(), loginDTO.getPassword() );
 
         return ResponseEntity.ok()
@@ -77,14 +68,13 @@ public class LoginController {
      */
     @GetMapping("/github")
     public ResponseEntity<String> githubOAuth2Login(
-            @RegisteredOAuth2AuthorizedClient OAuth2AuthorizedClient authorizedClient,
+            @RegisteredOAuth2AuthorizedClient("github") OAuth2AuthorizedClient authorizedClient,
             @AuthenticationPrincipal OAuth2User oauth2User,
             HttpServletResponse response) throws IOException {
-        //todo need to get authorization header from inside javascript, or put token into cookie
-        log.debug("login via github for principal:{}",authorizedClient.getPrincipalName() );
 
+        log.debug("login via github for principal:{}",authorizedClient.getPrincipalName() );
         String token = authorizationService.loginGithubUser( oauth2User );
-        response.addCookie( new Cookie("blogen-jwt", token));
+        response.addCookie( new Cookie("token", token));
         return buildTokenResponse(token);
     }
 

@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
@@ -61,6 +62,13 @@ public class UserController {
     @InitBinder("passwordRequestDTO")
     public void setupPasswordBinder( WebDataBinder binder ) {
         binder.addValidators( passwordValidator );
+    }
+
+    @GetMapping("/userinfo")
+    @ResponseBody
+    public UserDTO getAuthenticatedUserInfo(@AuthenticationPrincipal Jwt jwt) {
+        log.debug("get authenticated user info for :{}", jwt.getSubject() );
+        return userService.getUser( Long.parseLong( jwt.getSubject() ));
     }
 
     @ApiOperation( value = "get a list of all users", produces = "application/json", authorizations = { @Authorization(value="apiKey") })

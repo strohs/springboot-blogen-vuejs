@@ -86,8 +86,8 @@ public class SpringSecConfig extends WebSecurityConfigurerAdapter {
         //this will allow swagger UI, h2-console, and image files through spring-security
         web.ignoring().antMatchers("/v2/api-docs", "/swagger-resources/configuration/ui", "/swagger-resources",
                 "/swagger-resources/configuration/security", "/swagger-ui.html", "/webjars/**", "/console/*",
-                "/h2-console/**", "/actuator/**",
-                "/favicon.ico", "/**/*.png", "/**/*.gif", "/**/*.svg", "/**/*.jpg", "/**/*.html", "/**/*.css", "/**/*.js");
+                "/h2-console/**", "/actuator/**", "/favicon.ico",
+                "/**/*.png", "/**/*.gif", "/**/*.svg", "/**/*.jpg", "/**/*.html", "/**/*.css", "/**/*.js", "/**/*.map");
     }
 
     @Override
@@ -96,10 +96,13 @@ public class SpringSecConfig extends WebSecurityConfigurerAdapter {
                 .cors()
                     .and()
                 .csrf().disable()
+                .logout()
+                    .logoutSuccessUrl("/")
+                .and()
                 .authorizeRequests()
                     .antMatchers("/","/api/v1/auth/**","/blogen/login/form/**")
                         .permitAll()
-                    .antMatchers("/api/**","/blogen/login/userinfo")
+                    .antMatchers("/api/**")
                         .hasAuthority("SCOPE_API")
                     .anyRequest()
                         .authenticated()
@@ -119,19 +122,4 @@ public class SpringSecConfig extends WebSecurityConfigurerAdapter {
                 .generatePublic(new X509EncodedKeySpec(bytes));
     }
 
-
-
-//    @Configuration
-//    @Order(2)
-//    public static class OAuthLoginConfig extends WebSecurityConfigurerAdapter {
-//
-//        @Override
-//        protected void configure(HttpSecurity httpSecurity) throws Exception {
-//            httpSecurity
-//                    .authorizeRequests()
-//                        .anyRequest().authenticated()
-//                        .and()
-//                    .oauth2Login();
-//        }
-//    }
 }

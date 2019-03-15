@@ -33,7 +33,6 @@
 </template>
 
 <script>
-import constants from '../../common/constants.js'
 import { dateLongFormat } from '../../filters/dateFormatFilter'
 import { mapGetters } from 'vuex'
 import ReplyPost from './ReplyPost'
@@ -60,7 +59,7 @@ export default {
   data () {
     return {
       // image will hold a url to either the users avatar or the image the user posted
-      image: constants.API_SERVER_URL + this.user.avatarUrl
+      image: process.env.VUE_APP_API_SERVER_URL + this.user.avatarUrl
     }
   },
   methods: {
@@ -72,7 +71,7 @@ export default {
       'getAvatarByFileName'
     ]),
     avatarUrl () {
-      return constants.API_SERVER_URL + this.user.avatarUrl
+      return process.env.VUE_APP_API_SERVER_URL + this.user.avatarUrl
     },
     canEditOrDeletePost () {
       // the logged in user can delete a post of they created the post

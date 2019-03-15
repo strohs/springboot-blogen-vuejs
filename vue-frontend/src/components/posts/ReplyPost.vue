@@ -21,7 +21,6 @@
 
 <script>
 import PostForm from './PostForn'
-import constants from '../../common/constants.js'
 
 export default {
   name: 'ReplyPost',
@@ -36,7 +35,7 @@ export default {
       post: {
         title: '',
         text: '',
-        imageUrl: constants.API_SERVER_URL + constants.DEFAULT_IMAGE_PATH,
+        imageUrl: process.env.VUE_APP_API_SERVER_URL + process.env.VUE_APP_DEFAULT_IMAGE_PATH,
         categoryId: null
       }
     }

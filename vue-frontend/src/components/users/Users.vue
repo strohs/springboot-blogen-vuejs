@@ -35,7 +35,6 @@
 </template>
 
 <script>
-import constants from '../../common/constants.js'
 import StatusAlert from '../common/StatusAlert'
 import { mapState } from 'vuex'
 
@@ -67,7 +66,7 @@ export default {
       'pageInfo'
     ]),
     avatarUrl () {
-      return constants.DEFAULT_AVATAR_URL + '/' + this.user.avatarImage
+      return process.env.VUE_APP_DEFAULT_AVATAR_URL + '/' + this.user.avatarImage
     }
   },
   methods: {
