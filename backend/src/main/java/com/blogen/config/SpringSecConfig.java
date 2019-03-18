@@ -43,6 +43,12 @@ public class SpringSecConfig extends WebSecurityConfigurerAdapter {
     @Qualifier("daoAuthenticationProvider")
     private AuthenticationProvider daoAuthenticationProvider;
 
+    @Value("${app.jwtPublicKey}")
+    private String jwtPublicKey;
+
+    @Autowired
+    private JwtAuthenticationEntryPoint unauthorizedHandler;
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
@@ -69,12 +75,6 @@ public class SpringSecConfig extends WebSecurityConfigurerAdapter {
         auth.authenticationProvider( daoAuthenticationProvider );
     }
 
-    @Value("${app.jwtPublicKey}")
-    private String jwtPublicKey;
-
-    @Autowired
-    private JwtAuthenticationEntryPoint unauthorizedHandler;
-
     @Bean
     JwtDecoder jwtDecoder() throws Exception {
         // decodes a JWT from compact claims representation format into a Jwt object
@@ -83,7 +83,8 @@ public class SpringSecConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(WebSecurity web) throws Exception {
-        //this will allow swagger UI, h2-console, and image files through spring-security
+
+        //these matchers will allow swagger UI, h2-console, and image files through spring-security
         web.ignoring().antMatchers("/v2/api-docs", "/swagger-resources/configuration/ui", "/swagger-resources",
                 "/swagger-resources/configuration/security", "/swagger-ui.html", "/webjars/**", "/console/*",
                 "/h2-console/**", "/actuator/**", "/favicon.ico",
@@ -98,9 +99,9 @@ public class SpringSecConfig extends WebSecurityConfigurerAdapter {
                 .csrf().disable()
                 .logout()
                     .logoutSuccessUrl("/")
-                .and()
+                    .and()
                 .authorizeRequests()
-                    .antMatchers("/","/api/v1/auth/**","/blogen/login/form/**")
+                    .antMatchers("/","/api/v1/auth/**", "/login/form")
                         .permitAll()
                     .antMatchers("/api/**")
                         .hasAuthority("SCOPE_API")
@@ -108,7 +109,8 @@ public class SpringSecConfig extends WebSecurityConfigurerAdapter {
                         .authenticated()
                     .and()
                         .oauth2Login()
-                .and()
+                            .defaultSuccessUrl("/login/oauth2/success", true)
+                    .and()
                 .oauth2ResourceServer()
                     .authenticationEntryPoint(unauthorizedHandler)
                     .jwt()

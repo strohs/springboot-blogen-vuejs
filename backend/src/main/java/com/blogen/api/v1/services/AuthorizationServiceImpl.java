@@ -13,6 +13,7 @@ import com.blogen.services.security.BlogenAuthority;
 import com.blogen.services.security.EncryptionService;
 import com.blogen.services.security.BlogenJwtService;
 import lombok.extern.slf4j.Slf4j;
+import net.bytebuddy.pool.TypePool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -49,7 +50,12 @@ public class AuthorizationServiceImpl implements AuthorizationService {
         this.encryptionService = encryptionService;
         this.tokenService = tokenService;
     }
-    
+
+    @Override
+    public Boolean userNameExists( String userName ) {
+        return userService.findByUserName( userName ).isPresent();
+    }
+
     @Override
     public UserDTO signUpUser( UserDTO userDTO ) {
         //TODO check for existing username
@@ -100,7 +106,17 @@ public class AuthorizationServiceImpl implements AuthorizationService {
     }
 
     @Override
-    public String loginGithubUser(OAuth2User oAuth2User) {
+    public String loginOAuth2User(String providerName, OAuth2User oAuth2User) {
+        if (providerName.toLowerCase().equals("github")) {
+            return loginGithubUser(oAuth2User);
+        } else if (providerName.toLowerCase().equals("google")) {
+            return loginGoogleUser(oAuth2User);
+        } else {
+            throw new IllegalArgumentException("unknown client id " + providerName + " could not log user inti blogen");
+        }
+    }
+
+    protected String loginGithubUser(OAuth2User oAuth2User) {
         // check if this OAuth user already has an account with Blogen
         String username = AuthorizationService.GITHUB_USER_PREFIX + oAuth2User.getAttributes().get("login");
         if ( userNameExists(username) ) {
@@ -116,6 +132,20 @@ public class AuthorizationServiceImpl implements AuthorizationService {
         }
     }
 
+    protected String loginGoogleUser(OAuth2User oAuth2User) {
+        String username = AuthorizationService.GOOGLE_USER_PREFIX + oAuth2User.getAttributes().get("sub");
+        if ( userNameExists(username) ) {
+            log.debug("google oauth2 user exists: {}, logging them in and generating token", username);
+            User user = userService.findByUserName(username).get();
+            return buildJwt( user );
+        } else {
+            // create a new user
+            UserDTO newUserDto = userMapper.googleOAuth2UserToUser( oAuth2User );
+            UserDTO savedUser = signUpUser( newUserDto );
+            log.debug("created new google oauth2 user {}", savedUser.getUserName());
+            return buildJwt( userService.findById(savedUser.getId()).get() );
+        }
+    }
 
     /**
      * builds a JWT from Blogen User data. The JWT will build a "scope" claim containing the user's spring security
@@ -131,8 +161,4 @@ public class AuthorizationServiceImpl implements AuthorizationService {
         return tok;
     }
 
-    @Override
-    public Boolean userNameExists( String userName ) {
-        return userService.findByUserName( userName ).isPresent();
-    }
 }

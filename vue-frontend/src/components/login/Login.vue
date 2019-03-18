@@ -41,7 +41,7 @@
 
                 <div class="row my-2 justify-content-center">
                   <div class="col-md-4 mx-2">
-                    <b-button variant="danger">Login with Google</b-button>
+                    <b-button variant="danger" :href="googleLogin">Login with Google</b-button>
                   </div>
                   <div class="col-md-4 mx-2">
                     <b-button variant="dark" :href="githubLogin">Login with Github</b-button>
@@ -88,6 +88,7 @@ export default {
         password: ''
       },
       githubLogin: process.env.VUE_APP_GITHUB_LOGIN_URL,
+      googleLogin: process.env.VUE_APP_GOOGLE_LOGIN_URL,
       blogenUsers: defaultUsers,
       statusMessage: this.message,
       loginError: false,

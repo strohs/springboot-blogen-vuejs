@@ -52,8 +52,26 @@ public interface UserMapper {
         user.setFirstName( "anonymous" );
         user.setLastName( "anonymous" );
         user.setEmail( oath2User.getAttributes().getOrDefault("email", "github@example.com").toString() );
-        // ideally generate a random password and email it to them, BUT this is a just a PoC for now
+        // hardcode pw for now, ideally force them to change it on blogen profiles page
         user.setPassword("github");
+
+        return user;
+    }
+
+    /**
+     * maps google oauth2 user information to a blogen UserDTO object
+     * @param oath2User
+     * @return
+     */
+    default UserDTO googleOAuth2UserToUser(OAuth2User oath2User){
+
+        UserDTO user = new UserDTO();
+        user.setUserName( AuthorizationService.GOOGLE_USER_PREFIX + oath2User.getAttributes().get("sub"));
+        user.setFirstName( oath2User.getAttributes().get("given_name").toString() );
+        user.setLastName( oath2User.getAttributes().get("family_name").toString() );
+        user.setEmail( oath2User.getAttributes().getOrDefault("email", "google@example.com").toString() );
+        // hardcode password for now
+        user.setPassword("goggle");
 
         return user;
     }

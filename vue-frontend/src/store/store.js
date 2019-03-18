@@ -338,9 +338,9 @@ export const store = new Vuex.Store({
         })
     },
     fetchAuthenticatedUserInfo: ({ commit }) => {
-      return axios.get(`/api/v1/users/userinfo`)
+      return axios.get(`/api/v1/users/authenticate`)
         .then(res => {
-          console.log('authenticated userinfo:', res.data)
+          console.log('authenticated user data:', res.data)
           commit('SET_USER', res.data)
         })
         .catch(error => {
@@ -349,7 +349,8 @@ export const store = new Vuex.Store({
         })
     },
     loginWithUsername: ({ commit, dispatch }, { username, password }) => {
-      return axios.post(`/blogen/login/form`, { username, password })
+      // spring boot returns an empty OK response with the Authorization header containing the JWT
+      return axios.post(`/login/form`, { username, password })
         .then(res => {
           // blogen access token is passed as Bearer token in Authorization header
           const token = res.headers.authorization.split(' ')[1]
@@ -369,8 +370,8 @@ export const store = new Vuex.Store({
         })
     },
     //
-    // login to blogen using the JWT
-    loginWithToken: ({ commit, dispatch }, token) => {
+    // validate the JWT by making a request to the Blogen API, it will return 401 response if token is invalid
+    validateToken: ({ commit, dispatch }, token) => {
       commit('SET_AUTH_TOKEN', token)
       // set the JWT as a bearer token for all requests made with axios
       axios.defaults.headers.common['Authorization'] = 'Bearer ' + token

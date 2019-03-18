@@ -18,16 +18,19 @@ export default {
     appFooter: Footer
   },
   mounted () {
-    if (this.$route.query.login && this.$cookies.get('token')) {
+    if (this.$cookies.get('token')) {
       // user is logging in after OAuth2 redirect
       console.log('COOKIES:', this.$cookies.get('token'))
-      this.$store.dispatch('loginWithToken', this.$cookies.get('token'))
+      this.$store.dispatch('validateToken', this.$cookies.get('token'))
         .then(() => {
-          // if login successful, go to posts page
+          // if token validation successful, go to posts page
           this.$router.push({ name: 'posts' })
         })
         .catch(err => {
           console.log('in app catch error:', err)
+        })
+        .finally(() => {
+          this.$cookies.delete('token')
         })
     }
   }

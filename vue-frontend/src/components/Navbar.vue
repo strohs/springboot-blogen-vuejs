@@ -34,7 +34,11 @@
           Sign-Up
         </b-nav-item>
 
-        <b-nav-item to="/login" class="mx-2" v-if="!isAuthenticated">
+        <b-nav-item
+          to="/login"
+          class="mx-2"
+          v-if="!isAuthenticated"
+        >
           <font-awesome-icon icon="user-circle"></font-awesome-icon>
           Login
         </b-nav-item>
@@ -73,6 +77,17 @@ export default {
       this.$store.dispatch('doLogout')
       this.$router.push({ name: 'login', params: { message: 'you have been logged out' } })
     }
+    // async login () {
+    //   await this.$store.dispatch('loginCheck')
+    //     .then(res => {
+    //       console.log('test login response', res)
+    //       this.$router.push({ name: 'login' })
+    //     })
+    //     .catch(err => {
+    //       console.log('error during test login', err)
+    //     })
+    //
+    // }
   },
   computed: {
     ...mapGetters([

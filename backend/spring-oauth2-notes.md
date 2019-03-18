@@ -1,13 +1,13 @@
 Notes on Spring Securities Oauth2 classes
 =============================================
 * `OAuth2AuthorizationRequestRedirectWebFilter`
-    *  (possibly for reactive? app)
+    *  (for reactive apps)
 * `Oauth2AuthorizationCodeGrantWebFilter`
-    * process Auth. Resp. (for reactive?)
+    * process Auth. Resp. (for reactive apps)
 * `Oauth2AuthorizationCodeGrantFilter`
     * processes Auth. Resp. (for regular servlet env.?)
 * `OAuth2AuthorizationRequestRedirectFilter`
-    * initiates auth code grant or implicit flow, redirects end-user's user agent to Auth. Server's authorization endpoint
+    * initiates auth. code grant or implicit flow, redirects end-user's user agent to Auth. Server's authorization endpoint
     * By default, responds to authorization requests at the URI `/oauth2/authorization/{registrationId}`
 * `OAuth2LoginAuthenticationFilter`
     * the impl. of AbstractAuthenticationProcessingFilter for Oauth2 login

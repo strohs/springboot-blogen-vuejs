@@ -13,6 +13,7 @@ public interface AuthorizationService {
 
     // username prefix for Blogen user that login via github
     String GITHUB_USER_PREFIX = "github_";
+    String GOOGLE_USER_PREFIX = "google_";
 
     /**
      * signup a new user
@@ -41,12 +42,14 @@ public interface AuthorizationService {
     Boolean userNameExists( String userName );
 
     /**
-     * will attempt to login a Github Oauth2 user into Blogen. Checks for an existing Blogen user accounr
-     * using a username of "github_{login}" where login is the login name of the github user. If no Blogen user is
-     * found under this username, then a new Blogen user is created
+     * attempts to login an already authenticated Oauth2 user into Blogen. This method will check for an existing
+     * Blogen user account using a username of "{clientid}_{principalID}" where principalID is the name of the
+     * principal returned by oAuth2. If no Blogen user is found under this username, then a new Blogen user is created
      *
-     * @param oAuth2User
+     * @param providerName - the oauth2 provider name, i.e. "github" or "google"
+     * @param oAuth2User - an authenticated OAuth2User
      * @return a JWT token string (in compact claims form) giving the user access to the blogen API and website
      */
-    String loginGithubUser(OAuth2User oAuth2User);
+    String loginOAuth2User(String providerName, OAuth2User oAuth2User);
+
 }

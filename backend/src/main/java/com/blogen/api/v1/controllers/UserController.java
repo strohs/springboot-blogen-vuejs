@@ -64,7 +64,7 @@ public class UserController {
         binder.addValidators( passwordValidator );
     }
 
-    @GetMapping("/userinfo")
+    @GetMapping("/authenticate")
     @ResponseBody
     public UserDTO getAuthenticatedUserInfo(@AuthenticationPrincipal Jwt jwt) {
         log.debug("get authenticated user info for :{}", jwt.getSubject() );
