@@ -43,10 +43,9 @@ public class LoginController {
 
 
     /**
-     * handles successful logins from oauth2 providers. this method is called after a successful login with
-     * an OAuth2 provider. It is responsible for performing the final login to blogen by exchanging the oauth2User
-     * information for a Blogen Json Web Token (JWT). JWTs are what blogen uses to authenticate and authorize users
-     * of the blogen API and web application
+     * handles successful logins from oauth2 providers.
+     * It is responsible for performing the final login to blogen by exchanging the oauth2User
+     * information for a Blogen Json Web Token (JWT).
      *
      * @param authorizedClient - the authorized client that performed the OAuth2 login
      * @param oauth2User - authenticated OAuth2User

@@ -30,7 +30,7 @@ export default {
           console.log('in app catch error:', err)
         })
         .finally(() => {
-          this.$cookies.delete('token')
+          this.$cookies.remove('token')
         })
     }
   }

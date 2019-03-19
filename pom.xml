@@ -20,7 +20,7 @@
 
     <properties>
         <main.basedir>${project.basedir}</main.basedir>
-        <build-plugin.jacoco.version>0.7.9</build-plugin.jacoco.version>
+        <build-plugin.jacoco.version>0.8.3</build-plugin.jacoco.version>
         <docker.image.prefix>strohs</docker.image.prefix>
     </properties>
 

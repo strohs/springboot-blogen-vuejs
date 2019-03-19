@@ -87,6 +87,12 @@ export default {
     },
     validateEmail (val) {
       this.emailValidator = emailValidator(val)
+    },
+    validateAllFields () {
+      this.validateUserName(this.user.userName)
+      this.validateFirstName(this.user.firstName)
+      this.validateLastName(this.user.lastName)
+      this.validateEmail(this.user.email)
     }
   },
   computed: {
@@ -94,6 +100,9 @@ export default {
       return (this.userNameValidator.state && this.firstNameValidator.state && this.lastNameValidator.state &&
           this.emailValidator.state)
     }
+  },
+  created () {
+    this.validateAllFields()
   }
 }
 </script>

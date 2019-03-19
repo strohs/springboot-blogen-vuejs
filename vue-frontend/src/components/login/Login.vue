@@ -120,7 +120,7 @@ export default {
 </script>
 
 <style scoped>
-  @import './../../assets/css/bootstrap-social.css';
+  /*@import './../../assets/css/bootstrap-social.css';*/
 
   .flip-enter-active, .flip-leave-active {
     transition: 0.3s ease-out;

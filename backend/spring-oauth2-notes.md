@@ -34,3 +34,6 @@ Notes on Spring Securities Oauth2 classes
     * builds a`OAuth2AccessToken` to retrieve user info. from the auth server (or resource server)
     * builds a `OAuth2User impl. by DefaultOAuth2User` and gives them 'ROLE_USER'
     * finally returns an `OAuth2LoginAuthenticationToken` containing all the details
+    
+* `SavedRequestAwareAuthenticationSuccessHandler` impls AuthenticationSuccessHandler
+    * restores the original request (plus query parameters) that were used to access a protected resource

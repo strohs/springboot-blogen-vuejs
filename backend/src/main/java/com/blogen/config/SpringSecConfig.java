@@ -31,7 +31,7 @@ import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 
 /**
- * Spring Security Configuration - original NON-REST API security config
+ * Blogen Security Configuration
  *
  * @author Cliff
  */
@@ -43,9 +43,11 @@ public class SpringSecConfig extends WebSecurityConfigurerAdapter {
     @Qualifier("daoAuthenticationProvider")
     private AuthenticationProvider daoAuthenticationProvider;
 
+    // RSA public key used to verify JWTs signed by blogen
     @Value("${app.jwtPublicKey}")
     private String jwtPublicKey;
 
+    // EntryPoint that returns a HTTP 401 response if a JWT is invalid/expired
     @Autowired
     private JwtAuthenticationEntryPoint unauthorizedHandler;
 
@@ -54,6 +56,7 @@ public class SpringSecConfig extends WebSecurityConfigurerAdapter {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 
+    // AuthenticationProvider used to authenticate username/passwords from the Blogen login form
     @Bean
     public DaoAuthenticationProvider daoAuthenticationProvider( UserDetailsService userDetailsService ){
 
@@ -75,16 +78,16 @@ public class SpringSecConfig extends WebSecurityConfigurerAdapter {
         auth.authenticationProvider( daoAuthenticationProvider );
     }
 
+    // this bean is used by Spring to verify the signature of JWTs
     @Bean
     JwtDecoder jwtDecoder() throws Exception {
-        // decodes a JWT from compact claims representation format into a Jwt object
         return new NimbusJwtDecoder(JwtProcessors.withPublicKey(key()).build());
     }
 
     @Override
     public void configure(WebSecurity web) throws Exception {
-
         //these matchers will allow swagger UI, h2-console, and image files through spring-security
+
         web.ignoring().antMatchers("/v2/api-docs", "/swagger-resources/configuration/ui", "/swagger-resources",
                 "/swagger-resources/configuration/security", "/swagger-ui.html", "/webjars/**", "/console/*",
                 "/h2-console/**", "/actuator/**", "/favicon.ico",
@@ -104,7 +107,7 @@ public class SpringSecConfig extends WebSecurityConfigurerAdapter {
                     .antMatchers("/","/api/v1/auth/**", "/login/form")
                         .permitAll()
                     .antMatchers("/api/**")
-                        .hasAuthority("SCOPE_API")
+                        .hasAuthority("SCOPE_API") // this is how the Resource Server authorizes API requests
                     .anyRequest()
                         .authenticated()
                     .and()

@@ -13,7 +13,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  */
 @Configuration
 //@Profile( {"dev"} )
-public class WebMvcDevConfig implements WebMvcConfigurer {
+public class WebMvcConfig implements WebMvcConfigurer {
 
     // Note that CORS has also been enabled in the SpringSecConfig
     @Override
@@ -24,7 +24,7 @@ public class WebMvcDevConfig implements WebMvcConfigurer {
                 .allowedHeaders("*")
                 .allowCredentials(true)
                 .allowedMethods( "HEAD", "OPTIONS", "GET", "POST", "PUT", "PATCH", "DELETE" )
-                .exposedHeaders("Authorization", "Blogen-Login")
+                .exposedHeaders("Authorization")
                 .maxAge(MAX_AGE_SECS);
     }
 }
