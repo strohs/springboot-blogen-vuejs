@@ -10,7 +10,7 @@ import java.util.Optional;
 /**
  * Spring Data JPA implementation of the Avatar repository
  *
- * Author: Cliff
+ * NOT currently used in the project, but left here for reference purposes
  */
 public interface AvatarJpaRepository extends JpaRepository<Avatar,Long>, AvatarRepository {
 

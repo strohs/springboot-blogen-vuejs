@@ -14,7 +14,8 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * This is an example implementation of the AvatarRepository using jdbcTemplate. It is not used in the app.
+ * This is an example implementation of the AvatarRepository using jdbcTemplate. It is not used in the project, but
+ * kept for reference purposes
  *
  * Author: Cliff
  */

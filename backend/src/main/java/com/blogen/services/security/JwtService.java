@@ -1,5 +1,6 @@
 package com.blogen.services.security;
 
+import java.time.Instant;
 import java.util.List;
 
 public interface JwtService {
@@ -14,6 +15,7 @@ public interface JwtService {
      */
     String generateToken(String subject,
                          List<String> scopes,
+                         Instant issuedAt,
                          int expirationMs,
                          String privateKey);
 }

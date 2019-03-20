@@ -9,6 +9,7 @@ import java.lang.annotation.RetentionPolicy;
 @WithSecurityContext(factory = WithMockJwtSecurityContextFactory.class)
 public @interface WithMockJwt {
 
+    long issuedAtMs() default 0L;
     int expirationMs() default 180000;
     String subject();
     String [] scopes();

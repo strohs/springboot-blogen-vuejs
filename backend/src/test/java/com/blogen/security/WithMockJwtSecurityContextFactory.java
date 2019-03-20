@@ -14,6 +14,7 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.security.test.context.support.WithSecurityContextFactory;
 
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,9 +31,14 @@ public class WithMockJwtSecurityContextFactory implements WithSecurityContextFac
     public SecurityContext createSecurityContext(WithMockJwt annotation) {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
 
+
+        // if issuedAt time was not set, default it to the Instant.now()
+        Instant issuedAt = annotation.issuedAtMs() == 0 ? Instant.now() : Instant.ofEpochMilli( annotation.issuedAtMs() );
+
         // build a JWT string with the specified subject and scopes
         String jwtStr = ((BlogenJwtService) jwtService).builder()
                 .withSubject( annotation.subject() )
+                .withIssuedAt( issuedAt )
                 .withScopes( Arrays.asList( annotation.scopes() ))
                 .buildToken();
         // decode the jwt string into Spring Security's Jwt object

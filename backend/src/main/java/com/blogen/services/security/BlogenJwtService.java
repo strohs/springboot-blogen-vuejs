@@ -14,6 +14,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.time.Instant;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.Date;
@@ -40,13 +41,15 @@ public class BlogenJwtService implements JwtService {
     public class Builder {
         private String subject;
         private List<String> scopes;
+        private Instant issuedAt;
         private int expirationMs;
         private String privateKey;
 
-        Builder(String subject, List<String> scopes, int expirationMs, String privateKey) {
+        Builder(String subject, List<String> scopes, Instant issuedAt, int expirationMs, String privateKey) {
             this.subject = subject;
             this.scopes = scopes;
             this.expirationMs = expirationMs;
+            this.issuedAt = issuedAt;
             this.privateKey = privateKey;
         }
 
@@ -65,18 +68,23 @@ public class BlogenJwtService implements JwtService {
             return this;
         }
 
+        public Builder withIssuedAt(Instant issuedAt) {
+            this.issuedAt = issuedAt;
+            return this;
+        }
+
         public Builder withPrivateKey(String privateKeyStr) {
             this.privateKey = privateKeyStr;
             return this;
         }
 
         public String buildToken() {
-            return generateToken(subject, scopes, expirationMs, privateKey);
+            return generateToken(subject, scopes, issuedAt, expirationMs, privateKey);
         }
     }
 
     public Builder builder() {
-        return new Builder("subject", Collections.emptyList(), defaultExpirationMs, defaultPrivateKeyStr);
+        return new Builder("subject", Collections.emptyList(), Instant.now(), defaultExpirationMs, defaultPrivateKeyStr);
     }
 
     public BlogenJwtService(@Value("${app.jwtExpirationMs}") int defaultExpirationMs,
@@ -89,10 +97,11 @@ public class BlogenJwtService implements JwtService {
     @Override
     public String generateToken(String subject,
                                 List<String> scopes,
+                                Instant issueTime,
                                 int expirationMs,
                                 String privateKey) {
-        Date now = new Date();
-        Date expiryDate = new Date( now.getTime() + expirationMs);
+        Date issuedAt = issueTime == null ? new Date() : Date.from( issueTime );
+        Date expiryDate = new Date( issuedAt.getTime() + expirationMs);
 
         try {
             JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.RS256).type(JOSEObjectType.JWT).build();
@@ -102,7 +111,7 @@ public class BlogenJwtService implements JwtService {
             JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
                     .subject( subject )
                     .claim("scope", scopesArr )
-                    .issueTime( now)
+                    .issueTime(issuedAt)
                     .expirationTime( expiryDate )
                     .build();
             SignedJWT signedJWT = new SignedJWT(header, claimsSet);

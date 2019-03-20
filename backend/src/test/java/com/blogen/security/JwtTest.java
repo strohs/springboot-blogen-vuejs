@@ -5,6 +5,7 @@ import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.text.ParseException;
@@ -21,6 +22,7 @@ public class JwtTest {
     private String jwtSecret = "jwtsecretpasswordthatmustbeatleasttwohundredandfiftysixbits";
 
     @Test
+    @Ignore
     public void testJwtCreation() {
         Date now = new Date();
         Date expiryDate = new Date( now.getTime() + jwtExpirationInMs );

@@ -29,7 +29,7 @@ public interface PostRepository extends JpaRepository<Post,Long> {
    //Page<Post> findAllByUser_IdAndParentNullOrderByCreatedDesc( Long userId, Pageable pageable );
 
     /**
-     * get a page of Parent Posts in descending order of creation
+     * get a page of Parent Posts (aka Threads) in descending order of creation
      * @return a Page of parent posts ordered by creation date, in descending order
      */
    Page<Post> findAllByParentNullOrderByCreatedDesc( Pageable pageable );
@@ -74,7 +74,7 @@ public interface PostRepository extends JpaRepository<Post,Long> {
    List<Post> findAllByUser_userNameOrderByCreatedDesc( String name );
 
     /**
-     * searches for searchStr in the text or title of a Post. This is a brute force search
+     * searches for searchStr in the text or title of a Post. This is a brute force search using SQL LIKE operator
      * @param searchStr - the substring to search for in post.text or post.title
      * @return {@link Page} containing Posts matching the searchStr
      */
