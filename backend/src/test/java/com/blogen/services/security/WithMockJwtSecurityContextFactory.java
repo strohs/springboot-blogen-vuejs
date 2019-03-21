@@ -1,8 +1,6 @@
-package com.blogen.security;
+package com.blogen.services.security;
 
 
-import com.blogen.services.security.BlogenJwtService;
-import com.blogen.services.security.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;

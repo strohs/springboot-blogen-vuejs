@@ -1,7 +1,7 @@
 package com.blogen.api.v1.services;
 
 import com.blogen.api.v1.model.CategoryDTO;
-import com.blogen.security.WithMockJwt;
+import com.blogen.services.security.WithMockJwt;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

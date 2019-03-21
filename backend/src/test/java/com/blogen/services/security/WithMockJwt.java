@@ -1,5 +1,6 @@
-package com.blogen.security;
+package com.blogen.services.security;
 
+import com.blogen.services.security.WithMockJwtSecurityContextFactory;
 import org.springframework.security.test.context.support.WithSecurityContext;
 
 import java.lang.annotation.Retention;

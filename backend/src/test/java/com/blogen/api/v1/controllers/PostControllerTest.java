@@ -120,7 +120,7 @@ public class PostControllerTest {
     }
 
     @Test
-    public void should_returnCREATED_when_createNewPostWithValidContent() throws Exception {
+    public void should_return_CREATED_when_createNewPostWithValidContent() throws Exception {
         //"2018-01-30T12:39:53.798"
         //created and children should not be sent as part of request body
         postDTO_2.setCreated( null );
