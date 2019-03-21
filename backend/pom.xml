@@ -62,6 +62,12 @@
             <artifactId>spring-security-oauth2-jose</artifactId>
         </dependency>
 
+        <!-- needed for generating XML responses when using JDK11 or higher -->
+        <dependency>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-runtime</artifactId>
+        </dependency>
+
         <!-- devtools also enable the h2-console by default -->
         <!--<dependency>-->
         <!--<groupId>org.springframework.boot</groupId>-->
@@ -113,12 +119,6 @@
             <version>${springfox-swagger.version}</version>
         </dependency>
 
-        <!-- JSON Web Token Support -->
-        <!--<dependency>-->
-            <!--<groupId>io.jsonwebtoken</groupId>-->
-            <!--<artifactId>jjwt</artifactId>-->
-            <!--<version>${json.web.token.version}</version>-->
-        <!--</dependency>-->
 
         <dependency>
             <groupId>org.springframework.boot</groupId>

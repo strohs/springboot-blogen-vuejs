@@ -11,6 +11,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
@@ -65,7 +66,7 @@ public class AuthorizationController {
     }
 
     @ApiOperation( value = "check if a user name exists, return HTTP Status 200 if it does, else returns 404", produces = "application/json")
-    @GetMapping("/username/{name}")
+    @GetMapping(value = "/username/{name}", produces = {MediaType.APPLICATION_JSON_UTF8_VALUE, MediaType.APPLICATION_XML_VALUE})
     @ResponseStatus(HttpStatus.OK)
     public void userNameExists( @PathVariable("name") String userName ) {
         Boolean userExists = authorizationService.userNameExists( userName );
