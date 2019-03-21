@@ -1,4 +1,4 @@
-Notes on Spring Securities Oauth2 classes
+Notes on Spring Security's Oauth2 classes
 =============================================
 * `OAuth2AuthorizationRequestRedirectWebFilter`
     *  (for reactive apps)

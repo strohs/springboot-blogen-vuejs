@@ -42,6 +42,26 @@ with Spring Boot.
 3. Start the spring boot application:
     * `mvn --projects backend spring-boot:run`
 3. Open your web browser and navigate to [localhost:8080](http://localhost:8080/)
+4. If you want to use Github or Google to login via Oauth2, you will need to register your own client application
+ with Google and/or Github. They will generate a client-id and client-secret that you must copy into application.properties
+ ... see below for more info
+ 
+#### Github OAuth2 Client Creation Instructions
+* instructions to create an OAuth2 Client application are [here](https://developer.github.com/apps/building-oauth-apps/creating-an-oauth-app/)
+* home page url does not matter - i used http://localhost:8080
+* `Authorization callback URL` is very important as Spring has a default path it uses for Oauth2 redirects
+    * `http://localhost:8080/login/oauth2/code/github`
+* Github will generate a client-id and client-secret, copy those into application.properties for Github:
+    * spring.security.oauth2.client.registration.github.client-id=
+    * spring.security.oauth2.client.registration.github.client-secret=
+
+#### Google Oauth2 Client Creation Instructions
+* instructions to create Google Oauth2 application are [here](https://developers.google.com/identity/protocols/OAuth2WebServer)
+* follow that guide to create OAuth2 Authorization Credentials, make sure the Authorized redirect URL is set to:
+    * `http://localhost:8080/oauth2/authorization/google`
+* Google will generate a client-id and client-secret properties, copy them to application.properties
+    * spring.security.oauth2.client.registration.google.client-id=
+    * spring.security.oauth2.client.registration.google.client-secret=
 
 
 ### Project Structure
@@ -60,7 +80,7 @@ above scenarios, and it has been configured as an OAuth2 "login" and Resource Se
 
 ### OAuth 2.0
 Spring is currently in the process of rolling in functionality from their previous 
-[OAuth2 project](https://spring.io/projects/spring-security-oauth) into the base Spring Security project.
+[OAuth2 project](https://spring.io/projects/spring-security-oauth) into the main Spring Security module.
 (more info [here](https://github.com/spring-projects/spring-security/wiki/OAuth-2.0-Features-Matrix)). Therefore, 
 Blogen is using the support for OAuth 2.0 in Spring Security (version 5.2.0), rather than the  
 Spring-Security-Oauth project.
