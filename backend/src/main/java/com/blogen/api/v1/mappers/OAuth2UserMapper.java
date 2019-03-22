@@ -1,7 +1,7 @@
 package com.blogen.api.v1.mappers;
 
 import com.blogen.api.v1.model.UserDTO;
-import com.blogen.api.v1.services.OAuth2MappingService;
+import com.blogen.api.v1.services.OAuth2Provider;
 import org.mapstruct.Mapper;
 import org.mapstruct.NullValueCheckStrategy;
 import org.mapstruct.factory.Mappers;
@@ -26,7 +26,7 @@ public interface OAuth2UserMapper {
         //   avatar_uri = "https://......"
         //
         UserDTO user = new UserDTO();
-        user.setUserName( OAuth2MappingService.OAuth2Provider.GITHUB.toString().toLowerCase() + oath2User.getName() );
+        user.setUserName( OAuth2Provider.GITHUB.toString().toLowerCase() + oath2User.getName() );
         user.setFirstName( "anonymous" );
         user.setLastName( "anonymous" );
         user.setEmail( oath2User.getAttributes().getOrDefault("email", "github@example.com").toString() );
@@ -44,7 +44,7 @@ public interface OAuth2UserMapper {
     default UserDTO googleOAuth2UserToUserDTO(OAuth2User oath2User){
 
         UserDTO user = new UserDTO();
-        user.setUserName( OAuth2MappingService.OAuth2Provider.GOOGLE.toString().toLowerCase() + oath2User.getName() );
+        user.setUserName( OAuth2Provider.GOOGLE.toString().toLowerCase() + oath2User.getName() );
         user.setFirstName( oath2User.getAttributes().get("given_name").toString() );
         user.setLastName( oath2User.getAttributes().get("family_name").toString() );
         user.setEmail( oath2User.getAttributes().getOrDefault("email", "google@example.com").toString() );

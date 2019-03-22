@@ -11,7 +11,6 @@ import com.blogen.services.security.BlogenAuthority;
 import com.blogen.services.security.EncryptionService;
 import com.blogen.services.security.BlogenJwtService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
@@ -97,9 +96,9 @@ public class AuthorizationServiceImpl implements AuthorizationService {
     public String loginOAuth2User(String providerName, OAuth2User oAuth2User) {
         UserDTO userDTO;
         if (providerName.toLowerCase().equals("github")) {
-            userDTO = oAuth2MappingService.mapUser(OAuth2MappingService.OAuth2Provider.GITHUB, oAuth2User);
+            userDTO = oAuth2MappingService.mapUser(OAuth2Provider.GITHUB, oAuth2User);
         } else if (providerName.toLowerCase().equals("google")) {
-            userDTO = oAuth2MappingService.mapUser(OAuth2MappingService.OAuth2Provider.GOOGLE, oAuth2User);
+            userDTO = oAuth2MappingService.mapUser(OAuth2Provider.GOOGLE, oAuth2User);
         } else {
             throw new IllegalArgumentException("unknown provider " + providerName + " could not login OAuth2 user");
         }
