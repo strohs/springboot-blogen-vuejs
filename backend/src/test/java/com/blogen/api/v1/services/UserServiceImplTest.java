@@ -9,6 +9,7 @@ import com.blogen.domain.User;
 import com.blogen.exceptions.BadRequestException;
 import com.blogen.repositories.UserRepository;
 import com.blogen.services.AvatarService;
+import com.blogen.services.RoleService;
 import com.blogen.services.security.EncryptionService;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,6 +42,9 @@ public class UserServiceImplTest {
     private UserRepository userRepository;
 
     @Mock
+    private RoleService roleService;
+
+    @Mock
     private AvatarService avatarService;
 
     @Mock
@@ -64,7 +68,7 @@ public class UserServiceImplTest {
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks( this );
-        userService = new UserServiceImpl( userRepository, avatarService, encryptionService, userMapper );
+        userService = new UserServiceImpl( userRepository, avatarService, encryptionService, roleService, userMapper );
         user1 = Builder.buildUser( 1L, "johndoe", "John","Doe", "jdoe@gmail.com","","123abc");
         updatedUser1 = Builder.buildUser( 1L, "johndoe", "John","Doe", "jdoe@gmail.com","","123abc");
         user1Url = UserController.BASE_URL + "/1";

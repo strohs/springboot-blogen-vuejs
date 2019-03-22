@@ -11,10 +11,6 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
  */
 public interface AuthorizationService {
 
-    // username prefix for Blogen user that login via github
-    String GITHUB_USER_PREFIX = "github_";
-    String GOOGLE_USER_PREFIX = "google_";
-
     /**
      * signup a new user
      * @param userDTO

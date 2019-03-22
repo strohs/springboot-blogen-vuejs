@@ -1,5 +1,7 @@
 package com.blogen.services.security;
 
+import com.blogen.domain.User;
+
 import java.time.Instant;
 import java.util.List;
 
@@ -18,4 +20,5 @@ public interface JwtService {
                          Instant issuedAt,
                          int expirationMs,
                          String privateKey);
+
 }

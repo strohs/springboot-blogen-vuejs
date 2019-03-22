@@ -6,16 +6,12 @@ import com.blogen.api.v1.model.LoginRequestDTO;
 import com.blogen.api.v1.model.UserDTO;
 import com.blogen.domain.Role;
 import com.blogen.domain.User;
-import com.blogen.domain.UserPrefs;
 import com.blogen.exceptions.BadRequestException;
-import com.blogen.services.RoleService;
 import com.blogen.services.security.BlogenAuthority;
 import com.blogen.services.security.EncryptionService;
 import com.blogen.services.security.BlogenJwtService;
 import lombok.extern.slf4j.Slf4j;
-import net.bytebuddy.pool.TypePool;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
@@ -33,21 +29,23 @@ import java.util.stream.Collectors;
 public class AuthorizationServiceImpl implements AuthorizationService {
 
     private UserService userService;
-    private RoleService roleService;
     private UserMapper userMapper;
     private EncryptionService encryptionService;
+    private OAuth2MappingService oAuth2MappingService;
     private BlogenJwtService tokenService;
 
     private static final String DEFAULT_AVATAR_IMAGE = "avatar0.jpg";
 
-    @Autowired
-    public AuthorizationServiceImpl(UserService userService, RoleService roleService,
-                                    UserMapper userMapper, EncryptionService encryptionService,
-                                    BlogenJwtService tokenService) {
+    public AuthorizationServiceImpl(
+            UserService userService,
+            UserMapper userMapper,
+            EncryptionService encryptionService,
+            OAuth2MappingService oAuth2MappingService,
+            BlogenJwtService tokenService) {
         this.userService = userService;
-        this.roleService = roleService;
         this.userMapper = userMapper;
         this.encryptionService = encryptionService;
+        this.oAuth2MappingService = oAuth2MappingService;
         this.tokenService = tokenService;
     }
 
@@ -58,24 +56,14 @@ public class AuthorizationServiceImpl implements AuthorizationService {
 
     @Override
     public UserDTO signUpUser( UserDTO userDTO ) {
-        //TODO check for existing username
-        //required fields validated in controller
-        Role userRole = roleService.getByName( "USER" );
-        User user = userMapper.userDtoToUser( userDTO );
-        user.setEncryptedPassword( encryptionService.encrypt( user.getPassword() ) );
-        user.addRole( userRole );
-        UserPrefs prefs = userService.buildDefaultUserPrefs();
-        user.setUserPrefs( prefs );
-        User savedUser;
         try {
-            savedUser = userService.saveUser( user );
-        } catch ( DataIntegrityViolationException ex ) {
+            User newUser = userService.createNewUser( userDTO );
+            UserDTO returnDto = userMapper.userToUserDto( newUser );
+            returnDto.setUserUrl( UserService.buildUserUrl( newUser ) );
+            return returnDto;
+        } catch (IllegalArgumentException e) {
             throw new BadRequestException( "user with userName=" + userDTO.getUserName() + " already exists" );
         }
-        UserDTO returnDto = userMapper.userToUserDto( savedUser );
-        //returnDto.setPassword( "" );
-        returnDto.setUserUrl( UserService.buildUserUrl( savedUser ) );
-        return returnDto;
     }
 
     @Override
@@ -107,45 +95,21 @@ public class AuthorizationServiceImpl implements AuthorizationService {
 
     @Override
     public String loginOAuth2User(String providerName, OAuth2User oAuth2User) {
+        UserDTO userDTO;
         if (providerName.toLowerCase().equals("github")) {
-            return loginGithubUser(oAuth2User);
+            userDTO = oAuth2MappingService.mapUser(OAuth2MappingService.OAuth2Provider.GITHUB, oAuth2User);
         } else if (providerName.toLowerCase().equals("google")) {
-            return loginGoogleUser(oAuth2User);
+            userDTO = oAuth2MappingService.mapUser(OAuth2MappingService.OAuth2Provider.GOOGLE, oAuth2User);
         } else {
-            throw new IllegalArgumentException("unknown client id " + providerName + " could not log user inti blogen");
+            throw new IllegalArgumentException("unknown provider " + providerName + " could not login OAuth2 user");
         }
+        return tokenService.builder()
+                .withSubject( userDTO.getId().toString() )
+                .withScopes( userDTO.getRoles() )
+                .withScope( BlogenAuthority.API.toString() )
+                .buildToken();
     }
 
-    protected String loginGithubUser(OAuth2User oAuth2User) {
-        // check if this OAuth user already has an account with Blogen
-        String username = AuthorizationService.GITHUB_USER_PREFIX + oAuth2User.getAttributes().get("login");
-        if ( userNameExists(username) ) {
-            log.debug("github oauth2 user exists: {}, logging them in and generating token", username);
-            User user = userService.findByUserName(username).get();
-            return buildJwt( user );
-        } else {
-            // create a new user
-            UserDTO newUserDto = userMapper.githubOAuth2UserToUser( oAuth2User );
-            UserDTO savedUser = signUpUser( newUserDto );
-            log.debug("created new github oauth2 user {}", savedUser.getUserName());
-            return buildJwt( userService.findById(savedUser.getId()).get() );
-        }
-    }
-
-    protected String loginGoogleUser(OAuth2User oAuth2User) {
-        String username = AuthorizationService.GOOGLE_USER_PREFIX + oAuth2User.getAttributes().get("sub");
-        if ( userNameExists(username) ) {
-            log.debug("google oauth2 user exists: {}, logging them in and generating token", username);
-            User user = userService.findByUserName(username).get();
-            return buildJwt( user );
-        } else {
-            // create a new user
-            UserDTO newUserDto = userMapper.googleOAuth2UserToUser( oAuth2User );
-            UserDTO savedUser = signUpUser( newUserDto );
-            log.debug("created new google oauth2 user {}", savedUser.getUserName());
-            return buildJwt( userService.findById(savedUser.getId()).get() );
-        }
-    }
 
     /**
      * builds a JWT from Blogen User data. The JWT will build a "scope" claim containing the user's spring security

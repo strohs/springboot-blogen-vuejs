@@ -1,5 +1,7 @@
 package com.blogen.services.security;
 
+import com.blogen.domain.Role;
+import com.blogen.domain.User;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.RSASSASigner;
 import com.nimbusds.jwt.JWTClaimsSet;
@@ -15,10 +17,8 @@ import java.security.PrivateKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.time.Instant;
-import java.util.Base64;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * creates JSON Web Tokens for use by Blogen. The tokens are signed using a RSA256.
@@ -59,7 +59,12 @@ public class BlogenJwtService implements JwtService {
         }
 
         public Builder withScopes(List<String> scopes) {
-            this.scopes = scopes;
+            this.scopes.addAll( scopes );
+            return this;
+        }
+
+        public Builder withScope( String scope ) {
+            this.scopes.add( scope );
             return this;
         }
 
@@ -84,7 +89,7 @@ public class BlogenJwtService implements JwtService {
     }
 
     public Builder builder() {
-        return new Builder("subject", Collections.emptyList(), Instant.now(), defaultExpirationMs, defaultPrivateKeyStr);
+        return new Builder("subject", new ArrayList<>(), Instant.now(), defaultExpirationMs, defaultPrivateKeyStr);
     }
 
     public BlogenJwtService(@Value("${app.jwtExpirationMs}") int defaultExpirationMs,
@@ -123,6 +128,8 @@ public class BlogenJwtService implements JwtService {
         }
     }
 
+
+
     /**
      * decodes a BASE64 RSA private key into a java.security.PrivateKey
      * @param encodedKey - base64 encoded private key string
@@ -139,5 +146,6 @@ public class BlogenJwtService implements JwtService {
             throw new IllegalStateException("could not generate private RSA key");
         }
     }
+
 
 }

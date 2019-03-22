@@ -5,14 +5,17 @@ import com.blogen.api.v1.model.PasswordRequestDTO;
 import com.blogen.api.v1.model.UserDTO;
 import com.blogen.api.v1.model.UserListDTO;
 import com.blogen.domain.Avatar;
+import com.blogen.domain.Role;
 import com.blogen.domain.User;
 import com.blogen.domain.UserPrefs;
 import com.blogen.exceptions.BadRequestException;
 import com.blogen.repositories.UserRepository;
 import com.blogen.services.AvatarService;
+import com.blogen.services.RoleService;
 import com.blogen.services.security.EncryptionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -35,6 +38,7 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
     private AvatarService avatarService;
     private EncryptionService encryptionService;
+    private RoleService roleService;
     private UserMapper userMapper;
 
 
@@ -43,10 +47,12 @@ public class UserServiceImpl implements UserService {
     public UserServiceImpl( UserRepository userRepository,
                             AvatarService avatarService,
                             EncryptionService encryptionService,
+                            RoleService roleService,
                             UserMapper userMapper ) {
         this.userRepository = userRepository;
         this.avatarService = avatarService;
         this.userMapper = userMapper;
+        this.roleService = roleService;
         this.encryptionService = encryptionService;
     }
 
@@ -70,10 +76,24 @@ public class UserServiceImpl implements UserService {
         return userDTO;
     }
 
+    @Override
+    public User createNewUser(UserDTO userDTO) throws IllegalArgumentException {
+        if (findByUserName( userDTO.getUserName() ).isPresent() ) {
+            throw new IllegalArgumentException("user with userName=" + userDTO.getUserName() + " already exists");
+        } else {
+            // create a new user
+            Role userRole = roleService.getByName( "USER" );
+            User user = userMapper.userDtoToUser( userDTO );
+            user.setEncryptedPassword( encryptionService.encrypt( user.getPassword() ) );
+            user.addRole( userRole );
+            UserPrefs prefs = buildDefaultUserPrefs();
+            user.setUserPrefs( prefs );
+            return saveUser( user );
+        }
+    }
 
     // only the authenticated user can update their own user information, OR admins can always change user info
     @Override
-    //@Transactional
     @PreAuthorize( "hasAuthority('SCOPE_ADMIN') || #user.getId().toString() == authentication.principal.getClaimAsString('sub')" )
     public UserDTO updateUser(User user, UserDTO userDTO) {
         userMapper.updateUserFromDTO( userDTO, user );
