@@ -37,15 +37,4 @@ public interface AuthorizationService {
      */
     Boolean userNameExists( String userName );
 
-    /**
-     * attempts to login an already authenticated Oauth2 user into Blogen. This method will check for an existing
-     * Blogen user account using a username of "{clientid}_{principalID}" where principalID is the name of the
-     * principal returned by oAuth2. If no Blogen user is found under this username, then a new Blogen user is created
-     *
-     * @param providerName - the oauth2 provider name, i.e. "github" or "google"
-     * @param oAuth2User - an authenticated OAuth2User
-     * @return a JWT token string (in compact claims form) giving the user access to the blogen API and website
-     */
-    String loginOAuth2User(String providerName, OAuth2User oAuth2User);
-
 }

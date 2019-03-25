@@ -2,6 +2,7 @@ package com.blogen.api.v1.controllers;
 
 import com.blogen.api.v1.services.AuthorizationService;
 import com.blogen.api.v1.services.UserService;
+import com.blogen.api.v1.services.oauth2.OAuth2UserLoginService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,6 +29,9 @@ public class LoginControllerTest {
 
     @MockBean
     AuthorizationService authorizationService;
+
+    @MockBean
+    OAuth2UserLoginService oAuth2UserLoginService;
 
     @MockBean
     UserService userService;

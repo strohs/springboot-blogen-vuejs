@@ -4,6 +4,7 @@ import com.blogen.api.v1.mappers.UserMapper;
 import com.blogen.api.v1.model.LoginResponse;
 import com.blogen.api.v1.model.LoginRequestDTO;
 import com.blogen.api.v1.model.UserDTO;
+import com.blogen.api.v1.services.oauth2.OAuth2Providers;
 import com.blogen.domain.Role;
 import com.blogen.domain.User;
 import com.blogen.exceptions.BadRequestException;
@@ -30,7 +31,6 @@ public class AuthorizationServiceImpl implements AuthorizationService {
     private UserService userService;
     private UserMapper userMapper;
     private EncryptionService encryptionService;
-    private OAuth2MappingService oAuth2MappingService;
     private BlogenJwtService tokenService;
 
     private static final String DEFAULT_AVATAR_IMAGE = "avatar0.jpg";
@@ -39,12 +39,10 @@ public class AuthorizationServiceImpl implements AuthorizationService {
             UserService userService,
             UserMapper userMapper,
             EncryptionService encryptionService,
-            OAuth2MappingService oAuth2MappingService,
             BlogenJwtService tokenService) {
         this.userService = userService;
         this.userMapper = userMapper;
         this.encryptionService = encryptionService;
-        this.oAuth2MappingService = oAuth2MappingService;
         this.tokenService = tokenService;
     }
 
@@ -90,23 +88,6 @@ public class AuthorizationServiceImpl implements AuthorizationService {
         }
         // user is valid, generate a token from User data and grant them access to the API
         return buildJwt(user);
-    }
-
-    @Override
-    public String loginOAuth2User(String providerName, OAuth2User oAuth2User) {
-        UserDTO userDTO;
-        if (providerName.toLowerCase().equals("github")) {
-            userDTO = oAuth2MappingService.mapUser(OAuth2Provider.GITHUB, oAuth2User);
-        } else if (providerName.toLowerCase().equals("google")) {
-            userDTO = oAuth2MappingService.mapUser(OAuth2Provider.GOOGLE, oAuth2User);
-        } else {
-            throw new IllegalArgumentException("unknown provider " + providerName + " could not login OAuth2 user");
-        }
-        return tokenService.builder()
-                .withSubject( userDTO.getId().toString() )
-                .withScopes( userDTO.getRoles() )
-                .withScope( BlogenAuthority.API.toString() )
-                .buildToken();
     }
 
 

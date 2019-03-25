@@ -2,6 +2,8 @@ package com.blogen.api.v1.controllers;
 
 import com.blogen.api.v1.model.LoginRequestDTO;
 import com.blogen.api.v1.services.AuthorizationService;
+import com.blogen.api.v1.services.oauth2.OAuth2Providers;
+import com.blogen.api.v1.services.oauth2.OAuth2UserLoginService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
@@ -36,11 +38,12 @@ public class LoginController {
     public static final String BASE_URL = "/login";
 
     private AuthorizationService authorizationService;
+    private OAuth2UserLoginService oAuth2UserLoginService;
 
-    public LoginController(AuthorizationService authorizationService) {
+    public LoginController(AuthorizationService authorizationService, OAuth2UserLoginService oAuth2UserLoginService) {
         this.authorizationService = authorizationService;
+        this.oAuth2UserLoginService = oAuth2UserLoginService;
     }
-
 
     /**
      * handles successful logins from oauth2 providers.
@@ -62,7 +65,10 @@ public class LoginController {
             HttpServletResponse response) throws IOException {
 
         log.debug("oauth2 authenticated principal:{} ", authorizedClient.getPrincipalName() );
-        String token = authorizationService.loginOAuth2User( authorizedClient.getClientRegistration().getClientName(), oauth2User);
+        String providerName = authorizedClient.getClientRegistration().getClientName();
+        String token = oAuth2UserLoginService.loginUser(
+                OAuth2Providers.valueOf( providerName.toUpperCase() ),
+                oauth2User);
         return buildLoginResponse( token, response);
     }
 

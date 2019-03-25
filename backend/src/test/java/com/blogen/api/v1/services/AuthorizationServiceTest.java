@@ -8,9 +8,8 @@ import com.blogen.builders.Builder;
 import com.blogen.domain.Role;
 import com.blogen.domain.User;
 import com.blogen.exceptions.BadRequestException;
-import com.blogen.services.RoleService;
-import com.blogen.services.security.EncryptionService;
 import com.blogen.services.security.BlogenJwtService;
+import com.blogen.services.security.EncryptionService;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -21,7 +20,7 @@ import java.util.Arrays;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
@@ -38,9 +37,6 @@ public class AuthorizationServiceTest {
     private UserService userService;
 
     @Mock
-    private OAuth2MappingService oAuth2MappingService;
-
-    @Mock
     private EncryptionService encryptionService;
 
     @Mock
@@ -52,7 +48,7 @@ public class AuthorizationServiceTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks( this );
         authorizationService = new AuthorizationServiceImpl( userService, userMapper,
-                encryptionService, oAuth2MappingService, jwtTokenProvider);
+                encryptionService, jwtTokenProvider);
     }
 
     @Test

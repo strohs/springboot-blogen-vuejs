@@ -128,7 +128,18 @@ public class BlogenJwtService implements JwtService {
         }
     }
 
-
+    /**
+     * convenience method to generate a token that has API scope by default
+     * @param subject - the subject for this token
+     * @param scopes - additional scopes to add to the token (in addition to API scope)
+     */
+    public String generateApiToken( String subject, List<String> scopes ) {
+        return this.builder()
+                .withSubject( subject )
+                .withScopes( scopes )
+                .withScope( BlogenAuthority.API.toString() )
+                .buildToken();
+    }
 
     /**
      * decodes a BASE64 RSA private key into a java.security.PrivateKey
