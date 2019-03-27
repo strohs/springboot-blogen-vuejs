@@ -20,7 +20,7 @@ public interface OAuth2UserMapper {
      */
     UserDTO mapUser(OAuth2User oAuth2User);
 
-    static OAuth2UserMapper getForProvider(OAuth2Providers provider) throws IllegalArgumentException {
+    static OAuth2UserMapper getUserMapperForProvider(OAuth2Providers provider) throws IllegalArgumentException {
         switch (provider) {
             case GITHUB: return OAuth2UserMapper.mapGithubUser();
             case GOOGLE: return OAuth2UserMapper.mapGoogleUser();

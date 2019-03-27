@@ -32,7 +32,7 @@ public class OAuth2UserLoginServiceImpl implements OAuth2UserLoginService {
         final UserDTO userDTO = userService
                 .findByUserName(username)
                 .map(userMapper::userToUserDto)
-                .orElseGet( () -> createNewOauth2User( OAuth2UserMapper.getForProvider(provider), oAuth2User ) );
+                .orElseGet( () -> createNewOauth2User( OAuth2UserMapper.getUserMapperForProvider(provider), oAuth2User ) );
         return jwtService.generateApiToken( userDTO.getId().toString(), userDTO.getRoles() );
     }
 
