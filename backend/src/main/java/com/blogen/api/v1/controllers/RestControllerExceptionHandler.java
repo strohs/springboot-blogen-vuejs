@@ -15,8 +15,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
@@ -36,53 +35,58 @@ import static java.util.stream.Collectors.toList;
 @ControllerAdvice("com.blogen.api.v1.controllers")
 public class RestControllerExceptionHandler extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler( {NotFoundException.class} )
-    public ResponseEntity<Object> handleNotFoundException( Exception exception, WebRequest request ){
-        log.error( exception.getMessage() );
-        ApiGlobalError globalError = new ApiGlobalError( exception.getMessage() );
-        List<ApiGlobalError> globalErrors = Arrays.asList( globalError );
-        ApiErrorsView errorsView = new ApiErrorsView( null, globalErrors );
-        return new ResponseEntity<>( errorsView, new HttpHeaders(), HttpStatus.NOT_FOUND);
+    @ExceptionHandler({NotFoundException.class})
+    @ResponseStatus(code = HttpStatus.NOT_FOUND)
+    public ResponseEntity<Object> handleNotFoundException(Exception exception, WebRequest request) {
+        log.error(exception.getMessage());
+        ApiGlobalError globalError = new ApiGlobalError(exception.getMessage());
+        List<ApiGlobalError> globalErrors = Arrays.asList(globalError);
+        ApiErrorsView errorsView = new ApiErrorsView(null, globalErrors);
+        return new ResponseEntity<>(errorsView, new HttpHeaders(), HttpStatus.NOT_FOUND);
 
     }
 
-    @ExceptionHandler( {BadRequestException.class} )
-    public ResponseEntity<Object> handleBadRequestException( Exception exception, WebRequest request ) {
-        log.error( exception.getMessage() );
-        ApiGlobalError globalError = new ApiGlobalError( exception.getMessage() );
-        List<ApiGlobalError> globalErrors = Arrays.asList( globalError );
-        ApiErrorsView errorsView = new ApiErrorsView( null, globalErrors );
-        return new ResponseEntity<>( errorsView, new HttpHeaders(), HttpStatus.BAD_REQUEST );
+    @ExceptionHandler({BadRequestException.class})
+    @ResponseStatus(code = HttpStatus.BAD_REQUEST)
+    public ResponseEntity<Object> handleBadRequestException(Exception exception, WebRequest request) {
+        log.error(exception.getMessage());
+        ApiGlobalError globalError = new ApiGlobalError(exception.getMessage());
+        List<ApiGlobalError> globalErrors = Arrays.asList(globalError);
+        ApiErrorsView errorsView = new ApiErrorsView(null, globalErrors);
+        return new ResponseEntity<>(errorsView, new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
 
     //return a 401 code when a user provides invalid login credentials are token
-    @ExceptionHandler( {BadCredentialsException.class, AccessDeniedException.class} )
-    public ResponseEntity<Object> handleUnauthorizedException( Exception exception, WebRequest request ) {
-        log.error( exception.getMessage() );
-        ApiGlobalError globalError = new ApiGlobalError( exception.getMessage() );
-        List<ApiGlobalError> globalErrors = Arrays.asList( globalError );
-        ApiErrorsView errorsView = new ApiErrorsView( null, globalErrors );
-        return new ResponseEntity<>( errorsView, new HttpHeaders(), HttpStatus.UNAUTHORIZED );
+    @ExceptionHandler({BadCredentialsException.class, AccessDeniedException.class})
+    @ResponseStatus(code = HttpStatus.UNAUTHORIZED)
+    public ResponseEntity<Object> handleUnauthorizedException(Exception exception, WebRequest request) {
+        log.error(exception.getMessage());
+        ApiGlobalError globalError = new ApiGlobalError(exception.getMessage());
+        List<ApiGlobalError> globalErrors = Arrays.asList(globalError);
+        ApiErrorsView errorsView = new ApiErrorsView(null, globalErrors);
+        return new ResponseEntity<>(errorsView, new HttpHeaders(), HttpStatus.UNAUTHORIZED);
     }
 
-    @ExceptionHandler( {DataIntegrityViolationException.class} )
-    public ResponseEntity<Object> handleRowExists( Exception exception, WebRequest request ) {
-        log.error( exception.getMessage() );
-        ApiGlobalError globalError = new ApiGlobalError( exception.getMessage() );
-        List<ApiGlobalError> globalErrors = Arrays.asList( globalError );
-        ApiErrorsView errorsView = new ApiErrorsView( null, globalErrors );
-        return new ResponseEntity<>( errorsView, new HttpHeaders(), HttpStatus.UNPROCESSABLE_ENTITY );
+    @ExceptionHandler({DataIntegrityViolationException.class})
+    @ResponseStatus(code = HttpStatus.UNPROCESSABLE_ENTITY)
+    public ResponseEntity<Object> handleRowExists(Exception exception, WebRequest request) {
+        log.error(exception.getMessage());
+        ApiGlobalError globalError = new ApiGlobalError(exception.getMessage());
+        List<ApiGlobalError> globalErrors = Arrays.asList(globalError);
+        ApiErrorsView errorsView = new ApiErrorsView(null, globalErrors);
+        return new ResponseEntity<>(errorsView, new HttpHeaders(), HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
     @Override
-    protected ResponseEntity<Object> handleTypeMismatch( TypeMismatchException ex, HttpHeaders headers, HttpStatus status, WebRequest request ) {
-        log.error( ex.getMessage() );
-        String methodParamName = ( ex instanceof MethodArgumentTypeMismatchException) ? (( MethodArgumentTypeMismatchException ) ex).getName() : "";
+    @ResponseStatus(code = HttpStatus.BAD_REQUEST)
+    protected ResponseEntity<Object> handleTypeMismatch(TypeMismatchException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+        log.error(ex.getMessage());
+        String methodParamName = (ex instanceof MethodArgumentTypeMismatchException) ? ((MethodArgumentTypeMismatchException) ex).getName() : "";
         List<ApiFieldError> apiFieldErrors = new ArrayList<>();
         List<ApiGlobalError> apiGlobalErrors = new ArrayList<>();
         ApiGlobalError globalError = new ApiGlobalError();
-        globalError.setMessage( "invalid type sent for parameter: " + methodParamName + "  with value:" + ex.getValue() );
-        apiGlobalErrors.add( globalError );
+        globalError.setMessage("invalid type sent for parameter: " + methodParamName + "  with value:" + ex.getValue());
+        apiGlobalErrors.add(globalError);
 
         ApiErrorsView apiErrorsView = new ApiErrorsView(apiFieldErrors, apiGlobalErrors);
 
@@ -91,19 +95,20 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
 
     //TODO WebBinder errors are caught here, may need to return different HttpStatus
     @Override
-    public ResponseEntity<Object> handleMethodArgumentNotValid( MethodArgumentNotValidException exception,
-                                                                HttpHeaders headers,
-                                                                HttpStatus status,
-                                                                WebRequest request ) {
-        log.error( exception.getMessage() );
+    @ResponseStatus(code = HttpStatus.UNPROCESSABLE_ENTITY)
+    public ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException exception,
+                                                               HttpHeaders headers,
+                                                               HttpStatus status,
+                                                               WebRequest request) {
+        log.error(exception.getMessage());
         BindingResult bindingResult = exception.getBindingResult();
 
         List<ApiFieldError> apiFieldErrors = bindingResult
                 .getFieldErrors()
                 .stream()
-                .map( fieldError ->
-                        new ApiFieldError( fieldError.getField(), fieldError.getDefaultMessage(),fieldError.getRejectedValue() ) )
-                .collect( toList());
+                .map(fieldError ->
+                        new ApiFieldError(fieldError.getField(), fieldError.getDefaultMessage(), fieldError.getRejectedValue()))
+                .collect(toList());
 
         List<ApiGlobalError> apiGlobalErrors = bindingResult
                 .getGlobalErrors()
@@ -111,7 +116,7 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
                 .map(globalError -> new ApiGlobalError(
                         globalError.getCode())
                 )
-                .collect( toList() );
+                .collect(toList());
 
         ApiErrorsView apiErrorsView = new ApiErrorsView(apiFieldErrors, apiGlobalErrors);
 
@@ -119,11 +124,12 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<Object> handleOtherExceptions( Exception exception ) {
-        log.error( exception.getMessage() );
-        ApiGlobalError globalError = new ApiGlobalError( exception.getMessage() );
-        List<ApiGlobalError> globalErrors = Arrays.asList( globalError );
-        ApiErrorsView errorsView = new ApiErrorsView( null, globalErrors );
-        return new ResponseEntity<>( errorsView, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR );
+    @ResponseStatus(code = HttpStatus.INTERNAL_SERVER_ERROR)
+    public ResponseEntity<Object> handleOtherExceptions(Exception exception) {
+        log.error(exception.getMessage());
+        ApiGlobalError globalError = new ApiGlobalError(exception.getMessage());
+        List<ApiGlobalError> globalErrors = Arrays.asList(globalError);
+        ApiErrorsView errorsView = new ApiErrorsView(null, globalErrors);
+        return new ResponseEntity<>(errorsView, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

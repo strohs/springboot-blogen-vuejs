@@ -1,6 +1,6 @@
 package com.blogen.api.v1.model;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,9 +15,9 @@ import java.util.List;
 @AllArgsConstructor
 public class CategoryListDTO {
 
-    @ApiModelProperty(value = "container for categoryDTO", readOnly = true)
+    @Schema(description = "container for categoryDTO", accessMode = Schema.AccessMode.READ_ONLY)
     List<CategoryDTO> categories;
 
-    @ApiModelProperty(value = "page information", readOnly = true)
+    @Schema(description = "page information", accessMode = Schema.AccessMode.READ_ONLY)
     PageInfoResponse pageInfo;
 }

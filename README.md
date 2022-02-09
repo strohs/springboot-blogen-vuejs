@@ -16,17 +16,15 @@ form or via OAuth 2.0 (either github or google). See the JWT section below for m
 The website functionality remains unchanged and you can read about it on the 
 [original](https://github.com/strohs/springboot-blogen) project page. In a nutshell, Blogen is a message
 board that allows users to start threads of discussion on different subjects (called categories). This version of 
-Blogen allows you to sign-up a new user, perform CRUD operations on threads and posts, as well as perform basic 
+Blogen allows you to sign up a new user, perform CRUD operations on threads and posts, as well as perform basic 
  filtering operations on threads and posts. If you log in as an admin user, 
   you can edit or delete any threads (not just your own) as well as edit/create new categories for users.  
 
-Big thanks to [jonashackt](https://github.com/jonashackt/spring-boot-vuejs) for explaining how to integrate Vue.js
-with Spring Boot.
 
 
 ### Installation and Running
 #### Build Prerequisites
-* at least Java 8. I've successfully used Open JDK 11 as well.
+* at least Java 11
 * Apache maven installation *OR* you can use the included maven wrapper `mvnw` (in the project's root directory):
     * `mvnw.cmd` if you are running on windows
     * `mvnw` if you are running on a *nix operating system 
@@ -36,22 +34,22 @@ with Spring Boot.
 1. `cd` into the project's root directory
 2. Clean and compile the application:
     * `mvn clean install`
-        * if you don't have maven installed use maven wrapper: 
+        * if you don't have maven installed use the maven wrapper provided in the root directory of this project: 
             * on *nix systems replace `mvn` with: `./mvnw clean install`
-            * on windows systems replace `mvn` with: `./mvnw.cmd clean install` 
+            * on Windows systems replace `mvn` with: `./mvnw.cmd clean install` 
 3. Start the spring boot application:
     * `mvn --projects backend spring-boot:run`
 3. Open your web browser and navigate to [localhost:8080](http://localhost:8080/)
 4. If you want to use Github or Google to login via Oauth2, you will need to register your own client application
  with Google and/or Github. They will generate a client-id and client-secret that you must copy into application.properties
- ... see below for more info
+ ... see below for more info on how to do this
  
 #### Github OAuth2 Client Creation Instructions
-* instructions to create an OAuth2 Client application are [here](https://developer.github.com/apps/building-oauth-apps/creating-an-oauth-app/)
-* home page url does not matter - i used http://localhost:8080
+* instructions to create a GitHub OAuth2 Client application are [here](https://developer.github.com/apps/building-oauth-apps/creating-an-oauth-app/)
+* home page url does not matter - I used http://localhost:8080
 * `Authorization callback URL` is very important as Spring has a default path it uses for Oauth2 redirects
     * `http://localhost:8080/login/oauth2/code/github`
-* Github will generate a client-id and client-secret, copy those into application.properties for Github:
+* GitHub will generate a client-id and client-secret, copy those into Spring Boot's application.properties for Github:
     * spring.security.oauth2.client.registration.github.client-id=
     * spring.security.oauth2.client.registration.github.client-secret=
 
@@ -65,7 +63,7 @@ with Spring Boot.
 
 
 ### Project Structure
-This is a multi-module maven project with the vue.js code located in the *vue-frontend* module and the spring boot code
+This is a multimodule maven project with the vue.js code located in the *vue-frontend* module and the spring boot code
 located in the *backend* module.
 
 
@@ -73,7 +71,7 @@ located in the *backend* module.
 As mentioned previously, Blogen uses JWTs as the primary means of authentication and authorization. Users receive
 a JWT in two ways:
 1. by using Spring's standard "form" login and providing their **Blogen** username and password
-2. by using OAuth2 and logging into their Github or Google account
+2. by using OAuth2 and logging into their GitHub or Google account
 
 Spring Security has been [configured](backend/src/main/java/com/blogen/config/SpringSecConfig.java) to handle the 
 above scenarios, and it has been configured as an OAuth2 "login" and Resource Server.
@@ -89,8 +87,9 @@ Spring-Security-Oauth project.
 OAuth2.0 Login has been configured using the `oauth2Login()` configurer. By default, is uses the
  [Authorization Code Grant](https://oauth.net/2/grant-types/authorization-code/) flow to perform a login with 
  one of the OAuth2.0 providers you have configured (in your application.properties file). 
- However, because Blogen is a single page application, it will not play nice with all the 
- redirects that occur during a typical OAuth2 login process. To workaround this, I added the following functionality: 
+ However, because Blogen is a single page application, using Vue.js, it will not play nice with all the 
+ redirects that occur during a typical OAuth2 login process. To work around this, I added the following functionality:
+
 * ignore the default Spring Security generated oauth2 login page, and modify our main vue.js login page to 
 trigger the OAuth sign in process using Springs default sign-in endpoint of: `/oauth2/authorization/{providerID}`
 * configure a custom `AuthenticationSuccessHandler` (located in the LoginController) that takes the final 
@@ -126,7 +125,7 @@ See the docs at [OAuth2.0 Resource Server](https://docs.spring.io/spring-securit
 
 
 #### Blogen JSON Web Tokens
-The JWT generated by blogen contains a header and payload similar to the following:
+The JWT generated by Blogen contains a header and payload similar to the following:
 
     {
       "typ": "JWT",
@@ -156,17 +155,17 @@ and REST api.
     * The token is sent within the HTTP Authorization header using the *Bearer* schema. For example
         * `Authorization: Bearer fgnkjewrt3459hhh34rt.df93249odfgksdflhweurl4598gfufgdlhgdf9345...`
     * The OAuth2 resource server provided by spring security will check for the presence of this token, validate it, 
-    and then use the scopes within the token to set-up Granted Authorities
+    and then use the scopes within the token to set up Granted Authorities
 
 
 ### REST API
-Once Blogen is up and running, the URLs for the swagger api documentations are here:
+Once Blogen is up and running, the URLs for the OpenAPI (a.k.a swagger) documentations are here:
 * Swagger UI is [here](http://localhost:8080/swagger-ui.html#/)
-* Swagger API docs are [here](http://localhost:8080/v2/api-docs)
+* Swagger API docs are [here](http://localhost:8080/v3/api-docs)
 
 Accessing the Rest API via Swagger will require you to provide your authentication token to Swagger. You can find 
-your current token by first logging into blogen and then clicking the *Authentication Token* button located under t
-he "Welcome" dropdown menu in the upper right of the navbar. Once you've copied the token, navigate to the 
+your current token by first logging into blogen and then clicking the *Authentication Token* button located under
+the "Welcome" dropdown menu in the upper right of the navbar. Once you've copied the token, navigate to the 
 swagger-ui page and click the green authenticate button. In the dialog box that appears you must enter your token 
 prefixed with "Bearer " (note that there is a space after Bearer), for example:
 * `Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIzIiwiaWF0IjoxNTM1MzMzNTQ0LCJleHAiOjE1MzUzMzUzNDR9......`
@@ -177,16 +176,16 @@ prefixed with "Bearer " (note that there is a space after Bearer), for example:
     * Vue.js 2.5 (using npm and webpack as the build tools for the frontend)
         * Vuex
         * Vue Router
-        * axios (to make request to the REST API)
+        * axios (to make request to the Blogen REST API)
         * Bootstrap 4
         * [Bootstrap Vue](https://bootstrap-vue.js.org/)
 * On the Backend
-    * Spring Boot 2.1.3
+    * Spring Boot 2.6.3
         * Spring Security 5.2.0
             * OAuth2.0 Resource Server
             * OAuth2.0 Login
         * Spring MVC
     * [Project Lombok](https://projectlombok.org/)
     * [Mapstruct](http://mapstruct.org/)
-    * H2 embedded database
+    * H2 embedded, in-memory, database
     * [JSON Web Tokens](https://jwt.io/introduction/)

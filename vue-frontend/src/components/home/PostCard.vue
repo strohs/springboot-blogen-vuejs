@@ -18,7 +18,7 @@
 <script>
 export default {
   name: 'PostCard',
-  props: [ 'id', 'title', 'userName', 'imageUrl', 'categoryName', 'text', 'created' ]
+  props: ['id', 'title', 'userName', 'imageUrl', 'categoryName', 'text', 'created']
 }
 </script>
 

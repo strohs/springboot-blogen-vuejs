@@ -1,7 +1,10 @@
 package com.blogen.api.v1.model;
 
-import io.swagger.annotations.ApiModelProperty;
-import lombok.*;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
@@ -16,31 +19,31 @@ import java.util.List;
 @Builder
 public class UserDTO {
 
-    @ApiModelProperty( value = "User ID", readOnly = true, example = "25")
+    @Schema(description = "User ID", accessMode = Schema.AccessMode.READ_ONLY, example = "25")
     private Long id;
 
-    @ApiModelProperty(value = "first name of the user", example = "Mary")
+    @Schema(description = "first name of the user", example = "Mary")
     private String firstName;
 
-    @ApiModelProperty(value = "last name of the user", example = "Jones")
+    @Schema(description = "last name of the user", example = "Jones")
     private String lastName;
 
-    @ApiModelProperty(value = "user name of the user", example = "superCool2049")
+    @Schema(description = "user name of the user", example = "superCool2049")
     private String userName;
 
-    @ApiModelProperty(value = "users email address", example = "crazy@gmail.com")
+    @Schema(description = "users email address", example = "crazy@gmail.com")
     private String email;
 
-    @ApiModelProperty(value = "users password", example="superSecretPassword")
+    @Schema(description = "users password", example = "superSecretPassword")
     private String password = "";
 
-    @ApiModelProperty(value = "users avatar image file name", example="avatar43.jpg")
+    @Schema(description = "users avatar image file name", example = "avatar43.jpg")
     private String avatarImage;
 
-    @ApiModelProperty(value = "the roles this user has within the website", readOnly = true, example = "USER,ADMIN")
+    @Schema(description = "the security privileges assigned to the user", accessMode = Schema.AccessMode.READ_ONLY, example = "ROLE_USER,ROLE_ADMIN")
     private List<String> roles;
 
-    @ApiModelProperty(value = "url that identifies this user", readOnly = true, example = "/api/v1/users/23")
+    @Schema(description = "url that identifies this user", accessMode = Schema.AccessMode.READ_ONLY, example = "/api/v1/users/23")
     private String userUrl;
 
 }

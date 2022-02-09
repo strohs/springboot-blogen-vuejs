@@ -102,9 +102,8 @@ export default {
         .then(() => {
           this.$router.push({ name: 'posts' })
         })
-        .catch(error => {
-          console.log('login error', error)
-          this.statusMessage = error.response.message
+        .catch(apiError => {
+          this.statusMessage = apiError.message
         })
     }
   },

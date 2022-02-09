@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 /**
  * Helper class for building Spring-Data page requests.
  *
- * @see  {@link PageRequest}
+ * @see  {@link org.springframework.data.domain.PageRequest}
  *
  * @author Cliff
  */

@@ -11,7 +11,7 @@ import org.mapstruct.factory.Mappers;
  *
  * Author: Cliff
  */
-@Mapper
+@Mapper(componentModel = "spring")
 public interface UserPrefsMapper {
 
     UserPrefsMapper INSTANCE = Mappers.getMapper( UserPrefsMapper.class );

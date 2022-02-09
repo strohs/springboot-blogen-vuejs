@@ -12,7 +12,7 @@ import java.util.Optional;
 import java.util.function.Function;
 
 /**
- * Operations for getting user names from Security Principals
+ * Operations for getting user names from Spring Security Principals
  * Blogen mainly uses a JWT to store the user's ID in the "subject" claim. This class retrieves the id from the
  * subject and uses it to retrieve the UserName from the User table
  *

@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Service providing CRUD ops on {@link Role}
+ * Service providing CRUD operations on {@link Role}
  *
  * @author Cliff
  */

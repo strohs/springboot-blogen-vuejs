@@ -11,7 +11,7 @@ import java.lang.annotation.RetentionPolicy;
 public @interface WithMockJwt {
 
     long issuedAtMs() default 0L;
-    int expirationMs() default 180000;
+    int expirationSecs() default 1800;
     String subject();
-    String [] scopes();
+    BlogenAuthority [] scopes();
 }

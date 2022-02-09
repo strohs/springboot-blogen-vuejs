@@ -1,6 +1,6 @@
 package com.blogen.api.v1.model;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,7 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 public class UserListDTO {
 
-    @ApiModelProperty(value = "container for userDTO", readOnly = true)
+    @Schema(description = "list container for userDTO", accessMode = Schema.AccessMode.READ_ONLY)
     private List<UserDTO> users;
 
 }

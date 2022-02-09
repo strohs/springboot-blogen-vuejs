@@ -1,6 +1,6 @@
 package com.blogen.api.v1.model;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,9 +19,9 @@ import java.util.List;
 @XmlRootElement
 public class PostListDTO {
 
-    @ApiModelProperty(value = "container for postDTO", readOnly = true)
+    @Schema(description = "container for postDTO", accessMode = Schema.AccessMode.READ_ONLY)
     List<PostDTO> posts;
 
-    @ApiModelProperty(value = "container for a PageInfoResponse", readOnly = true)
+    @Schema(description = "container for a PageInfoResponse", accessMode = Schema.AccessMode.READ_ONLY)
     PageInfoResponse pageInfo;
 }

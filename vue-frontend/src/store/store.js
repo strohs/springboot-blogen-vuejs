@@ -2,6 +2,21 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from '../axios-auth'
 import { handleAxiosError } from '../common/errorHandlers'
+import {
+  createCategory,
+  createPost,
+  deletePostById,
+  getAllCategoriesByPage,
+  getAuthenticatedUserInfo,
+  getAvatarFileNames,
+  getPostsByCategory,
+  getPostsByUserId,
+  getUserInfoById,
+  loginByUsername,
+  logout,
+  putCategoryById,
+  putPostById
+} from '../api/blogen-api'
 
 Vue.use(Vuex)
 
@@ -79,7 +94,7 @@ export const store = new Vuex.Store({
     },
     getPostIndicesById: (state) => (id) => {
       // find a post by id in this.posts as well as in this.posts.children
-      let indices = { pi: -1, ci: -1 }
+      const indices = { pi: -1, ci: -1 }
       for (let pi = 0; pi < state.posts.length; pi++) {
         if (state.posts[pi].id === id) {
           indices.pi = pi
@@ -107,7 +122,7 @@ export const store = new Vuex.Store({
     'SET_AUTH_TOKEN' (state, token) {
       state.AUTH_TOKEN = token
       // set the JWT as a bearer token for each request made with axios
-      axios.defaults.headers.common['Authorization'] = 'Bearer ' + token
+      axios.defaults.headers.common.Authorization = 'Bearer ' + token
     },
     'SET_USER' (state, userObj) {
       state.user = userObj
@@ -118,7 +133,7 @@ export const store = new Vuex.Store({
         state.AUTH_TOKEN = ''
       }
       // remove Authorization header from axios requests
-      delete axios.defaults.headers.common['Authorization']
+      delete axios.defaults.headers.common.Authorization
     },
     'RESET_USER' (state) {
       state.user = { id: 0, firstName: '', lastName: '', userName: '', email: '', roles: [] }
@@ -175,19 +190,14 @@ export const store = new Vuex.Store({
   },
   actions: {
     updatePostData: ({ commit, getters }, { id, newPost }) => {
-      let updateData = getters.getPostIndicesById(id)
+      const updateData = getters.getPostIndicesById(id)
       updateData.newPost = newPost // { ci, pi, newPost }
       commit('UPDATE_POST', updateData)
     },
     fetchAndStoreCategories: ({ commit }, { pageNum = 0, pageLimit = 20 }) => {
-      axios.get(`/api/v1/categories`, {
-        params: {
-          page: pageNum,
-          limit: pageLimit
-        }
-      })
+      return getAllCategoriesByPage(pageNum, pageLimit)
         .then(res => {
-          console.log(`fetchAndStoreCategories response:`, res.data)
+          console.log('fetchAndStoreCategories response:', res.data)
           commit('SET_CATEGORIES', res.data.categories)
         })
         .catch(error => {
@@ -195,14 +205,9 @@ export const store = new Vuex.Store({
         })
     },
     fetchCategories: ({ commit }, { pageNum = 0, pageLimit = 20 }) => {
-      return axios.get(`/api/v1/categories`, {
-        params: {
-          page: pageNum,
-          limit: pageLimit
-        }
-      })
+      return getAllCategoriesByPage(pageNum, pageLimit)
         .then(res => {
-          console.log(`fetchCategories response:`, res.data)
+          console.log('fetchCategories response:', res.data)
           return res.data
         })
         .catch(error => {
@@ -211,7 +216,7 @@ export const store = new Vuex.Store({
     },
     createCategory: ({ commit }, categoryObj) => {
       console.log('create category with object:', categoryObj)
-      return axios.post(`/api/v1/categories`, categoryObj)
+      return createCategory(categoryObj)
         .then(res => {
           console.log('createCategory response:', res.data)
           commit('ADD_CATEGORY', res.data)
@@ -222,10 +227,10 @@ export const store = new Vuex.Store({
           throw error
         })
     },
-    updateCategory: ({ commit }, categoryObj) => {
+    updateCategoryById: ({ commit }, categoryObj) => {
       console.log('update category with object:', categoryObj)
       delete categoryObj.categoryUrl
-      return axios.put(`/api/v1/categories/${categoryObj.id}`, categoryObj)
+      return putCategoryById(categoryObj.id, categoryObj)
         .then(res => {
           console.log('updateCategory response:', res.data)
           commit('UPDATE_CATEGORY', res.data)
@@ -237,13 +242,7 @@ export const store = new Vuex.Store({
         })
     },
     fetchPosts: ({ commit, dispatch }, { pageNum, pageLimit, categoryId }) => {
-      axios.get(`/api/v1/posts`, {
-        params: {
-          page: pageNum,
-          limit: pageLimit,
-          category: categoryId
-        }
-      })
+      return getPostsByCategory(pageNum, pageLimit, categoryId)
         .then(res => {
           console.log('fetchPosts response:', res.data)
           commit('SET_POSTS', res.data.posts)
@@ -254,15 +253,13 @@ export const store = new Vuex.Store({
         })
     },
     createPost: (context, { id, post }) => {
-      // if id is passed, then we are creating a child post, if id is undefined then we are creating a parent post
-      const url = (id) ? `/api/v1/posts/${id}` : `/api/v1/posts`
-      axios.post(url, post)
+      return createPost(id, post)
         .then(res => {
-          console.log(`createPost url:${url} response:`, res.data)
+          console.log(`createPost response id:${id} response:`, res.data)
           if (!id) {
             context.commit('PREPEND_POST', res.data)
           } else {
-            let indices = context.getters.getPostIndicesById(id)
+            const indices = context.getters.getPostIndicesById(id)
             indices.newPost = res.data
             context.commit('UPDATE_POST', indices)
           }
@@ -272,11 +269,9 @@ export const store = new Vuex.Store({
         })
     },
     updatePost: (context, { id, post }) => {
-      // id and post are mandatory parameters
-      const url = `/api/v1/posts/${id}`
-      axios.put(url, post)
+      return putPostById(id, post)
         .then(res => {
-          console.log(`updatePost url:${url} response:`, res.data)
+          console.log(`updatePost ${id} response:`, res.data)
           context.dispatch('updatePostData', { id: id, newPost: res.data })
         })
         .catch(error => {
@@ -284,10 +279,9 @@ export const store = new Vuex.Store({
         })
     },
     deletePost: (context, id) => {
-      const url = `/api/v1/posts/${id}`
-      axios.delete(url)
+      return deletePostById(id)
         .then(res => {
-          console.log(`deletePost url:${url} response:`, res.data)
+          console.log(`deletePost ${id} response:`, res.data)
           const indices = context.getters.getPostIndicesById(id)
           context.commit('DELETE_POST', indices)
         })
@@ -296,14 +290,7 @@ export const store = new Vuex.Store({
         })
     },
     fetchPostsByUser: (context, { id, pageNum, pageLimit, categoryId }) => {
-      const url = `/api/v1/users/${id}/posts`
-      return axios.get(url, {
-        params: {
-          page: pageNum,
-          limit: pageLimit,
-          category: categoryId
-        }
-      })
+      return getPostsByUserId(id, pageNum, pageLimit, categoryId)
         .then(res => {
           console.log(`get posts for user:${id} response:`, res)
           context.commit('SET_POSTS', res.data.posts)
@@ -316,7 +303,7 @@ export const store = new Vuex.Store({
         })
     },
     fetchAvatarFileNames: ({ commit }) => {
-      axios.get(`/api/v1/userPrefs/avatars`)
+      return getAvatarFileNames()
         .then(res => {
           console.log('fetch avatar file name response:', res)
           commit('SET_AVATARS', res.data.avatars)
@@ -327,46 +314,39 @@ export const store = new Vuex.Store({
         })
     },
     fetchUserInfo: ({ commit }, id) => {
-      return axios.get(`/api/v1/users/${id}`)
+      return getUserInfoById(id)
         .then(res => {
           console.log('fetch user info response:', res)
           return res.data
         })
         .catch(error => {
-          handleAxiosError(error)
           throw (error)
         })
     },
     fetchAuthenticatedUserInfo: ({ commit }) => {
-      return axios.get(`/api/v1/users/authenticate`)
+      return getAuthenticatedUserInfo()
         .then(res => {
-          console.log('authenticated user data:', res.data)
+          console.log('got authenticated user data:', res.data)
           commit('SET_USER', res.data)
         })
         .catch(error => {
-          handleAxiosError(error)
           throw (error)
         })
     },
     loginWithUsername: ({ commit, dispatch }, { username, password }) => {
-      // spring boot returns an empty OK response with the Authorization header containing the JWT
-      return axios.post(`/login/form`, { username, password })
-        .then(res => {
-          // blogen access token is passed as Bearer token in Authorization header
-          const token = res.headers.authorization.split(' ')[1]
-          console.log('received access token:', token)
+      return loginByUsername(username, password)
+        .then(token => {
           commit('SET_AUTH_TOKEN', token)
           return token
         })
-        .then(() => {
+        .then(_ => {
           // get authenticated user information and store it in Vuex
           return dispatch('fetchAuthenticatedUserInfo')
         })
-        .catch(error => {
+        .catch(apiError => {
           commit('LOGOUT')
           commit('RESET_USER')
-          handleAxiosError(error)
-          throw (error)
+          throw (apiError)
         })
     },
     //
@@ -374,7 +354,7 @@ export const store = new Vuex.Store({
     validateToken: ({ commit, dispatch }, token) => {
       commit('SET_AUTH_TOKEN', token)
       // set the JWT as a bearer token for all requests made with axios
-      axios.defaults.headers.common['Authorization'] = 'Bearer ' + token
+      axios.defaults.headers.common.Authorization = 'Bearer ' + token
       return dispatch('fetchAuthenticatedUserInfo')
         .then((res) => res)
         .catch(error => {
@@ -386,7 +366,7 @@ export const store = new Vuex.Store({
     doLogout: ({ commit }) => {
       commit('LOGOUT')
       commit('RESET_USER')
-      return axios.get('/logout')
+      return logout()
         .then(res => {
           return res
         })

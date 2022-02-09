@@ -91,7 +91,7 @@ export default {
       return (this.titleValidator.state && this.categoryValidator.state && this.imageUrlValidator.state && this.textValidator.state)
     },
     categoryOptions () {
-      let options = [{ value: null, text: 'Please Select a Category' }]
+      const options = [{ value: null, text: 'Please Select a Category' }]
       this.$store.getters.getCategories.forEach(cat => options.push({ value: cat.id, text: cat.name }))
       return options
     }

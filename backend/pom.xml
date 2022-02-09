@@ -9,26 +9,17 @@
     <parent>
         <groupId>com.cliff</groupId>
         <artifactId>springboot-blogen-vuejs</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>0.1.0</version>
     </parent>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <java.version>1.8</java.version>
-        <org.mapstruct.version>1.2.0.Final</org.mapstruct.version>
-        <lombok.version>1.18.0</lombok.version>
-        <springfox-swagger.version>2.9.2</springfox-swagger.version>
-        <spring-security.version>5.2.0.BUILD-SNAPSHOT</spring-security.version>
+        <java.version>11</java.version>
+        <org.mapstruct.version>1.4.2.Final</org.mapstruct.version>
+        <org.mapstruct.extensions.spring.version>0.1.0</org.mapstruct.extensions.spring.version>
+        <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
     </properties>
-
-    <repositories>
-        <repository>
-            <id>spring-snapshot</id>
-            <name>Spring Snapshot Repository</name>
-            <url>https://repo.spring.io/snapshot</url>
-        </repository>
-    </repositories>
 
     <dependencies>
         <dependency>
@@ -57,23 +48,38 @@
         </dependency>
 
         <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-oauth2-resource-server</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-oauth2-client</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-oauth2-client</artifactId>
-            <version>5.1.4.RELEASE</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-oauth2-jose</artifactId>
-        </dependency>
+
+        <!-- TODO possibly delete these dependencies if we get JWTs and OATH working, may need to keep jose? package -->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.security</groupId>-->
+<!--            <artifactId>spring-security-oauth2-resource-server</artifactId>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.security</groupId>-->
+<!--            <artifactId>spring-security-oauth2-client</artifactId>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.security</groupId>-->
+<!--            <artifactId>spring-security-oauth2-jose</artifactId>-->
+<!--        </dependency>-->
 
         <!-- needed for generating XML responses when using JDK11 or higher -->
         <dependency>
             <groupId>org.glassfish.jaxb</groupId>
             <artifactId>jaxb-runtime</artifactId>
+        </dependency>
+
+        <!-- need to explicitly include validation libraries -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
 
         <!-- devtools also enable the h2-console by default -->
@@ -98,14 +104,18 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>${lombok.version}</version>
-            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
 
         <dependency>
             <groupId>org.mapstruct</groupId>
-            <artifactId>mapstruct-jdk8</artifactId>
+            <artifactId>mapstruct</artifactId>
             <version>${org.mapstruct.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mapstruct.extensions.spring</groupId>
+            <artifactId>mapstruct-spring-annotations</artifactId>
+            <version>${org.mapstruct.extensions.spring.version}</version>
         </dependency>
 
         <!-- so we can use java.time and store dates in hibernate -->
@@ -114,19 +124,18 @@
             <artifactId>hibernate-java8</artifactId>
             <version>5.0.12.Final</version>
         </dependency>
-        
 
+        <!-- OpenAPI dependencies -->
         <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger2</artifactId>
-            <version>${springfox-swagger.version}</version>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-ui</artifactId>
+            <version>1.6.5</version>
         </dependency>
         <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger-ui</artifactId>
-            <version>${springfox-swagger.version}</version>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-security</artifactId>
+            <version>1.6.5</version>
         </dependency>
-
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -180,27 +189,30 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.7.0</version>
+                <version>3.8.1</version>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
                     <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.mapstruct</groupId>
+                            <artifactId>mapstruct-processor</artifactId>
+                            <version>${org.mapstruct.version}</version>
+                        </path>
+                        <path>
+                            <groupId>org.mapstruct.extensions.spring</groupId>
+                            <artifactId>mapstruct-spring-extensions</artifactId>
+                            <version>${org.mapstruct.extensions.spring.version}</version>
+                        </path>
                         <path>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
                             <version>${lombok.version}</version>
                         </path>
                         <path>
-                            <groupId>org.mapstruct</groupId>
-                            <artifactId>mapstruct-processor</artifactId>
-                            <version>${org.mapstruct.version}</version>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok-mapstruct-binding</artifactId>
+                            <version>${lombok-mapstruct-binding.version}</version>
                         </path>
                     </annotationProcessorPaths>
-                    <compilerArgs>
-                        <compilerArg>
-                            -Amapstruct.defaultComponentModel=spring
-                        </compilerArg>
-                    </compilerArgs>
                 </configuration>
             </plugin>
             

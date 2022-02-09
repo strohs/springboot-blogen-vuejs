@@ -11,11 +11,11 @@ public interface RoleService {
 
     List<?> listAll();
 
-    Role getById( Long id );
+    Role getById(Long id);
 
-    Role getByName( String role );
+    Role getByName(String role);
 
-    Role saveOrUpdate( Role role );
+    Role saveOrUpdate(Role role);
 
-    void delete( Long id );
+    void delete(Long id);
 }

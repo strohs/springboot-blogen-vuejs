@@ -5,6 +5,7 @@ import com.blogen.api.v1.services.AuthorizationService;
 import com.blogen.api.v1.services.oauth2.OAuth2Providers;
 import com.blogen.api.v1.services.oauth2.OAuth2UserLoginService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -26,9 +27,10 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 /**
- * Controller for handling the various ways users can login to Blogen:
- * - via the login form (using a username and password)
- * - via OAuth2 (via redirects from github or google)
+ * Controller for handling the two ways users can log in to Blogen:
+ * <p>
+ * - via Blogen's own HTML login page (using a username and password)
+ * - OR via OAuth2 (using github or google as an OAuth2 authorization service)
  */
 @Slf4j
 @Controller
@@ -40,6 +42,7 @@ public class LoginController {
     private AuthorizationService authorizationService;
     private OAuth2UserLoginService oAuth2UserLoginService;
 
+    @Autowired
     public LoginController(AuthorizationService authorizationService, OAuth2UserLoginService oAuth2UserLoginService) {
         this.authorizationService = authorizationService;
         this.oAuth2UserLoginService = oAuth2UserLoginService;
@@ -51,38 +54,39 @@ public class LoginController {
      * information for a Blogen Json Web Token (JWT).
      *
      * @param authorizedClient - the authorized client that performed the OAuth2 login
-     * @param oauth2User - authenticated OAuth2User
-     * @param response - HttpServletResponse
+     * @param oauth2User       - authenticated OAuth2User
+     * @param response         - HttpServletResponse
      * @return - ResponseEntity containing the Blogen index.html page in the body, and the Blogen JWT in the
      * authorization header; plus a cookie is returned named "token" that also contains the Blogen JWT, this cookie is set
      * in addition to the header because some browser based SPAs cannot check for response headers via javascript.
      * @throws IOException - if an exception occurs trying to read the index.html page
      */
     @RequestMapping("/oauth2/success")
-    public ResponseEntity<String> oauth2SuccessHandler (
+    public ResponseEntity<String> oauth2SuccessHandler(
             @RegisteredOAuth2AuthorizedClient OAuth2AuthorizedClient authorizedClient,
             @AuthenticationPrincipal OAuth2User oauth2User,
             HttpServletResponse response) throws IOException {
 
-        log.debug("oauth2 authenticated principal:{} ", authorizedClient.getPrincipalName() );
+        log.debug("oauth2 authenticated principal:{} ", authorizedClient.getPrincipalName());
         String providerName = authorizedClient.getClientRegistration().getClientName();
         String token = oAuth2UserLoginService.loginUser(
-                OAuth2Providers.valueOf( providerName.toUpperCase() ),
+                OAuth2Providers.valueOf(providerName.toUpperCase()),
                 oauth2User);
-        return buildLoginResponse( token, response);
+        return buildLoginResponse(token, response);
     }
 
 
     /**
      * handles logins from the Blogen login form.
+     *
      * @param loginDTO - DTO that contains the username and password for login
      * @return - if the login authenticated, a 200 response is returned, with an empty body, containing an
      * the user's JWT in the Authorization header (as a Bearer Token)
      */
     @PostMapping("/form")
-    public ResponseEntity<String> handleFormLogin (@RequestBody @Valid LoginRequestDTO loginDTO) {
+    public ResponseEntity<String> handleFormLogin(@RequestBody @Valid LoginRequestDTO loginDTO) {
 
-        log.debug("login username:{} password:{}", loginDTO.getUsername(), loginDTO.getPassword());
+        log.debug("LOGIN/form username:{} password:{}", loginDTO.getUsername(), loginDTO.getPassword());
         String token = authorizationService.authenticateAndLoginUser(loginDTO.getUsername(), loginDTO.getPassword());
 
         return ResponseEntity.ok()
@@ -99,7 +103,7 @@ public class LoginController {
      *
      * @param bearerToken - the jwt to include in the response header (in compact format)
      * @return a ResponseEntity
-     * @throws IOException
+     * @throws IOException if the index.html file is not found in the "public" directory
      */
     private ResponseEntity<String> buildLoginResponse(
             String bearerToken,
@@ -108,7 +112,7 @@ public class LoginController {
         File f = new ClassPathResource("public/index.html").getFile();
         String content = new String(Files.readAllBytes(Paths.get(f.getPath())));
 
-        response.addCookie( new Cookie("token", bearerToken));
+        response.addCookie(new Cookie("token", bearerToken));
         return ResponseEntity.ok()
                 .header("Authorization", "Bearer " + bearerToken)
                 .contentType(MediaType.TEXT_HTML)

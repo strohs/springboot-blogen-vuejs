@@ -1,4 +1,4 @@
-package com.blogen.builders;
+package com.blogen.utils;
 
 import com.blogen.api.v1.model.CategoryDTO;
 import com.blogen.api.v1.model.PostDTO;
@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
  *
  * @author Cliff
  */
-public class Builder {
+public class DomainBuilder {
 
     public static User buildUser( Long id, String userName, String firstName, String lastName, String email, String password, String encryptedPassword ) {
         User user = new User();

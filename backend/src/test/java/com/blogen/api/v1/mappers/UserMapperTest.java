@@ -3,15 +3,15 @@ package com.blogen.api.v1.mappers;
 import com.blogen.api.v1.model.UserDTO;
 import com.blogen.domain.Role;
 import com.blogen.domain.User;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * Unit Test mappings between {@link com.blogen.domain.User} and {@link com.blogen.api.v1.model.UserDTO}
@@ -36,23 +36,23 @@ public class UserMapperTest {
 
     private UserMapper userMapper = UserMapper.INSTANCE;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         adminRole = new Role();
         userRole = new Role();
-        adminRole.setId( 1L );
-        adminRole.setRole( ADMIN_ROLE );
-        userRole.setId( 2L );
-        userRole.setRole( USER_ROLE );
+        adminRole.setId(1L);
+        adminRole.setRole(ADMIN_ROLE);
+        userRole.setId(2L);
+        userRole.setRole(USER_ROLE);
         user = new User();
-        user.setId( ID );
-        user.setFirstName( FIRSTNAME );
-        user.setLastName( LASTNAME );
-        user.setUserName( USERNAME );
-        user.setEmail( EMAIL );
-        user.setPassword( PASSWORD );
-        user.addRole( adminRole );
-        user.addRole( userRole );
+        user.setId(ID);
+        user.setFirstName(FIRSTNAME);
+        user.setLastName(LASTNAME);
+        user.setUserName(USERNAME);
+        user.setEmail(EMAIL);
+        user.setPassword(PASSWORD);
+        user.addRole(adminRole);
+        user.addRole(userRole);
 
     }
 
@@ -61,47 +61,48 @@ public class UserMapperTest {
         //given a user
 
         //when
-        UserDTO userDTO = userMapper.userToUserDto( user );
+        UserDTO userDTO = userMapper.userToUserDto(user);
 
         //then
-        assertThat( userDTO.getId(), equalTo( ID ) );
-        assertThat( userDTO.getFirstName(), equalTo( FIRSTNAME ) );
-        assertThat( userDTO.getLastName(), equalTo( LASTNAME ) );
-        assertThat( userDTO.getUserName(), equalTo( USERNAME ) );
-        assertThat( userDTO.getEmail(), equalTo( EMAIL ) );
-        assertThat( userDTO.getPassword(), equalTo( "" ) );
+        assertThat(userDTO.getId(), equalTo(ID));
+        assertThat(userDTO.getFirstName(), equalTo(FIRSTNAME));
+        assertThat(userDTO.getLastName(), equalTo(LASTNAME));
+        assertThat(userDTO.getUserName(), equalTo(USERNAME));
+        assertThat(userDTO.getEmail(), equalTo(EMAIL));
+        // user's password should not be mapped into DTO
+        assertThat(userDTO.getPassword(), equalTo(""));
     }
 
     @Test
     public void userDtoToUser() {
         //given
-        List<String> roles = Arrays.asList( "USER", "ADMIN" );
-        UserDTO userDTO = new UserDTO( ID, FIRSTNAME, LASTNAME, USERNAME, EMAIL, PASSWORD, AVATAR_IMAGE, roles, null );
+        List<String> roles = Arrays.asList("USER", "ADMIN");
+        UserDTO userDTO = new UserDTO(ID, FIRSTNAME, LASTNAME, USERNAME, EMAIL, PASSWORD, AVATAR_IMAGE, roles, null);
 
         //when
-        User user = userMapper.userDtoToUser( userDTO );
+        User user = userMapper.userDtoToUser(userDTO);
 
         //then
-        assertThat( user.getId(), equalTo( ID ) );
-        assertThat( user.getFirstName(), equalTo( FIRSTNAME ) );
-        assertThat( user.getLastName(), equalTo( LASTNAME ) );
-        assertThat( user.getUserName(), equalTo( USERNAME ) );
-        assertThat( user.getEmail(), equalTo( EMAIL ) );
-        assertThat( user.getPassword(), equalTo( PASSWORD ) );
+        assertThat(user.getId(), equalTo(ID));
+        assertThat(user.getFirstName(), equalTo(FIRSTNAME));
+        assertThat(user.getLastName(), equalTo(LASTNAME));
+        assertThat(user.getUserName(), equalTo(USERNAME));
+        assertThat(user.getEmail(), equalTo(EMAIL));
+        assertThat(user.getPassword(), equalTo(PASSWORD));
     }
 
     @Test
     public void userDtoToUser_withNullId_shouldSetUserIdToNull() {
         //given
-        List<String> roles = Arrays.asList( "USER", "ADMIN" );
-        UserDTO userDTO = new UserDTO( null, FIRSTNAME, LASTNAME, USERNAME, EMAIL, PASSWORD, AVATAR_IMAGE, roles, null );
+        List<String> roles = Arrays.asList("USER", "ADMIN");
+        UserDTO userDTO = new UserDTO(null, FIRSTNAME, LASTNAME, USERNAME, EMAIL, PASSWORD, AVATAR_IMAGE, roles, null);
 
         //when
-        User user = userMapper.userDtoToUser( userDTO );
+        User user = userMapper.userDtoToUser(userDTO);
 
         //then
-        assertNotNull( user );
-        assertThat( user.getId(), is( nullValue() ) );
+        assertNotNull(user);
+        assertThat(user.getId(), is(nullValue()));
     }
 
     @Test
@@ -109,11 +110,11 @@ public class UserMapperTest {
         //given - a user with two roles (from @SetUp above)
 
         //when
-        UserDTO dto = userMapper.userToUserDto( user );
+        UserDTO dto = userMapper.userToUserDto(user);
 
         //then
-        assertNotNull( dto.getRoles() );
-        assertThat( dto.getRoles().size(), equalTo(2));
+        assertNotNull(dto.getRoles());
+        assertThat(dto.getRoles().size(), equalTo(2));
     }
 
     @Test
@@ -121,10 +122,10 @@ public class UserMapperTest {
         //given - a user with the "USER" Role (from @SetUp above)
 
         //when
-        UserDTO dto = userMapper.userToUserDto( user );
+        UserDTO dto = userMapper.userToUserDto(user);
 
         //then
-        assertNotNull( dto.getRoles() );
-        assertThat( dto.getRoles().contains( USER_ROLE ), is(true));
+        assertNotNull(dto.getRoles());
+        assertThat(dto.getRoles().contains(USER_ROLE), is(true));
     }
 }

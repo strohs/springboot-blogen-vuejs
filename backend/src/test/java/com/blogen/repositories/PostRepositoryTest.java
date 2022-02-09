@@ -1,15 +1,12 @@
 package com.blogen.repositories;
 
 import com.blogen.domain.Post;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.List;
 
@@ -19,7 +16,6 @@ import static org.hamcrest.Matchers.*;
 /**
  * These tests all use the H2 schema and data located in src/main/resources
  */
-@RunWith(SpringRunner.class)
 @DataJpaTest
 public class PostRepositoryTest {
 
@@ -32,12 +28,12 @@ public class PostRepositoryTest {
 
         Page<Post> page = postRepository.findAllByParentNullOrderByCreatedDesc(pageable);
 
-        assertThat( page, is( notNullValue()));
-        assertThat( page.getSize(), is(4) );
+        assertThat(page, is(notNullValue()));
+        assertThat(page.getSize(), is(4));
         List<Post> posts = page.getContent();
         // assert that all the returned posts are parent posts (aka starting "threads")
-        assertThat( posts.stream().allMatch(Post::isParentPost), is(true) );
-        assertThat( posts.get(0).getCreated().compareTo( posts.get(3).getCreated()), greaterThanOrEqualTo(0) );
+        assertThat(posts.stream().allMatch(Post::isParentPost), is(true));
+        assertThat(posts.get(0).getCreated().compareTo(posts.get(3).getCreated()), greaterThanOrEqualTo(0));
     }
 
     @Test
@@ -47,10 +43,10 @@ public class PostRepositoryTest {
         Long businessId = 1L;
         Pageable pageable = PageRequest.of(0, 10);
 
-        Page<Post> page = postRepository.findAllByCategory_IdAndParentNull( businessId, pageable);
+        Page<Post> page = postRepository.findAllByCategory_IdAndParentNull(businessId, pageable);
 
-        assertThat( page.getNumberOfElements(), is(expectedPostCount) );
-        assertThat( page.get().allMatch( p -> p.getCategory().getId().equals(businessId)), is(true) );
+        assertThat(page.getNumberOfElements(), is(expectedPostCount));
+        assertThat(page.get().allMatch(p -> p.getCategory().getId().equals(businessId)), is(true));
     }
 
     @Test
@@ -62,12 +58,12 @@ public class PostRepositoryTest {
 
         Page<Post> page = postRepository.findAllByUser_IdAndParentNull(userId, pageable);
 
-        assertThat( page.getNumberOfElements(), is(5) );
-        assertThat( page.getTotalElements(), is(expectedPostCount) );
+        assertThat(page.getNumberOfElements(), is(5));
+        assertThat(page.getTotalElements(), is(expectedPostCount));
         // all returned posts should be parent posts (aka thread starters)
-        assertThat( page.get().allMatch(Post::isParentPost), is(true));
+        assertThat(page.get().allMatch(Post::isParentPost), is(true));
         // all posts should belong to the requested user
-        assertThat( page.get().allMatch( p -> p.getUser().getId().equals(userId)), is(true));
+        assertThat(page.get().allMatch(p -> p.getUser().getId().equals(userId)), is(true));
     }
 
     @Test
@@ -78,24 +74,24 @@ public class PostRepositoryTest {
         long categoryId = 2L;
         Pageable pageable = PageRequest.of(0, 5);
 
-        Page<Post> page = postRepository.findAllByUser_IdAndCategory_IdAndParentNull( userId, categoryId, pageable);
+        Page<Post> page = postRepository.findAllByUser_IdAndCategory_IdAndParentNull(userId, categoryId, pageable);
 
-        assertThat( page.getNumberOfElements(), is( expectedPostCount ) );
+        assertThat(page.getNumberOfElements(), is(expectedPostCount));
         // all returned posts should be parent posts (aka thread starters)
-        assertThat( page.get().allMatch(Post::isParentPost), is(true));
+        assertThat(page.get().allMatch(Post::isParentPost), is(true));
         // all posts should belong to the requested user
-        assertThat( page.get().allMatch( p -> p.getUser().getId().equals(userId)), is(true));
+        assertThat(page.get().allMatch(p -> p.getUser().getId().equals(userId)), is(true));
     }
 
     @Test
     public void findByTextOrTitleIgnoreCaseContaining() {
         // given there are 3 posts in the database containing the word "phone"
         String searchStr = "phone";
-        Pageable pageable = PageRequest.of(0,10);
+        Pageable pageable = PageRequest.of(0, 10);
 
-        Page<Post> page = postRepository.findByTextOrTitleIgnoreCaseContaining( searchStr, pageable);
+        Page<Post> page = postRepository.findByTextOrTitleIgnoreCaseContaining(searchStr, pageable);
 
-        assertThat( page.getNumberOfElements(), is(3) );
+        assertThat(page.getNumberOfElements(), is(3));
 
     }
 

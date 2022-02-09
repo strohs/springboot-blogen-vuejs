@@ -5,6 +5,8 @@ import lombok.Data;
 import java.util.List;
 
 /**
+ * A response object sent to users after they successfully log in via the REST Api.
+ * It contains their access token (i.e. their JWT) and their current user data
  * Author: Cliff
  */
 @Data
@@ -12,7 +14,6 @@ public class LoginResponse {
 
     private String accessToken;
     private String tokenType = "Bearer";
-    // the users role at Blogen, either: 'USER' or 'ADMIN'
     private UserDTO user;
 
     public LoginResponse(String accessToken) {

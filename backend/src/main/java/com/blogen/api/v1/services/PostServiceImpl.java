@@ -237,12 +237,12 @@ public class PostServiceImpl implements PostService {
     }
 
 
-    /**
-     * Merge non-null fields of PostDTO into a {@link Post} object
-     * @param target Post object to merge fields into
-     * @param source PostRequestDTO containing the non-null fields you want to merge
-     * @return a Post object containing the merged fields
-     */
+//    /**
+//     * Merge non-null fields of PostDTO into a {@link Post} object
+//     * @param target Post object to merge fields into
+//     * @param source PostRequestDTO containing the non-null fields you want to merge
+//     * @return a Post object containing the merged fields
+//     */
 //    private Post mergePostRequestDtoToPost( Post target, PostRequestDTO source ) {
 //        if ( source.getImageUrl() != null )
 //            target.setImageUrl( source.getImageUrl() );
@@ -279,14 +279,14 @@ public class PostServiceImpl implements PostService {
                 .orElseThrow( () -> new NotFoundException( "user with id: " + id + " does not exist" ) );
     }
 
-    /**
-     * validate that a userName exists in the repository
-     * @param name the username to search for
-     * @return the {@link User} corresponding to the name
-     * @throws BadRequestException if the username does not exist in the repository
-     */
-    private User validateUserName( String name ) throws BadRequestException {
-        return userService.findByUserName( name )
-                .orElseThrow( () -> new BadRequestException( "user with name: " + name + " does not exist" ) );
-    }
+//    /**
+//     * validate that a userName exists in the repository
+//     * @param name the username to search for
+//     * @return the {@link User} corresponding to the name
+//     * @throws BadRequestException if the username does not exist in the repository
+//     */
+//    private User validateUserName( String name ) throws BadRequestException {
+//        return userService.findByUserName( name )
+//                .orElseThrow( () -> new BadRequestException( "user with name: " + name + " does not exist" ) );
+//    }
 }

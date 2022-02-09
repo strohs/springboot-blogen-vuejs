@@ -13,7 +13,7 @@ const instance = axios.create({
   baseURL: process.env.VUE_APP_API_SERVER_URL,
   responseType: 'json'
   // headers: {
-  // during development, these headers are now configured in the webpack dev server, proxy table config (in config/index.js)
+  // during development, these headers are now configured in the webpack dev server proxy table config (in config/index.js)
   //   'Access-Control-Allow-Origin': 'http://localhost:8080'
   // }
 })

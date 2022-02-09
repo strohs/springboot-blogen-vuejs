@@ -12,7 +12,7 @@ export default {
   props: ['value'],
   computed: {
     categories () {
-      let cats = [{ id: -1, name: 'All', categoryUrl: '' }]
+      const cats = [{ id: -1, name: 'All', categoryUrl: '' }]
       this.$store.state.categories.forEach(cat => cats.push(cat))
       return cats
     }

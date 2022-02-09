@@ -4,13 +4,11 @@ import com.blogen.api.v1.model.CategoryDTO;
 import com.blogen.api.v1.model.CategoryListDTO;
 import com.blogen.api.v1.services.CategoryService;
 import com.blogen.api.v1.validators.CategoryDtoValidator;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.Authorization;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,10 +19,12 @@ import javax.validation.Valid;
  *
  * @author Cliff
  */
-@Api
+//TODO try to match security scheme to a SecurityRequirement for each method of this controller
+//@SecurityScheme(type = SecuritySchemeType.HTTP, scheme = "bearer", bearerFormat = "JWT")
+@Tag(name = "Categories", description = "operations on categories")
 @Slf4j
 @RestController
-@RequestMapping( CategoryController.BASE_URL )
+@RequestMapping(CategoryController.BASE_URL)
 public class CategoryController {
 
     public static final String BASE_URL = "/api/v1/categories";
@@ -33,55 +33,47 @@ public class CategoryController {
     private CategoryDtoValidator categoryDtoValidator;
 
     @Autowired
-    public CategoryController( CategoryService categoryService,
-                               CategoryDtoValidator categoryDtoValidator ) {
+    public CategoryController(CategoryService categoryService,
+                              CategoryDtoValidator categoryDtoValidator) {
         this.categoryService = categoryService;
         this.categoryDtoValidator = categoryDtoValidator;
     }
 
     @InitBinder("categoryDTO")
-    public void setUpBinder( WebDataBinder binder ) {
-        binder.addValidators( categoryDtoValidator );
+    public void setUpBinder(WebDataBinder binder) {
+        binder.addValidators(categoryDtoValidator);
     }
 
-//    @ApiOperation( value = "get a list of all categories", produces = "application/json")
-//    @GetMapping
-//    @ResponseStatus( HttpStatus.OK )
-//    public CategoryListDTO getAllCategories() {
-//        log.debug( "getAllCategories" );
-//        return categoryService.getAllCategories();
-//    }
-
-    @ApiOperation( value = "get a page of categories", produces = "application/json", authorizations = { @Authorization(value="apiKey") })
-    @GetMapping
-    @ResponseStatus( HttpStatus.OK )
-    public CategoryListDTO getCategories( @RequestParam(value = "page", defaultValue = "0") int pageNum,
-                                            @RequestParam(value = "limit", defaultValue = "3") int pageLimit) {
-        log.debug( "getCategoryPage pageNum={} limit={}",pageNum, pageLimit );
-        return categoryService.getCategories( pageNum, pageLimit );
+    @Operation(summary = "get a page of categories")
+    @GetMapping(produces = {"application/json"})
+    @ResponseStatus(HttpStatus.OK)
+    public CategoryListDTO getCategories(@RequestParam(value = "page", defaultValue = "0") int pageNum,
+                                         @RequestParam(value = "limit", defaultValue = "3") int pageLimit) {
+        log.debug("getCategoryPage pageNum={} limit={}", pageNum, pageLimit);
+        return categoryService.getCategories(pageNum, pageLimit);
     }
 
-    @ApiOperation( value = "get a specific category by id", produces = "application/json", authorizations = { @Authorization(value="apiKey") })
-    @GetMapping( "/{id}")
-    @ResponseStatus( HttpStatus.OK )
-    public CategoryDTO getCategory( @PathVariable("id") Long id ) {
-        log.debug( "getCategory id=" + id );
-        return categoryService.getCategory( id );
+    @Operation(summary = "get a specific category by id")
+    @GetMapping(value = "/{id}", produces = {"application/json"})
+    @ResponseStatus(HttpStatus.OK)
+    public CategoryDTO getCategory(@PathVariable("id") Long id) {
+        log.debug("getCategory id=" + id);
+        return categoryService.getCategory(id);
     }
 
-    @ApiOperation( value = "create a new category", produces = "application/json", consumes = "application/json", authorizations = { @Authorization(value="apiKey") })
-    @PostMapping
-    @ResponseStatus( HttpStatus.CREATED )
-    public CategoryDTO createNewCategory( @Valid @RequestBody CategoryDTO categoryDTO ) {
-        log.debug( "createNewCategory categoryDTO=" + categoryDTO );
-        return categoryService.createNewCategory( categoryDTO );
+    @Operation(summary = "create a new category")
+    @PostMapping(produces = {"application/json"}, consumes = {"application/json"})
+    @ResponseStatus(HttpStatus.CREATED)
+    public CategoryDTO createNewCategory(@Valid @RequestBody CategoryDTO categoryDTO) {
+        log.debug("createNewCategory categoryDTO=" + categoryDTO);
+        return categoryService.createNewCategory(categoryDTO);
     }
 
-    @ApiOperation( value = "replace an existing category with new category data", consumes = "application/json", produces = "application/json", authorizations = { @Authorization(value="apiKey") })
-    @PutMapping( "/{id}" )
-    @ResponseStatus( HttpStatus.OK )
-    public CategoryDTO updateCategory( @PathVariable("id") Long id, @Valid @RequestBody CategoryDTO categoryDTO ) {
-        log.debug( "updateCategory id=" + id + " categoryDTO:\n" + categoryDTO );
-        return categoryService.updateCategory( id, categoryDTO );
+    @Operation(summary = "replace an existing category with new category data")
+    @PutMapping(value = "/{id}", produces = {"application/json"}, consumes = {"application/json"})
+    @ResponseStatus(HttpStatus.OK)
+    public CategoryDTO updateCategory(@PathVariable("id") Long id, @Valid @RequestBody CategoryDTO categoryDTO) {
+        log.debug("updateCategory id=" + id + " categoryDTO:\n" + categoryDTO);
+        return categoryService.updateCategory(id, categoryDTO);
     }
 }

@@ -8,8 +8,8 @@ import com.blogen.domain.Category;
 import com.blogen.exceptions.BadRequestException;
 import com.blogen.repositories.CategoryRepository;
 import com.blogen.services.utils.PageRequestBuilder;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.data.domain.Page;
@@ -24,6 +24,7 @@ import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
@@ -54,7 +55,7 @@ public class CategoryServiceImplTest {
     private CategoryDTO healthCatDto;
     private CategoryDTO techCatDto;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks( this );
         categoryService = new CategoryServiceImpl( categoryRepository, categoryMapper, pageRequestBuilder );
@@ -99,13 +100,13 @@ public class CategoryServiceImplTest {
         assertThat( dto.getCategoryUrl(), is( CategoryController.BASE_URL + "/1") );
     }
 
-    @Test(expected = BadRequestException.class)
+    @Test
     public void should_throwBadRequestException_when_invalidID_getCategory() {
         //id does not exist
         Long catId = 9445L;
         given( categoryRepository.findById(anyLong())).willReturn( Optional.empty() );
 
-        CategoryDTO dto = categoryService.getCategory( catId );
+        assertThrows(BadRequestException.class, () -> categoryService.getCategory( catId ));
     }
 
     @Test

@@ -1,6 +1,5 @@
 package com.blogen.services.security;
 
-import com.blogen.domain.User;
 
 import java.time.Instant;
 import java.util.List;
@@ -8,17 +7,20 @@ import java.util.List;
 public interface JwtService {
 
     /**
-     * generates a signed Json Web Token aka (JWT)
-     * @param subject - the string to put into the "sub" claim of the JWT
-     * @param scopes - the scopes to add to the "scope" claim of the JWT
-     * @param expirationMs - expiration time of the JWT in milliseconds
-     * @param privateKey - the key to use for signing the JWT
-     * @return - a String containing the generated JWT in compact claims format
+     * generates a signed Json Web Token (JWT)
+     * @param subject - the string to put into the "sub" claim of the JWT, for this example project
+     *                the subject will be the end-user's unique ID within the blogen Users table
+     * @param scopes - the scopes to add to the "scope" claim of the JWT, these will be added as a
+     *               space separated list of strings
+     * @param expirationSecs - expiration time of the JWT in seconds. If this is null, it will default
+     *                       to the defaultExpirationSecs configured within application.properties
+     * @param issuedAt - the issued at time to use in the "iat" field of the JWT. If this is null it
+     *                 will default to Instant.now()
+     * @return - a Base64 encoded String containing the generated JWT in compact claims format
      */
     String generateToken(String subject,
-                         List<String> scopes,
+                         List<BlogenAuthority> scopes,
                          Instant issuedAt,
-                         int expirationMs,
-                         String privateKey);
+                         Long expirationSecs);
 
 }

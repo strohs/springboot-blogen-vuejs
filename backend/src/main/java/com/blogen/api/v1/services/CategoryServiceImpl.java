@@ -72,7 +72,7 @@ public class CategoryServiceImpl implements CategoryService {
         return categoryDTO;
     }
 
-    @PreAuthorize( "hasAuthority('SCOPE_ADMIN')" )
+    @PreAuthorize( "hasAuthority('SCOPE_ROLE_ADMIN')" )
     @Override
     public CategoryDTO createNewCategory( CategoryDTO categoryDTO ) {
         CategoryDTO savedDTO = null;
@@ -88,7 +88,7 @@ public class CategoryServiceImpl implements CategoryService {
         return savedDTO;
     }
 
-    @PreAuthorize( "hasAuthority('SCOPE_ADMIN')" )
+    @PreAuthorize( "hasAuthority('SCOPE_ROLE_ADMIN')" )
     @Override
     public CategoryDTO updateCategory( Long id, CategoryDTO categoryDTO ) {
         Category category = categoryRepository.findById( id )

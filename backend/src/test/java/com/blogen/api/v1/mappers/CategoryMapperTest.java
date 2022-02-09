@@ -2,11 +2,11 @@ package com.blogen.api.v1.mappers;
 
 import com.blogen.api.v1.model.CategoryDTO;
 import com.blogen.domain.Category;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * Unit Test data transfer between Category/CategoryDTO
@@ -20,7 +20,7 @@ public class CategoryMapperTest {
 
     private CategoryMapper categoryMapper = CategoryMapper.INSTANCE;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
 
     }
@@ -29,28 +29,28 @@ public class CategoryMapperTest {
     public void categoryToCategoryDto() {
         //given
         Category category = new Category();
-        category.setId( ID );
-        category.setName( NAME );
+        category.setId(ID);
+        category.setName(NAME);
 
         //when
-        CategoryDTO categoryDTO = categoryMapper.categoryToCategoryDto( category );
+        CategoryDTO categoryDTO = categoryMapper.categoryToCategoryDto(category);
 
         //then
-        assertThat( categoryDTO.getId(), equalTo( ID ) );
-        assertThat( categoryDTO.getName(), equalTo( NAME ) );
+        assertThat(categoryDTO.getId(), equalTo(ID));
+        assertThat(categoryDTO.getName(), equalTo(NAME));
 
     }
 
     @Test
     public void categoryDtoToCategory() {
         //given
-        CategoryDTO categoryDTO = new CategoryDTO( 1L, NAME, null );
+        CategoryDTO categoryDTO = new CategoryDTO(1L, NAME, null);
 
         //when
-        Category category = categoryMapper.categoryDtoToCategory( categoryDTO );
+        Category category = categoryMapper.categoryDtoToCategory(categoryDTO);
 
         //then
-        assertThat( category.getId(), equalTo( ID ) );
-        assertThat( category.getName(), equalTo( NAME ) );
+        assertThat(category.getId(), equalTo(ID));
+        assertThat(category.getName(), equalTo(NAME));
     }
 }

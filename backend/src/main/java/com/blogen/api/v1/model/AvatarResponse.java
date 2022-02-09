@@ -1,6 +1,6 @@
 package com.blogen.api.v1.model;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,6 +18,6 @@ import java.util.List;
 @Builder
 public class AvatarResponse {
 
-    @ApiModelProperty(value = "a list of avatar file names", readOnly = true)
+    @Schema(description = "a list of all avatar file names", accessMode = Schema.AccessMode.READ_ONLY)
     List<String> avatars;
 }

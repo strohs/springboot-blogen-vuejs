@@ -80,10 +80,10 @@ export default {
             this.displayStatusAlert()
           }
         })
-        .catch(error => {
+        .catch(apiError => {
           // TODO some other error occurred, may need global alert component
-          this.status.code = error.response.status
-          this.status.message = error.response.data.globalError[0].message
+          this.status.code = apiError.code
+          this.status.message = apiError.message
           this.displayStatusAlert()
         })
     },
@@ -92,9 +92,9 @@ export default {
         .then(data => {
           this.user = data
         })
-        .catch(error => {
-          this.status.code = error.response.status
-          this.status.message = error.response.data.globalError[0].message
+        .catch(apiError => {
+          this.status.code = apiError.code
+          this.status.message = apiError.message
           this.displayStatusAlert()
         })
     },

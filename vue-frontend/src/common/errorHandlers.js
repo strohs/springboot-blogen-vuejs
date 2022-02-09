@@ -1,21 +1,26 @@
 import router from '../router/index'
 
 function handleAxiosError (error) {
-  console.log('axios error:', error)
   if (error.response) {
-    console.log('Error Data:', error.response.data)
-    console.log('Error Status', error.response.status)
-    console.log('Error Headers', error.response.headers)
+    // console.error('Error Data:', error.response.data)
+    // console.error('Error Status', error.response.status)
+    // console.error('Error Headers', error.response.headers)
     switch (error.response.status) {
       case 401:
         // this.$store.dispatch('doLogout')
         router.push({ name: 'login', params: { message: 'Your credentials are invalid/expired please log back in' } })
         break
+      case 403:
+        router.push({ name: 'login', params: { message: 'That resource is forbidden, please log back in' } })
+        break
+      case 500:
+        router.push({ name: 'login', params: { message: 'all servers are busy, please try again later' } })
+        break
     }
   } else if (error.request) {
-    console.log('Request made but no response received. request=', error.request)
+    console.error('Request made but no response received. request=', error.request)
   } else {
-    console.log('Some other error occurred:', error.message)
+    console.error('Some other error occurred:', error.message)
   }
 }
 

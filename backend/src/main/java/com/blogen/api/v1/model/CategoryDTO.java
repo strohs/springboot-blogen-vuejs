@@ -1,6 +1,6 @@
 package com.blogen.api.v1.model;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,12 +17,12 @@ import lombok.NoArgsConstructor;
 @Builder
 public class CategoryDTO {
 
-    @ApiModelProperty( value = "Category ID", readOnly = true, example = "236")
+    @Schema(description = "Category ID", accessMode = Schema.AccessMode.READ_ONLY, example = "236")
     private Long id;
 
-    @ApiModelProperty( value = "Category Name", required = true, example = "Business")
+    @Schema(description = "Category Name", required = true, example = "Business")
     private String name;
 
-    @ApiModelProperty( value = "URL of this Category", readOnly = true, example = "/api/v1/categories/4")
+    @Schema(description = "URL of this Category", accessMode = Schema.AccessMode.READ_ONLY, example = "/api/v1/categories/4")
     private String categoryUrl;
 }

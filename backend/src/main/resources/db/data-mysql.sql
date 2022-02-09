@@ -12,8 +12,8 @@ insert into avatar (id, file_name) values (7, 'avatar6.jpg');
 insert into avatar (id, file_name) values (8, 'avatar7.jpg');
 
 # Roles
-insert into role (id, role) values (1, 'ADMIN');
-insert into role (id, role) values (2, 'USER');
+insert into role (id, role) values (1, 'ROLE_ADMIN');
+insert into role (id, role) values (2, 'ROLE_USER');
 
 # categories
 insert into category (id, name, created) values (1, 'Business', current_timestamp );

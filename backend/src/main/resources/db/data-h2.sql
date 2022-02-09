@@ -11,8 +11,9 @@ insert into AVATAR (id, file_name) values (7, 'avatar6.jpg');
 insert into AVATAR (id, file_name) values (8, 'avatar7.jpg');
 
 -- Roles
-insert into ROLE (ID, ROLE) values (1, 'ADMIN');
-insert into ROLE (ID, ROLE) values (2, 'USER');
+insert into ROLE (ID, ROLE) values (1, 'ROLE_ADMIN');
+insert into ROLE (ID, ROLE) values (2, 'ROLE_USER');
+insert into ROLE (ID, ROLE) values (3, 'ROLE_API');
 
 -- categories
 insert into CATEGORY (ID, NAME, CREATED) values (1, 'Business', current_timestamp );
@@ -42,10 +43,15 @@ insert into USER_PREFS (ID, USER_ID, AVATAR_ID) values (5, 5, 5);
 -- map users to roles
 insert into USER_ROLES (USERS_ID, ROLES_ID) values (1, 1);
 insert into USER_ROLES (USERS_ID, ROLES_ID) values (1, 2);
+insert into USER_ROLES (USERS_ID, ROLES_ID) values (1, 3);
 insert into USER_ROLES (USERS_ID, ROLES_ID) values (2, 2);
+insert into USER_ROLES (USERS_ID, ROLES_ID) values (2, 3);
 insert into USER_ROLES (USERS_ID, ROLES_ID) values (3, 2);
+insert into USER_ROLES (USERS_ID, ROLES_ID) values (3, 3);
 insert into USER_ROLES (USERS_ID, ROLES_ID) values (4, 2);
+insert into USER_ROLES (USERS_ID, ROLES_ID) values (4, 3);
 insert into USER_ROLES (USERS_ID, ROLES_ID) values (5, 2);
+insert into USER_ROLES (USERS_ID, ROLES_ID) values (5, 3);
 
 -- create some posts
 INSERT INTO POST(ID, CREATED, IMAGE_URL, TEXT, TITLE, UUID, CATEGORY_ID, PARENT_ID, USER_ID) VALUES

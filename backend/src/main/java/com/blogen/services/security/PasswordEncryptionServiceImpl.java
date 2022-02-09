@@ -10,13 +10,12 @@ import org.springframework.stereotype.Service;
  * @author Cliff
  */
 @Service
-public class EncryptionServiceImpl implements EncryptionService {
+public class PasswordEncryptionServiceImpl implements PasswordEncryptionService {
 
-
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public EncryptionServiceImpl( PasswordEncoder passwordEncoder ) {
+    public PasswordEncryptionServiceImpl(PasswordEncoder passwordEncoder ) {
         this.passwordEncoder = passwordEncoder;
     }
 

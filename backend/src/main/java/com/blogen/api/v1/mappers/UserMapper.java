@@ -5,10 +5,7 @@ import com.blogen.api.v1.services.AuthorizationService;
 import com.blogen.api.v1.services.UserService;
 import com.blogen.domain.Role;
 import com.blogen.domain.User;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
-import org.mapstruct.NullValueCheckStrategy;
+import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -21,7 +18,9 @@ import java.util.List;
  *
  * @author Cliff
  */
-@Mapper(nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS)
+@Mapper(componentModel = "spring",
+        nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS,
+        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface UserMapper {
     //NullValueCheckStrategy.ALWAYS ensures that source properties that are NULL, don't get mapped
     // onto target properties
@@ -30,7 +29,7 @@ public interface UserMapper {
 
     @Mapping( target = "avatarImage", source = "userPrefs.avatar.fileName")
     @Mapping( target = "userUrl", expression = "java(com.blogen.api.v1.services.UserService.buildUserUrl(user))")
-    @Mapping( target = "password", ignore = true)
+    @Mapping( target = "password", constant = "")
     UserDTO userToUserDto( User user );
 
     @Mapping( target = "userPrefs.avatar.fileName", source = "avatarImage")

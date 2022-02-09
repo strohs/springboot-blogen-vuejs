@@ -129,10 +129,9 @@ export default {
           this.tableCurrentPage = 1
           this.fetchPage(1)
         })
-        .catch(error => {
-          this.status.code = error.response.status
-          // TODO possibly move global error check into VUEX
-          this.status.message = error.response.data.globalError[0].message
+        .catch(apiError => {
+          this.status.code = apiError.code
+          this.status.message = apiError.message
         })
       this.displayStatusAlert()
     },
@@ -150,10 +149,10 @@ export default {
           const idx = this.categories.findIndex(c => c.id === cat.id)
           this.categories.splice(idx, 1, cat)
         })
-        .catch(error => {
-          this.status.code = error.response.status
+        .catch(apiError => {
+          this.status.code = apiError.code
           // TODO possible global error handling
-          this.status.message = error.response.data.globalError[0].message
+          this.status.message = apiError.message
           this.displayStatusAlert()
         })
     }
