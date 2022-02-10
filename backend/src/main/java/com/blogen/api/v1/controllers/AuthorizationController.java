@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
@@ -73,9 +74,6 @@ public class AuthorizationController {
     public Boolean userNameExists(@PathVariable("name") String userName) {
         Boolean userExists = authorizationService.userNameExists(userName);
         log.debug("check user name exists: {} = {}", userName, userExists);
-//        if (!userExists) {
-//            throw new NotFoundException("user name not found: " + userName);
-//        }
         return userExists;
     }
 }
