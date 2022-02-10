@@ -18,7 +18,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
@@ -31,7 +30,23 @@ import java.security.interfaces.RSAPublicKey;
 
 
 /**
- * Blogen Security Configuration
+ * Blogen Security Configuration.
+ * <p>
+ * In this example project, Spring Boot is performing four roles: Rest Server, OAuth2 Login server,
+ * OAuth2 Resource Server, and HTTP Server.
+ * <p>
+ * Therefore, this configuration enables support for
+ * - enabling users to login using a username and password
+ * - accepting a Blogen issued JWT as an authentication/authorization mechanism when accessing the REST Api endpoints
+ * located at /api/v1/**   NOTE that we are intentionally leaving the "/api/v1/auth/**" path unsecured so that users
+ * can log in, or register as a new user without first needing a JWT
+ * - enabling support for using Spring Security as an OAuth2 login server
+ * - enabling support for using Spring Security as a OAuth2 resource server so that we can leverage its functionality
+ * to create, accept and validate our own JWTs
+ * - ignoring paths that serve .html, .css, .js, images etc... since the Vue.js frontend client will be requesting these
+ * <p>
+ * After a successful login, any JWT tokens received from an OAuth2 provider will be converted into our own custom
+ * JWT be copying relevant claims from the provider. This is done in the OAuth2UserLoginServiceImpl class
  *
  * @author Cliff
  */
@@ -40,81 +55,6 @@ import java.security.interfaces.RSAPublicKey;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SpringSecConfig extends WebSecurityConfigurerAdapter {
 
-//    @Autowired
-//    @Qualifier("daoAuthenticationProvider")
-//    private AuthenticationProvider daoAuthenticationProvider;
-//
-//    // AuthenticationProvider used to authenticate username/passwords from the Blogen login form
-//    @Bean
-//    public DaoAuthenticationProvider daoAuthenticationProvider( UserDetailsService userDetailsService ){
-//
-//        DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
-//        daoAuthenticationProvider.setPasswordEncoder( passwordEncoder() );
-//        daoAuthenticationProvider.setUserDetailsService( userDetailsService );
-//        return daoAuthenticationProvider;
-//    }
-//
-//    @Override
-//    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-//        //super.configure(auth);
-//        auth.authenticationProvider( daoAuthenticationProvider );
-//    }
-
-//    // EntryPoint that returns a HTTP 401 response if a JWT is invalid/expired
-//    @Autowired
-//    private JwtAuthenticationEntryPoint unauthorizedHandler;
-
-//    // RSA public key used to verify JWTs signed by blogen
-//    @Value("${app.jwtPublicKey}")
-//    private String jwtPublicKey;
-
-
-//    //TODO do we still need to expose this bean?
-//    @Bean(BeanIds.AUTHENTICATION_MANAGER)
-//    @Override
-//    public AuthenticationManager authenticationManagerBean() throws Exception {
-//        return super.authenticationManagerBean();
-//    }
-
-//    // this bean is used by Spring to verify the signature of JWTs
-//    @Bean
-//    JwtDecoder jwtDecoder() throws Exception {
-//        return NimbusJwtDecoder.withPublicKey( key() ).build();
-//    }
-
-
-//    //generates the PublicKey used to verify the JWTs used in Blogen
-//    private RSAPublicKey key() throws Exception {
-//        byte[] bytes = Base64.getDecoder().decode(jwtPublicKey.getBytes());
-//        return (RSAPublicKey) KeyFactory.getInstance("RSA")
-//                .generatePublic(new X509EncodedKeySpec(bytes));
-//    }
-
-    //    @Override
-//    protected void configure(HttpSecurity httpSecurity) throws Exception {
-//        httpSecurity
-//                .cors()
-//                    .and()
-//                .csrf().disable()
-//                .logout()
-//                    .logoutSuccessUrl("/")
-//                    .and()
-//                .authorizeRequests()
-//                    .antMatchers("/","/api/v1/auth/**", "/login/form")
-//                        .permitAll()
-//                    .antMatchers("/api/**")
-//                        .hasAuthority("SCOPE_API") // this is how the Resource Server authorizes API requests
-//                    .anyRequest()
-//                        .authenticated()
-//                    .and()
-//                        .oauth2Login()
-//                            .defaultSuccessUrl("/login/oauth2/success", true)
-//                    .and()
-//                .oauth2ResourceServer()
-//                    .authenticationEntryPoint(unauthorizedHandler)
-//                    .jwt()
-//                        .decoder(jwtDecoder());
-//    }
 
     @Value("${jwt.public.key}")
     RSAPublicKey key;
@@ -124,16 +64,19 @@ public class SpringSecConfig extends WebSecurityConfigurerAdapter {
 
 
     @Bean
+    // used to encode user passwords
     public PasswordEncoder passwordEncoder() {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 
     @Bean
+        // used to enable decoding JWTs using our public key
     JwtDecoder jwtDecoder() {
         return NimbusJwtDecoder.withPublicKey(this.key).build();
     }
 
     @Bean
+        // used to encode and self sign or JWTs using a private key
     JwtEncoder jwtEncoder() {
         JWK jwk = new RSAKey.Builder(this.key).privateKey(this.priv).build();
         JWKSource<SecurityContext> jwks = new ImmutableJWKSet<>(new JWKSet(jwk));
@@ -144,11 +87,11 @@ public class SpringSecConfig extends WebSecurityConfigurerAdapter {
     public void configure(WebSecurity web) throws Exception {
         //these matchers will allow swagger UI, h2-console, and image files through spring-security
         web.ignoring()
-                .antMatchers("/v3/api-docs",
+                .antMatchers("/v3/api-docs/**",
                         "/swagger-resources/configuration/ui",
                         "/swagger-resources",
                         "/swagger-resources/configuration/security",
-                        "/swagger-ui.html",
+                        "/swagger-ui/**",
                         "/webjars/**",
                         "/console/*",
                         "/h2-console/**",
@@ -179,7 +122,8 @@ public class SpringSecConfig extends WebSecurityConfigurerAdapter {
                 );
     }
 
-
+//    // NOTE: we can't configure a custom SecurityFilterChain when using WebSecurityConfigurerAdapter, so we are
+//    // using the HttpSecurity configurer above
 //    @Bean
 //    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 //        http

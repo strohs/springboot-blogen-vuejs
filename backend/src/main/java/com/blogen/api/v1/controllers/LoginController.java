@@ -51,14 +51,15 @@ public class LoginController {
     /**
      * handles successful logins from oauth2 providers.
      * It is responsible for performing the final login to blogen by exchanging the oauth2User
-     * information from the authentication provider, into a Blogen Json Web Token (JWT).
+     * information into a Blogen Json Web Token (JWT).
      *
-     * @param authorizedClient - the authorized client that performed the OAuth2 login
+     * @param authorizedClient - the authorized client object that performed the OAuth2 login
      * @param oauth2User       - authenticated OAuth2User
      * @param response         - HttpServletResponse
-     * @return - ResponseEntity containing the Blogen index.html page in the body, and the Blogen JWT in the
-     * authorization header; plus a cookie is returned named "token" that also contains the Blogen JWT, this cookie is set
-     * in addition to the header because some browser based SPAs cannot check for response headers via javascript.
+     * @return - a ResponseEntity containing the Blogen index.html page in the body, and the Blogen JWT in the
+     * authorization header; plus a cookie is returned named "token" that also contains the Blogen JWT,
+     * this cookie is set because some browser based Single-Page-Applications cannot check for response headers
+     * via javascript.
      * @throws IOException - if an exception occurs trying to read the index.html page
      */
     @RequestMapping("/oauth2/success")

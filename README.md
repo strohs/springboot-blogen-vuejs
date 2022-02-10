@@ -1,173 +1,179 @@
 Spring Boot Blogen with Vue.js
 ===================================
-This is a [Vue.js](https://vuejs.org) version of my [Blogen](https://github.com/strohs/springboot-blogen) website.
+This is a [Vue.js](https://vuejs.org) version of my [Blogen](https://github.com/strohs/springboot-blogen) CRUD website.
 
-Blogen is a fictional micro-blogging website / message board that I use to try out various Spring Framework 
-functionality as well as various other backend/frontend technologies. The 
-[original](https://github.com/strohs/springboot-blogen) version of Blogen uses Spring Boot along 
-with [thymeleaf](https://www.thymeleaf.org/).  This version swaps out thymeleaf in favor of Vue.js, a javascript single
-page application framework that handles all of the "view" related functionality. 
-Spring boot basically becomes a resource server for the REST Api that the vue.js client uses.
+Blogen is basically fictional micro-blogging website / message board that I use as a front-end for various
+Spring Framework projects. 
+The [original](https://github.com/strohs/springboot-blogen) version of Blogen uses Spring Boot and Spring MVC 
+to power the backend, and [thymeleaf](https://www.thymeleaf.org/) to render the view layer.
 
-[JSON Web Tokens](https://jwt.io/introduction/) (JWT) support has also been added as the main form of authentication /
-authorization credential. They are issued to clients after successfully logging in to Blogen via a username/password 
-form or via OAuth 2.0 (either github or google). See the JWT section below for more information on how JWTs are used.
+This version of the project has swapped out thymeleaf for Vue.js and Bootstrap 4.
 
-The website functionality remains unchanged and you can read about it on the 
-[original](https://github.com/strohs/springboot-blogen) project page. In a nutshell, Blogen is a message
-board that allows users to start threads of discussion on different subjects (called categories). This version of 
-Blogen allows you to sign up a new user, perform CRUD operations on threads and posts, as well as perform basic 
- filtering operations on threads and posts. If you log in as an admin user, 
-  you can edit or delete any threads (not just your own) as well as edit/create new categories for users.  
+In addition, the following changes have been made:
+- JSON Web Token (JWT) support has also been added to secure the REST Api endpoints using Spring Security 5.
+JWTs are issued to clients after successfully logging into Blogen via a username/password form, and then sent by
+the vue.js client at each request to the frontend.
+- OAuth2 support has been added, given users the option to login using their GitHub or Google credentials. This
+functionality will require you to register this spring boot application as an OAuth2 client with GitHub and or Google.
+This is a free service. Information on how to do this is below...
+
+To keep things somewhat simple, the Spring Boot backend is performing multiple roles:
+- serves as the REST Api Server
+- serves the html,css,javascript resources needed by Vue.js
+- acts as an OAuth2 client and resource server, making request to GitHub or Google, to log in users to Blogen
+In a real production environment, these roles would be handled be separate servers
+
+No changes have been made to the base website functionality. You can read about it on the 
+[original](https://github.com/strohs/springboot-blogen) project page.
 
 
-
-### Installation and Running
-#### Build Prerequisites
+## Installation and Running
+### Prerequisites
 * at least Java 11
-* Apache maven installation *OR* you can use the included maven wrapper `mvnw` (in the project's root directory):
-    * `mvnw.cmd` if you are running on windows
+* Apache maven (at least version 3+) *OR* you can use the included maven wrapper `mvnw` 
+(located in the project's root directory):
+    * `mvnw.cmd` if you are running on Windows
     * `mvnw` if you are running on a *nix operating system 
+* npm version 14+, is needed only if you plan to develop on the frontend; otherwise it will be downloaded automatically,
+by the "maven-frontend-plugin" when you run the maven to build this project. This feature was added 
+to support users that may not already have node.js/npm installed. The downloaded node.js files will be placed in
+the vue-frontend/node directory.
 
-
-#### Build Steps 
-1. `cd` into the project's root directory
+### Build Steps 
+1. make sure you are inthe project's root directory
 2. Clean and compile the application:
-    * `mvn clean install`
-        * if you don't have maven installed use the maven wrapper provided in the root directory of this project: 
-            * on *nix systems replace `mvn` with: `./mvnw clean install`
-            * on Windows systems replace `mvn` with: `./mvnw.cmd clean install` 
+   -`mvn clean install`
+        - if you don't have maven installed use the maven wrapper provided in the root directory of this project: 
+            - on *nix systems replace `mvn` with: `./mvnw clean install`
+            - on Windows systems replace `mvn` with: `./mvnw.cmd clean install`
+        - this will compile the backend, run tests, AND download node.js/npm in order to build the vue.js resources.
+          The download is only performed the first time you run mvn install
 3. Start the spring boot application:
     * `mvn --projects backend spring-boot:run`
-3. Open your web browser and navigate to [localhost:8080](http://localhost:8080/)
-4. If you want to use GitHub or Google to log in via Oauth2, you will need to register your own client application
- with Google and/or GitHub. They will generate a client-id and client-secret that you must copy into application.properties
- ... see below for more info on how to do this
+4. Open your web browser and navigate to [localhost:8080](http://localhost:8080/)
+5. Login to the blogen website (button is located in the upper right corner of the page), using an existing user
+such as "mcgill" with password: "password", or you could register as a new user.
+6. If you want to use GitHub or Google to log in via Oauth2, you will need to register your locally running Blogen
+project as a client application. Google/GitHub will generate a `client-id` and `client-secret` string that you must
+copy into application.properties. See the sections below on how to do this for each provider.
  
-#### Github OAuth2 Client Creation Instructions
-instructions to create a GitHub OAuth2 Client application are [here](https://developer.github.com/apps/building-oauth-apps/creating-an-oauth-app/)
-
+#### GitHub OAuth2 Client Creation Instructions
+In order to use spring boot as an OAuth2 client with GitHub, you must register it with GitHub. This will enable you to
+use your GitHub username and password to log in to the Blogen website running locally on your machine.
+Instructions to create a GitHub OAuth2 Client application are [here](https://developer.github.com/apps/building-oauth-apps/creating-an-oauth-app/)
 
 When configuring the Oath2 Client, be aware of the following:
 * the home page url does not matter - I used `http://localhost:8080`
-* the `Authorization callback URL` is very important, as Spring has a default path it uses for Oauth2 redirects. You
+* the `Authorization callback URL` is very important. Spring Security uses a default path for Oauth2 redirects. You
 should use the following URL: `http://localhost:8080/login/oauth2/code/github`
-* GitHub will generate a `client-id` and `client-secret`, copy those into Spring Boot's application.properties for
-the following keys:
+* GitHub will generate a `client-id` and `client-secret`, copy those into Spring Boot's 
+[application.properties](backend/src/main/resources/application.properties) for the following keys:
 * `spring.security.oauth2.client.registration.github.client-id`=
 * `spring.security.oauth2.client.registration.github.client-secret`=
 
 #### Google Oauth2 Client Creation Instructions
-This is somewhat similar to the GitHub configuration.
+This is similar to the GitHub configuration.
 The instructions to create Google Oauth2 application are [here](https://developers.google.com/identity/protocols/OAuth2WebServer)
 Follow that guide to create OAuth2 Authorization Credentials, and make sure the Authorized redirect URL is set to:
 `http://localhost:8080/oauth2/authorization/google`
 
-Google will generate a `client-id` and `client-secret` string. Copy them into application.properties at the following
-keys:
+Google will generate a `client-id` and `client-secret` string. Copy them into 
+[application.properties](backend/src/main/resources/application.properties) using the following keys:
 * `spring.security.oauth2.client.registration.google.client-id`=
 * `spring.security.oauth2.client.registration.google.client-secret`=
 
 
-### Project Structure
-This is a multimodule maven project with the vue.js code located in the *vue-frontend* module and the spring boot code
-located in the *backend* module.
+## Project Structure
+This is a multimodule maven project with the vue.js code located in the *vue-frontend* directory and the spring boot
+code located in the *backend* directory.
 
 
 ## Security
-As mentioned previously, Blogen uses JWTs as the primary means of authentication and authorization. Users receive
-a JWT in two ways:
+Blogen uses Spring Security 5 JWT support to protect the REST Api endpoints. 
+Users receive a JWT in two ways:
 1. by using Spring's standard "form" login and providing their **Blogen** username and password
 2. by using OAuth2 and logging into their GitHub or Google account
 
 Spring Security has been [configured](backend/src/main/java/com/blogen/config/SpringSecConfig.java) to handle the 
-above scenarios, and it has been configured as an OAuth2 "login" and Resource Server.
+above scenarios.
 
 ### OAuth 2.0
-Spring is currently in the process of rolling in functionality from their previous 
-[OAuth2 project](https://spring.io/projects/spring-security-oauth) into the main Spring Security module.
-(more info [here](https://github.com/spring-projects/spring-security/wiki/OAuth-2.0-Features-Matrix)). Therefore, 
-Blogen is using the support for OAuth 2.0 in Spring Security (version 5.2.0), rather than the  
-Spring-Security-Oauth project.
+[Spring Security 5](https://docs.spring.io/spring-security/reference/servlet/oauth2/client/index.html) 
+is used to provide OAuth2 client support. Currently, Spring Security 5 only supports 
+the [Authorization Code Grant](https://oauth.net/2/grant-types/authorization-code/) flow to perform a login with 
+one of the OAuth2.0 providers you have configured (in your application.properties file). 
+However, because Blogen is a single page application, using Vue.js, it will not play nice with all the 
+redirects that occur during a typical OAuth2 login process. To work around this, I added the following functionality:
 
-#### OAuth 2.0 Login
-OAuth2.0 Login has been configured using the `oauth2Login()` configurer. By default, is uses the
- [Authorization Code Grant](https://oauth.net/2/grant-types/authorization-code/) flow to perform a login with 
- one of the OAuth2.0 providers you have configured (in your application.properties file). 
- However, because Blogen is a single page application, using Vue.js, it will not play nice with all the 
- redirects that occur during a typical OAuth2 login process. To work around this, I added the following functionality:
+- ignore the default Spring Security generated oauth2 login page, and modify our main vue.js login page to 
+trigger the OAuth sign in process using Springs default OAuth2 sign-in endpoint of: `/oauth2/authorization/{providerID}`
+- configure a custom "AuthenticationSuccessHandler", located in the 
+[LoginController](backend/src/main/java/com/blogen/api/v1/controllers/LoginController.java) that converts user
+credentials provided from the OAuth2 provider into a Blogen JWT, and then returns the main 
+index.html back to the web browser... along with a cookie containing the JWT
+-the vue.js application will re-load the main page and check for the presence of this cookie.
+If present, it will call a REST API endpoint to retrieve the user's (complete) details from the database
 
-* ignore the default Spring Security generated oauth2 login page, and modify our main vue.js login page to 
-trigger the OAuth sign in process using Springs default sign-in endpoint of: `/oauth2/authorization/{providerID}`
-* configure a custom `AuthenticationSuccessHandler` (located in the LoginController) that takes the final 
-authenticated user information, converts it into a Blogen JWT, and then returns the main index.html back to the 
- web browser along with a cookie that contains the JWT
-* the vue.js application will re-load the main page and check for the presence of this cookie. If present, it will
-call a REST API function to validate the JWT and if it is valid, vue.js will consider the user successfully logged in
-and proceed to the main posts page
-
-NOTE that the above process may not be the "best" approach for handling OAuth2 logins with single page applications. 
-I really wanted to try and get the authorization code grant flow working with vue.js and Spring, rather than using the 
-**implicit flow**, which is what a majority of single page application use. The implicit flow doesn't require
- browser redirects but it less secure than authorization code grant.
+NOTE: that the above process may not be the "best" approach for handling OAuth2 logins with single page applications. 
+I wanted to try and get the authorization code grant flow working with vue.js and Spring Security, rather than using the 
+**implicit flow**, which is what a majority of single page application use. Additionally, as of writing this, Spring
+Security does not support the implicit flow.
  
 #### OAuth 2.0 Resource Server
-Blogen also uses Spring Security's resource server support to secure api endpoints. Out of the box, it supports 
-using JSON Web Tokens to provide authentication and authorization. The resource server is activated using
-the following configurer:
+Blogen also uses Spring Security's OAuth2 resource server support to secure api endpoints.
+Out of the box, it supports using JSON Web Tokens to provide authentication and authorization.
+The resource server is activated using the following Spring Security configurer:
 
-        .oauth2ResourceServer()
-            .authenticationEntryPoint(unauthorizedHandler)
-                .jwt()
-                    .decoder(jwtDecoder()) 
+        .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
+                .exceptionHandling((exceptions) -> exceptions
+                        .authenticationEntryPoint(new RestApiAuthenticationEntryPoint())
+                        .accessDeniedHandler(new RestApiAccessDeniedHandler()) 
 
-To secure an endpoints, we use the following ant matcher that indicates the scope a user must have to access the endpoint:
-`.antMatchers("/api/**").hasAuthority("SCOPE_API")`
+Spring Security resource server will take care of validating any JWT sent into protected endpoints.
+To actually secure a REST Api endpoint, use the HttpConfigurer with the following matcher:
+`.antMatchers("/api/**").hasAuthority("SCOPE_ROLE_API")`
 
-The resource server expects the JWT to be sent with each request as a "Bearer" token in the Authorization header. 
-It will then validate the token (using our own RSA Public Key configured in application.properties), then check that 
-the JWT has not expired, then convert all the scopes into SimpleGrantedAuthorities (prefixing each authority with the
-String "SCOPE_".    
-See the docs at [OAuth2.0 Resource Server](https://docs.spring.io/spring-security/site/docs/5.2.0.BUILD-SNAPSHOT/reference/htmlsingle/#oauth2resourceserver)  
+Spring Security will then require all requests hitting that endpoint to have a (valid) JWT with a scope of:
+`SCOPE_ROLE_API`, or whatever simple granted authority you wish to use.
+ 
 
 
-#### Blogen JSON Web Tokens
+### Blogen JSON Web Tokens
 The JWT generated by Blogen contains a header and payload similar to the following:
+```
+{
+  "alg": "RS256"
+}
+{
+  "iss": "self",
+  "sub": "3",
+  "exp": 1644510769,
+  "iat": 1644508969,
+  "scope": "ROLE_USER ROLE_API"
+}
+```
+The example token above is signed using RS256. The JWT payload contains a subject *sub* of 3, which is the user's 
+internal ID within the Blogen User table.
+The scope field contains the user's security role, either 'ROLE_USER' to indicate they are a plain user within
+blogen, or 'ROLE_ADMIN' to indicate they are an administrator of the website. Additionally, all users of blogen get
+the 'ROLE_API' scope granted to them. This role gives them access to the blogen REST API. 
+Lastly, there are the standard JWT claims: "iat" (issued at time) and "exp" (expiration) fields, 
+used to indicate when the token was issued and when it expires.
 
-    {
-      "typ": "JWT",
-      "alg": "RS256"
-    }
-    {
-       "sub": "6",
-       "scope": [
-         "USER",
-         "API"
-       ],
-       "exp": 1552947450,
-       "iat": 1552945650
-     }
-
-The example token above is signed using RSA256. The payload contains a subject *sub* of 6, which is the user's 
-internal ID within the Blogen User table. The scope field contains the user's role (either 'USER' or 'ADMIN') and a custom
-scope specific to Blogen named 'API', which gives a user permission to use the rest API. Lastly, there are the 
-"iat" (issued at time) and "exp" (expiration) fields, used to indicate when the token was issued and when it expires.
-
-#### Authorization flow summary
-* A user can log into Blogen with their username and password, OR using their Github or Google account 
-* once successfully logged in, Blogen will return a JWT to the vue.js client
-* Vue.js will send the JWT (via axios) with every HTTP request to spring boot so that it can access the website 
-and REST api. 
-* Spring Boot does not store the token in some datastore
-    * The token is sent within the HTTP Authorization header using the *Bearer* schema. For example
+### Authorization flow summary
+- A user can log into Blogen with their username and password, OR using their Github or Google account 
+- once successfully logged in, Blogen will return a JWT to the vue.js client
+- Vue.js will send the JWT with every request to the REST API.
+- Note that Spring Boot does not store the JWT in some datastore, it is "session-less"
+  - The token is sent within the HTTP Authorization header using the *Bearer* schema. For example
         * `Authorization: Bearer fgnkjewrt3459hhh34rt.df93249odfgksdflhweurl4598gfufgdlhgdf9345...`
-    * The OAuth2 resource server provided by spring security will check for the presence of this token, validate it, 
-    and then use the scopes within the token to set up Granted Authorities
+    * The OAuth2 resource server, configured in spring security, will check for the presence of this token, validate it, 
+    and then use the scopes within the token to set up `SimpleGrantedAuthorities`
 
 
-### REST API
+## REST API
 Once Blogen is up and running, the URLs for the OpenAPI (a.k.a swagger) documentations are here:
-* Swagger UI is [here](http://localhost:8080/swagger-ui.html#/)
+* Swagger UI is [here](http://localhost:8080/swagger-ui.html/)
 * Swagger API docs are [here](http://localhost:8080/v3/api-docs)
 
 Accessing the Rest API via Swagger will require you to provide your authentication token to Swagger. You can find 
@@ -180,7 +186,7 @@ prefixed with "Bearer " (note that there is a space after Bearer), for example:
 
 #### Technologies used
 * On the Frontend
-    * Vue.js 2.5 (using npm and webpack as the build tools for the frontend)
+    * Vue.js 2.5 (using npm and webpack)
         * Vuex
         * Vue Router
         * axios (to make request to the Blogen REST API)
