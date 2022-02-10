@@ -11,6 +11,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -21,6 +22,9 @@ public class OAuth2UserLoginServiceImpl implements OAuth2UserLoginService {
     private UserMapper userMapper;
     private BlogenJwtService jwtService;
 
+    // list of Oath2 Providers that blogen supports
+    private final List<String> authorizedProviders = List.of("GOOGLE", "GITHUB");
+
     public OAuth2UserLoginServiceImpl(UserService userService, UserMapper userMapper, BlogenJwtService jwtService) {
         this.userService = userService;
         this.userMapper = userMapper;
@@ -30,16 +34,16 @@ public class OAuth2UserLoginServiceImpl implements OAuth2UserLoginService {
     @Override
     public String loginUser(final OAuth2Providers provider, final OAuth2User oAuth2User) {
 
-        // users authenticated with OAuth2 providers have the providers name prefixed to the username
-        String username = provider.toString().toLowerCase() + oAuth2User.getName();
+        // map the OAuth2User data into a blogen userDTO object
+        UserDTO userDTO = OAuth2UserMapper.getUserMapperForProvider(provider).mapUser(oAuth2User);
 
         // check for user in our DB, if found return it as a UserDTO, else if not found, create a new user
-        final UserDTO userDTO = userService
-                .findByUserName(username)
+        userDTO = userService
+                .findByUserName(userDTO.getUserName())
                 .map(userMapper::userToUserDto)
                 .orElseGet(() -> createNewOauth2User(OAuth2UserMapper.getUserMapperForProvider(provider), oAuth2User));
 
-        // convert the user's roles, stored as strings, into BlogenAuthorities
+        // convert the user's roles, stored as strings, into BlogenAuthorities types so we can generate a JWT
         List<BlogenAuthority> roles = userDTO.getRoles()
                 .stream()
                 .map((role) -> BlogenAuthority.valueOf(role.toUpperCase()))

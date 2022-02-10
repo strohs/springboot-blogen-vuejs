@@ -22,7 +22,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registry.addMapping( "/**" )
                 //.allowedOrigins( "*" )
                 //.allowedHeaders("*")
-                .allowedOriginPatterns("*localhost*")
+                .allowedOriginPatterns("*localhost*", "https://play.google.com/**")
                 .allowCredentials(true)
                 .allowedMethods( "HEAD", "OPTIONS", "GET", "POST", "PUT", "PATCH", "DELETE" )
                 .exposedHeaders("Authorization")

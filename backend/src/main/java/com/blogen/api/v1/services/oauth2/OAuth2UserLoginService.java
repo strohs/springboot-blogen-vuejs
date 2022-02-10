@@ -16,6 +16,6 @@ public interface OAuth2UserLoginService {
      * @param oAuth2User
      * @return a valid Blogen JWT string (base64 encoded)
      */
-    String loginUser(OAuth2Providers provider, OAuth2User oAuth2User);
+    String loginUser(OAuth2Providers provider, OAuth2User oAuth2User) throws IllegalArgumentException;
 
 }

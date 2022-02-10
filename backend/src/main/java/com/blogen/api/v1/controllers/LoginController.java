@@ -51,7 +51,7 @@ public class LoginController {
     /**
      * handles successful logins from oauth2 providers.
      * It is responsible for performing the final login to blogen by exchanging the oauth2User
-     * information for a Blogen Json Web Token (JWT).
+     * information from the authentication provider, into a Blogen Json Web Token (JWT).
      *
      * @param authorizedClient - the authorized client that performed the OAuth2 login
      * @param oauth2User       - authenticated OAuth2User

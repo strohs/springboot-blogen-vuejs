@@ -11,7 +11,8 @@ public interface OAuth2UserMapper {
     /**
      * map OAuth2 user information into a UserDTO. OAuth2 fields that aren't provided will be set to "anonymous"
      * At a minimum, the UserDTO.username field must be set to a unique value to avoid collisions in the Blogen
-     * database
+     * database. Therefore; GitHub users will be assigned their GitHub "id" with the suffix "@GitHub" appended.
+     * Google users will be assigned: TODO
      *
      * @param oAuth2User - contains the OAuth2 user information used to populate a blogen User domain object.
      *                   at a minimum, there must be a unique field that can be used to generate a blogen
@@ -30,7 +31,7 @@ public interface OAuth2UserMapper {
     static OAuth2UserMapper mapGithubUser() {
         return oAuth2User -> {
             UserDTO user = new UserDTO();
-            user.setUserName( OAuth2Providers.GITHUB.toString().toLowerCase() + oAuth2User.getName() );
+            user.setUserName( oAuth2User.getName() + "@GitHub");
             user.setFirstName( "anonymous" );
             user.setLastName( "anonymous" );
             user.setEmail( oAuth2User.getAttributes().getOrDefault("email", "github@example.com").toString() );
@@ -44,7 +45,7 @@ public interface OAuth2UserMapper {
     static OAuth2UserMapper mapGoogleUser() {
         return oAuth2User -> {
             UserDTO user = new UserDTO();
-            user.setUserName( OAuth2Providers.GOOGLE.toString().toLowerCase() + oAuth2User.getName() );
+            user.setUserName( oAuth2User.getName() + "@Google");
             user.setFirstName( oAuth2User.getAttributes().get("given_name").toString() );
             user.setLastName( oAuth2User.getAttributes().get("family_name").toString() );
             user.setEmail( oAuth2User.getAttributes().getOrDefault("email", "google@example.com").toString() );

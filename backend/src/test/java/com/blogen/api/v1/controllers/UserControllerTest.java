@@ -20,6 +20,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
@@ -74,7 +75,7 @@ public class UserControllerTest {
     }
 
     @Test
-    @WithMockJwt(subject = "1", scopes = {BlogenAuthority.ROLE_API, BlogenAuthority.ROLE_USER})
+    @WithMockUser(username = "1", authorities={"SCOPE_ROLE_API", "SCOPE_ROLE_USER"})
     public void should_returnOKandTwoUsers_when_getAllUsers() throws Exception {
         UserListDTO userListDTO = new UserListDTO(Arrays.asList(userDTO1, userDTO2));
 
@@ -86,7 +87,7 @@ public class UserControllerTest {
     }
 
     @Test
-    @WithMockJwt(subject = "1", scopes = {BlogenAuthority.ROLE_API, BlogenAuthority.ROLE_USER})
+    @WithMockUser(username = "1", authorities={"SCOPE_ROLE_API", "SCOPE_ROLE_USER"})
     public void should_returnOneUser_when_getUser() throws Exception {
         given(userService.getUser(anyLong())).willReturn(userDTO1);
 
@@ -96,7 +97,7 @@ public class UserControllerTest {
     }
 
     @Test
-    @WithMockJwt(subject = "1", scopes = {BlogenAuthority.ROLE_API, BlogenAuthority.ROLE_USER})
+    @WithMockUser(username = "1", authorities={"SCOPE_ROLE_API", "SCOPE_ROLE_USER"})
     public void should_returnApiErrorJSON_when_getUserWithInvalidID() throws Exception {
         given(userService.getUser(anyLong())).willThrow(new BadRequestException("invalid id"));
 
@@ -131,7 +132,7 @@ public class UserControllerTest {
 //    }
 
     @Test
-    @WithMockJwt(subject = "1", scopes = {BlogenAuthority.ROLE_API, BlogenAuthority.ROLE_USER})
+    @WithMockUser(username = "1", authorities={"SCOPE_ROLE_API", "SCOPE_ROLE_USER"})
     public void should_returnOK_when_updateUserWithValidRequestDTO() throws Exception {
         given(userService.findById(anyLong())).willReturn(Optional.of(new User()));
         given(userService.updateUser(any(User.class), any(UserDTO.class))).willReturn(updateUserDTO1);
@@ -144,7 +145,7 @@ public class UserControllerTest {
     }
 
     @Test
-    @WithMockJwt(subject = "1", scopes = {BlogenAuthority.ROLE_API, BlogenAuthority.ROLE_USER})
+    @WithMockUser(username = "1", authorities={"SCOPE_ROLE_API", "SCOPE_ROLE_USER"})
     public void should_returnBadRequest_when_updateUserWithInvalidID() throws Exception {
         given(userService.findById(anyLong())).willThrow(new BadRequestException("user does not exist with id:67334"));
 
@@ -156,7 +157,7 @@ public class UserControllerTest {
     }
 
     @Test
-    @WithMockJwt(subject = "1", scopes = {BlogenAuthority.ROLE_API, BlogenAuthority.ROLE_USER})
+    @WithMockUser(username = "1", authorities={"SCOPE_ROLE_API", "SCOPE_ROLE_USER"})
     public void should_returnBadRequest_when_updateUserWithUserNameThatExists() throws Exception {
         given(userService.findById(anyLong())).willReturn(Optional.of(new User()));
         given(userService.updateUser(any(User.class), any(UserDTO.class))).willThrow(new BadRequestException("username exists"));

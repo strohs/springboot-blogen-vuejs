@@ -14,6 +14,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static com.blogen.api.v1.controllers.AbstractRestControllerTest.asJsonString;
@@ -36,7 +37,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class CategoryControllerTest {
 
     @MockBean
-    @Qualifier("categoryRestService")
     private CategoryService categoryService;
 
     @Autowired
@@ -65,7 +65,7 @@ public class CategoryControllerTest {
 //    }
 
     @Test
-    @WithMockJwt(subject = "1", scopes = {BlogenAuthority.ROLE_API, BlogenAuthority.ROLE_USER, BlogenAuthority.ROLE_ADMIN})
+    @WithMockUser(username = "1", authorities={"SCOPE_ROLE_API", "SCOPE_ROLE_USER"})
     public void should_getOneCategoryWithCategoryUrl_when_getCategory() throws Exception {
 
         given(categoryService.getCategory(anyLong())).willReturn(catDto_1);
@@ -76,7 +76,7 @@ public class CategoryControllerTest {
     }
 
     @Test
-    @WithMockJwt(subject = "1", scopes = {BlogenAuthority.ROLE_API, BlogenAuthority.ROLE_USER, BlogenAuthority.ROLE_ADMIN})
+    @WithMockUser(username = "1", authorities={"SCOPE_ROLE_API", "SCOPE_ROLE_USER"})
     public void should_returnHttpBadRequest_when_getCategoryWithInvalidId() throws Exception {
 
         given(categoryService.getCategory(anyLong())).willThrow(new BadRequestException("invalid category id"));
@@ -87,7 +87,7 @@ public class CategoryControllerTest {
     }
 
     @Test
-    @WithMockJwt(subject = "1", scopes = {BlogenAuthority.ROLE_API, BlogenAuthority.ROLE_USER, BlogenAuthority.ROLE_ADMIN})
+    @WithMockUser(username = "1", authorities={"SCOPE_ROLE_API", "SCOPE_ROLE_ADMIN"})
     public void should_returnCreatedAndSetCategoryURL_when_createNewCategory() throws Exception {
         given(categoryService.createNewCategory(any(CategoryDTO.class))).willReturn(newCatDto);
 
@@ -101,7 +101,7 @@ public class CategoryControllerTest {
     }
 
     @Test
-    @WithMockJwt(subject = "1", scopes = {BlogenAuthority.ROLE_API, BlogenAuthority.ROLE_USER, BlogenAuthority.ROLE_ADMIN})
+    @WithMockUser(username = "1", authorities={"SCOPE_ROLE_API", "SCOPE_ROLE_ADMIN"})
     public void should_returnUnprocessableEntity_when_createNewCategory_withInvalidRequestParam() throws Exception {
         catDto_1.setName(null);
 

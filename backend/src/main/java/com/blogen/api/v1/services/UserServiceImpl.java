@@ -80,9 +80,11 @@ public class UserServiceImpl implements UserService {
         } else {
             // create a new user
             Role userRole = roleService.getByName( "ROLE_USER" );
+            Role apiRole = roleService.getByName("ROLE_API");
             User user = userMapper.userDtoToUser( userDTO );
             user.setEncryptedPassword( encryptionService.encrypt( user.getPassword() ) );
             user.addRole( userRole );
+            user.addRole( apiRole );
             UserPrefs prefs = buildDefaultUserPrefs();
             user.setUserPrefs( prefs );
             return saveUser( user );

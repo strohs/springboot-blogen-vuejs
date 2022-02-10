@@ -4,8 +4,6 @@ import com.blogen.api.v1.model.*;
 import com.blogen.api.v1.services.PostService;
 import com.blogen.api.v1.validators.PostRequestDtoValidator;
 import com.blogen.exceptions.NotFoundException;
-import com.blogen.services.security.BlogenAuthority;
-import com.blogen.services.security.WithMockJwt;
 import com.blogen.utils.DomainBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,6 +12,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
@@ -74,7 +73,7 @@ public class PostControllerTest {
     }
 
     @Test
-    @WithMockJwt(subject = "1", scopes = {BlogenAuthority.ROLE_API, BlogenAuthority.ROLE_USER})
+    @WithMockUser(username = "1", authorities = {"SCOPE_ROLE_API", "SCOPE_ROLE_USER"})
     public void should_getOneParentPostsAndReturnOK_when_getPostsWithLimitSet() throws Exception {
         PostListDTO postListDTO = new PostListDTO(Arrays.asList(postDTO_1), pageInfoResponse);
 
@@ -88,7 +87,7 @@ public class PostControllerTest {
     }
 
     @Test
-    @WithMockJwt(subject = "1", scopes = {BlogenAuthority.ROLE_API, BlogenAuthority.ROLE_USER})
+    @WithMockUser(username = "1", authorities = {"SCOPE_ROLE_API", "SCOPE_ROLE_USER"})
     public void should_getTwoParentPostsAndReturnOK_when_getPostsWithNoLimitSet() throws Exception {
         PostListDTO postListDTO = new PostListDTO(Arrays.asList(postDTO_1, postDTO_2), pageInfoResponse);
 
@@ -101,7 +100,7 @@ public class PostControllerTest {
     }
 
     @Test
-    @WithMockJwt(subject = "1", scopes = {BlogenAuthority.ROLE_API, BlogenAuthority.ROLE_USER})
+    @WithMockUser(username = "1", authorities = {"SCOPE_ROLE_API", "SCOPE_ROLE_USER"})
     public void should_getPostById_when_getPost() throws Exception {
         String requestUrl = PostController.BASE_URL + "/1";
         given(postService.getPost(anyLong())).willReturn(postDTO_1);
@@ -113,7 +112,7 @@ public class PostControllerTest {
     }
 
     @Test
-    @WithMockJwt(subject = "1", scopes = {BlogenAuthority.ROLE_API, BlogenAuthority.ROLE_USER})
+    @WithMockUser(username = "1", authorities = {"SCOPE_ROLE_API", "SCOPE_ROLE_USER"})
     public void should_returnHTTP_NOT_FOUND_when_getPostWithBadID() throws Exception {
         String requestUrl = PostController.BASE_URL + "/565";
         given(postService.getPost(anyLong())).willThrow(NotFoundException.class);
@@ -124,7 +123,7 @@ public class PostControllerTest {
     }
 
     @Test
-    @WithMockJwt(subject = "1", scopes = {BlogenAuthority.ROLE_API, BlogenAuthority.ROLE_USER})
+    @WithMockUser(username = "1", authorities = {"SCOPE_ROLE_API", "SCOPE_ROLE_USER"})
     public void should_return_CREATED_when_createNewPostWithValidContent() throws Exception {
         //"2018-01-30T12:39:53.798"
         //created and children should not be sent as part of request body
@@ -141,7 +140,7 @@ public class PostControllerTest {
     }
 
     @Test
-    @WithMockJwt(subject = "1", scopes = {BlogenAuthority.ROLE_API, BlogenAuthority.ROLE_USER})
+    @WithMockUser(username = "1", authorities = {"SCOPE_ROLE_API", "SCOPE_ROLE_USER"})
     public void should_return_UNPROCESSABLE_ENTITY_when_createNewPostWithMissingField() throws Exception {
         //"2018-01-30T12:39:53.798"
         //category ID is required
@@ -155,7 +154,7 @@ public class PostControllerTest {
     }
 
     @Test
-    @WithMockJwt(subject = "1", scopes = {BlogenAuthority.ROLE_API, BlogenAuthority.ROLE_USER})
+    @WithMockUser(username = "1", authorities = {"SCOPE_ROLE_API", "SCOPE_ROLE_USER"})
     public void should_return_CREATED_when_createNewChildPost_requestBodyContainsValidPostDTO() throws Exception {
         childDTO_1.setCreated(null);
         childDTO_1.setPostUrl(null);
@@ -171,7 +170,7 @@ public class PostControllerTest {
     }
 
     @Test
-    @WithMockJwt(subject = "1", scopes = {BlogenAuthority.ROLE_API, BlogenAuthority.ROLE_USER})
+    @WithMockUser(username = "1", authorities = {"SCOPE_ROLE_API", "SCOPE_ROLE_USER"})
     public void should_returnUNPROCESSABLE_ENTITY_when_requestBodyContainsNullPostDtoField() throws Exception {
         childDTO_1.setCreated(null);
         childDTO_1.getCategory().setId(null);
@@ -186,7 +185,7 @@ public class PostControllerTest {
     }
 
     @Test
-    @WithMockJwt(subject = "1", scopes = {BlogenAuthority.ROLE_API, BlogenAuthority.ROLE_USER})
+    @WithMockUser(username = "1", authorities = {"SCOPE_ROLE_API", "SCOPE_ROLE_USER"})
     public void should_returnUNPROCESSABLE_ENTITY_when_requestBodyHas_RequiredFieldThatIsEmpty() throws Exception {
         //text is a required field
         requestDTO.setText("");
@@ -200,7 +199,7 @@ public class PostControllerTest {
     }
 
     @Test
-    @WithMockJwt(subject = "1", scopes = {BlogenAuthority.ROLE_API, BlogenAuthority.ROLE_USER})
+    @WithMockUser(username = "1", authorities = {"SCOPE_ROLE_API", "SCOPE_ROLE_USER"})
     public void should_returnOK_when_updatePostWithValidRequestData() throws Exception {
         postDTO_2.setTitle("new title");
         postDTO_2.setCreated(null);
@@ -218,7 +217,7 @@ public class PostControllerTest {
     }
 
     @Test
-    @WithMockJwt(subject = "1", scopes = {BlogenAuthority.ROLE_API, BlogenAuthority.ROLE_USER})
+    @WithMockUser(username = "1", authorities = {"SCOPE_ROLE_API", "SCOPE_ROLE_USER"})
     public void should_deletePost() throws Exception {
         mockMvc.perform(delete(PostController.BASE_URL + "/2"))
                 .andExpect(status().isOk());
