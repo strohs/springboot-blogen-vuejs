@@ -9,20 +9,20 @@ import ApiError from './ApiError'
 // Any errors received from the REST Api will be mapped into an ApiError
 // object and then re-thrown to the caller
 
-/**
- * calls the REST API to fetch a page of categories
- * @param pageNumber{Number} - the page number to fetch
- * @param pageLimit(Number - the maximum number of items to fetch per page
- * @returns {Promise<AxiosResponse<any>>}
- */
-export async function getCategories (pageNumber = 0, pageLimit = 20) {
-  return axios.get('/api/v1/categories', {
-    params: {
-      page: pageNumber,
-      limit: pageLimit
-    }
-  })
-}
+// /**
+//  * calls the REST API to fetch a page of categories
+//  * @param pageNumber{Number} - the page number to fetch
+//  * @param pageLimit(Number - the maximum number of items to fetch per page
+//  * @returns {Promise<AxiosResponse<any>>}
+//  */
+// export async function getCategories (pageNumber = 0, pageLimit = 20) {
+//   return axios.get('/api/v1/categories', {
+//     params: {
+//       page: pageNumber,
+//       limit: pageLimit
+//     }
+//   })
+// }
 
 /**
  * calls the REST API to log in a blogen user using their username and password.

@@ -56,6 +56,7 @@
               <arguments>run build</arguments>
             </configuration>
           </execution>
+
           <!-- Run Unit tests -->
           <!--<execution>-->
             <!--<id>npm run test</id>-->

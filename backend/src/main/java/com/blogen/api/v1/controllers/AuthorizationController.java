@@ -70,11 +70,12 @@ public class AuthorizationController {
     @Operation(summary = "check if a user name exists")
     @GetMapping(value = "/username/{name}", produces = {"application/json"})
     @ResponseStatus(HttpStatus.OK)
-    public void userNameExists(@PathVariable("name") String userName) {
+    public Boolean userNameExists(@PathVariable("name") String userName) {
         Boolean userExists = authorizationService.userNameExists(userName);
         log.debug("check user name exists: {} = {}", userName, userExists);
-        if (!userExists) {
-            throw new NotFoundException("user name not found: " + userName);
-        }
+//        if (!userExists) {
+//            throw new NotFoundException("user name not found: " + userName);
+//        }
+        return userExists;
     }
 }
