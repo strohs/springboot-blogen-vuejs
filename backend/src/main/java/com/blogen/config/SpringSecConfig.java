@@ -75,8 +75,8 @@ public class SpringSecConfig extends WebSecurityConfigurerAdapter {
         return NimbusJwtDecoder.withPublicKey(this.key).build();
     }
 
+    // used to encode and self sign our JWTs using a private key
     @Bean
-        // used to encode and self sign or JWTs using a private key
     JwtEncoder jwtEncoder() {
         JWK jwk = new RSAKey.Builder(this.key).privateKey(this.priv).build();
         JWKSource<SecurityContext> jwks = new ImmutableJWKSet<>(new JWKSet(jwk));

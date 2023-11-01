@@ -2,7 +2,7 @@ Spring Boot Blogen with Vue.js
 ===================================
 This is a [Vue.js](https://vuejs.org) version of my [Blogen](https://github.com/strohs/springboot-blogen) fullstack application.
 
-Blogen is a fictitous micro-blogging / message board website that I use as a basis for exploring different frontend and backend
+Blogen is a fictitious micro-blogging / message board website that I use as a basis for exploring different frontend and backend
 technologies. 
 The [first](https://github.com/strohs/springboot-blogen) version of Blogen uses Spring Boot and Spring MVC 
 to power the backend, along with [thymeleaf](https://www.thymeleaf.org/) to render the view layer.
@@ -20,7 +20,7 @@ This is a free service provided by them. Information on how to do this is [below
 
 To keep things somewhat simple, the Spring Boot backend is performing multiple roles:
 - serves as the REST Api Server
-- serves the html,css and javascript resources needed by Vue.js
+- serves the html,css and javascript resources needed by the Vue.js frontend
 - acts as an OAuth2 client *and* resource server, making requests to GitHub or Google, to log in users to Blogen
 
 In a real production environment, these roles would ideally be handled be separate servers.
@@ -45,8 +45,8 @@ the vue-frontend/node directory.
 1. make sure you are in the project's root directory: `springboot-blogen-vuejs`
 2. Clean and compile the application:
    -`mvn clean install`
-        - if you don't already have maven installed use may use the maven wrapper provided in the root directory of this project: 
-            - on linux/macos systems replace `mvn` with: `./mvnw clean install`
+        - if you don't already have maven installed, you may use the maven wrapper provided in the root directory of this project: 
+            - on linux/mac-os systems replace `mvn` with: `./mvnw clean install`
             - on Windows systems replace `mvn` with: `./mvnw.cmd clean install`
         - this will compile the backend, run tests, AND download node.js/npm in order to build the vue.js resources.
           The download is only performed the first time you run mvn install
@@ -58,7 +58,7 @@ dummy user such as "mcgill" with password: "password", or you could register you
 6. If you want to use GitHub or Google to log in via Oauth2, you will need to first register your (locally running) Blogen
 project as a client application. Google/GitHub will generate a `client-id` and `client-secret` string that you must
 configure within `application.properties`, and then restart spring boot. 
-See the OAthu2 Configuration section (below) for the configuration steps.
+See the OAuth2 Configuration section (below) for the configuration steps.
 
 
 ### OAuth2 Configuration
@@ -179,7 +179,7 @@ used to indicate when the token was issued and when it expires.
 
 
 ## REST API
-Once Blogen is up and running on spring boot, the URLs for the OpenAPI (a.k.a swagger) documentations will be located here:
+Once Blogen is up and running on your localhost, the URLs for the OpenAPI (a.k.a swagger) documentations will be located here:
 * [Blogen Swagger UI](http://localhost:8080/swagger-ui.html/)
 * [Blogen Swagger API docs](http://localhost:8080/v3/api-docs)
 
