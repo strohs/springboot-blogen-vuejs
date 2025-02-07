@@ -31,7 +31,8 @@ No changes have been made to the base, Blogen, website functionality. You can re
 
 ## Installation and Running
 ### Prerequisites
-* at least Java 11
+* at least Java 11 up to (and including) Java 17 as your JDK. JDK 21+ will cause compile errors when building this
+project due to incompatibilities with Lombok
 * Apache maven (at least version 3+) *OR* you can use the included maven wrapper `mvnw` 
 (located in the project's root directory):
     * `mvnw.cmd` if you are running on Windows
